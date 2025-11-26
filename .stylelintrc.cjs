@@ -1,11 +1,7 @@
 module.exports = {
-  extends: [
-    'stylelint-config-standard-scss', // SCSS 标准规则
-    'stylelint-config-prettier', // 避免与 Prettier 冲突
-  ],
+  extends: ['stylelint-config-standard-scss'],
   plugins: ['stylelint-order'],
   rules: {
-    // 属性顺序规则
     'order/properties-order': [
       'position',
       'top',
@@ -29,9 +25,15 @@ module.exports = {
       'transition',
       'animation',
     ],
-    'declaration-block-trailing-semicolon': 'always',
     'block-no-empty': true,
-    'unit-whitelist': ['em', 'rem', '%', 'px', 's', 'vh', 'vw'],
+    'unit-allowed-list': ['em', 'rem', '%', 'px', 's', 'vh', 'vw', 'deg'],
     'property-no-unknown': true,
+    'no-descending-specificity': null,
+    'scss/at-rule-no-unknown': [
+      true,
+      {
+        ignoreAtRules: ['tailwind', 'apply', 'variants', 'responsive', 'screen'],
+      },
+    ],
   },
 };
