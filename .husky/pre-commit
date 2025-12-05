@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
-pnpm lint:fix
+pnpm lint
 pnpm format
 pnpm exec lint-staged
