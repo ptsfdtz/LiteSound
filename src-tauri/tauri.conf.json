@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "LitePlayer",
+  "productName": "lite-sound",
   "version": "0.1.0",
   "identifier": "com.user.lite-player",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "LitePlayer",
+        "title": "LiteSound",
         "width": 1200,
         "height": 800,
         "center": true,
