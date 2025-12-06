@@ -26,9 +26,12 @@ module.exports = {
       'animation',
     ],
     'block-no-empty': true,
-    'unit-allowed-list': ['em', 'rem', '%', 'px', 's', 'vh', 'vw', 'deg'],
+    'unit-allowed-list': ['em', 'rem', '%', 'px', 's', 'ms', 'vh', 'vw', 'deg', 'fr'],
     'property-no-unknown': true,
     'no-descending-specificity': null,
+    'selector-class-pattern': null,
+    'keyframes-name-pattern': null,
+    'declaration-property-value-keyword-no-deprecated': null,
     'scss/at-rule-no-unknown': [
       true,
       {

@@ -1,0 +1,228 @@
+@import 'tailwindcss';
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nowPlayingGroup {
+  display: contents;
+
+  & .lyricsWrapper {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    min-height: 250px;
+  }
+
+  & .lyricsBox {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    width: 100%;
+    animation: fadeIn 0.4s ease;
+  }
+
+  & .lyricLine {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text);
+    font-weight: 500;
+    text-align: center;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    letter-spacing: 0.02em;
+    animation: slideInUp 0.5s ease forwards;
+  }
+
+  & .lyricLine:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  & .lyricLine:nth-child(2) {
+    animation-delay: 0.08s;
+  }
+
+  & .lyricLine:nth-child(3) {
+    animation-delay: 0.16s;
+  }
+
+  & .lyricLine:nth-child(4) {
+    animation-delay: 0.24s;
+  }
+
+  & .lyricLine:nth-child(5) {
+    animation-delay: 0.32s;
+  }
+
+  & .lyricLine:nth-child(6) {
+    animation-delay: 0.4s;
+  }
+
+  & .noLyrics {
+    font-size: 1.1rem;
+    color: var(--muted);
+    font-weight: 500;
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+
+  & .trackInfoBottom {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  & .trackTitle {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  & .infoRow {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  & .infoText {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  & .trackMeta {
+    color: var(--muted-2);
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  & .separator {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  & .albumName {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  & .badges {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  & .badge {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 1.7rem;
+    padding: 0 0.65rem;
+    color: var(--text);
+    background: var(--control-bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  & .progressRow {
+    display: grid;
+    grid-template-columns: 42px 1fr 42px;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  & .timeLabel {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  & input[type='range'] {
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    transition: all 0.2s ease;
+    appearance: none;
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  & input[type='range']:hover {
+    height: 6px;
+  }
+
+  & input[type='range']::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--border);
+  }
+
+  & input[type='range']::-webkit-slider-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--text);
+    border: 3px solid var(--surface);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+    transition: all 0.2s ease;
+    appearance: none;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  & input[type='range']:hover::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+    box-shadow: 0 3px 12px rgb(0 0 0 / 20%);
+  }
+
+  & input[type='range']::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--border);
+  }
+
+  & input[type='range']::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 3px solid var(--surface);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+    cursor: pointer;
+  }
+
+  & input[type='range']:focus-visible {
+    outline: 2px solid #c7d2fe;
+    outline-offset: 3px;
+  }
+}

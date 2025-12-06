@@ -12,13 +12,17 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,css,scss,html}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,css,scss,html}\"",
     "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix",
-    "stylelint": "stylelint \"src/**/*.{css,scss}\" --fix"
+    "lint:check": "eslint \"src/**/*.{ts,tsx,js,jsx}\"",
+    "stylelint": "stylelint \"src/**/*.{css,scss}\" --fix",
+    "stylelint:check": "stylelint \"src/**/*.{css,scss}\""
   },
   "dependencies": {
     "@tauri-apps/api": "^2.9.0",
     "@tauri-apps/plugin-opener": "^2.5.2",
+    "clsx": "^2.1.1",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
