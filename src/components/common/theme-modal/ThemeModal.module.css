@@ -1,0 +1,88 @@
+@import 'tailwindcss';
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(0 0 0 / 32%);
+  z-index: 20;
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  width: min(420px, 92vw);
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: 16px;
+  gap: 1rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  & .title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  & .option {
+    display: grid;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    color: var(--text);
+    background: transparent;
+    border: 1px solid var(--border);
+    transition:
+      border-color 140ms ease,
+      background 140ms ease,
+      box-shadow 140ms ease;
+    border-radius: 12px;
+    grid-template-columns: auto 1fr;
+    gap: 0.6rem;
+    cursor: pointer;
+  }
+
+  & .option:hover {
+    border-color: var(--accent);
+    background: var(--control-bg);
+  }
+
+  & .active {
+    border-color: var(--accent);
+    background: var(--accent-2);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 8%);
+  }
+
+  & .optionTitle {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  & .optionMeta {
+    color: var(--muted-2);
+    font-size: 0.9rem;
+  }
+
+  & .dot {
+    width: 12px;
+    height: 12px;
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    border-radius: 999px;
+  }
+}

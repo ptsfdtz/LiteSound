@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+.filterBar {
+  display: grid;
+  justify-content: start;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  & .label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted-2);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+}
