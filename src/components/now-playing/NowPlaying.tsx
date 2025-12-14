@@ -3,23 +3,18 @@ import styles from './NowPlaying.module.css';
 
 type NowPlayingProps = {
   track: Track;
+  isPlaying: boolean;
 };
 
-function NowPlaying({ track }: NowPlayingProps) {
+function NowPlaying({ track, isPlaying }: NowPlayingProps) {
   return (
     <div className={styles.nowPlayingGroup}>
-      <div className={styles.lyricsWrapper}>
-        {track.lyrics && track.lyrics.length > 0 ? (
-          <div className={styles.lyricsBox}>
-            {track.lyrics.map((line, index) => (
-              <div key={index} className={styles.lyricLine}>
-                {line}
-              </div>
-            ))}
+      <div className={styles.recordWrapper}>
+        <div className={`${styles.record} ${isPlaying ? styles.playing : ''}`} aria-hidden="false">
+          <div className={styles.label} title={track.title}>
+            {track.title}
           </div>
-        ) : (
-          <div className={styles.noLyrics}>No lyrics available</div>
-        )}
+        </div>
       </div>
       <div className={styles.trackInfoBottom}>
         <div className={styles.trackTitle}>{track.title}</div>

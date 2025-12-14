@@ -82,7 +82,7 @@ function App() {
         </div>
         <div className={styles.content}>
           <div className={styles.nowPlaying}>
-            <NowPlaying track={currentTrack} />
+            <NowPlaying track={currentTrack} isPlaying={isPlaying} />
           </div>
           <div className={styles.playlist}>
             <FilterBar

@@ -22,68 +22,92 @@
   }
 }
 
-.nowPlayingGroup {
-  display: contents;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
-  & .lyricsWrapper {
+.nowPlayingGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* 替换歌词区域为旋转唱片 */
+  & .recordWrapper {
     display: flex;
-    flex: 1;
+    flex: 1 1 auto;
     justify-content: center;
     align-items: center;
-    overflow-y: auto;
-    min-height: 250px;
-  }
-
-  & .lyricsBox {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
     width: 100%;
-    animation: fadeIn 0.4s ease;
+    padding: 1rem;
+    min-height: 320px;
+    align-self: center;
   }
 
-  & .lyricLine {
-    font-size: 1rem;
-    line-height: 1.6;
+  /* 唱片样式 */
+  & .record {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 320px;
+    height: 320px;
+
+    /* 使用主题色渐变，避免纯黑风格 */
+    background: radial-gradient(circle at 30% 30%, var(--surface) 0%, var(--control-bg) 45%, rgb(0 0 0 / 55%) 100%);
+    box-shadow:
+      inset 0 0 20px rgb(255 255 255 / 2%),
+      0 6px 18px rgb(0 0 0 / 18%);
+    animation: spin 6s linear infinite;
+    border-radius: 50%;
+    animation-play-state: paused; /* 默认暂停，只有在播放时再运行 */
+  }
+
+  /* 当添加 playing 类时开始旋转 */
+  & .playing {
+    animation-play-state: running;
+  }
+
+  & .record::before {
+    content: '';
+    position: absolute;
+    inset: 6%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(255 255 255 / 2%) 1%, transparent 3%);
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  & .label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 56%;
+    height: 56%;
+    padding: 0.6rem;
     color: var(--text);
-    font-weight: 500;
+    background: var(--surface);
+    border-radius: 50%;
     text-align: center;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    letter-spacing: 0.02em;
-    animation: slideInUp 0.5s ease forwards;
+    font-weight: 700;
+    font-size: 1.05rem;
+    z-index: 2;
+    line-height: 1.1;
   }
 
-  & .lyricLine:nth-child(1) {
-    animation-delay: 0s;
-  }
+  /* 响应式：在小屏幕上缩小唱片 */
+  @media (width <= 480px) {
+    & .record {
+      width: 220px;
+      height: 220px;
+    }
 
-  & .lyricLine:nth-child(2) {
-    animation-delay: 0.08s;
-  }
-
-  & .lyricLine:nth-child(3) {
-    animation-delay: 0.16s;
-  }
-
-  & .lyricLine:nth-child(4) {
-    animation-delay: 0.24s;
-  }
-
-  & .lyricLine:nth-child(5) {
-    animation-delay: 0.32s;
-  }
-
-  & .lyricLine:nth-child(6) {
-    animation-delay: 0.4s;
-  }
-
-  & .noLyrics {
-    font-size: 1.1rem;
-    color: var(--muted);
-    font-weight: 500;
-    text-align: center;
-    letter-spacing: 0.02em;
+    & .label {
+      width: 60%;
+      height: 60%;
+      font-size: 0.95rem;
+    }
   }
 
   & .trackInfoBottom {
