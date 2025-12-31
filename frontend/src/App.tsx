@@ -61,7 +61,7 @@ function App() {
         const match = findTrackByPath(files, lastPlayedPath);
         if (match) {
             hasRestoredRef.current = true;
-            void player.selectTrack(match);
+            void player.selectTrack(match, {autoplay: false});
         }
     }, [files, lastPlayedPath]);
 
@@ -95,6 +95,7 @@ function App() {
                 duration={player.duration}
                 position={player.position}
                 hasTracks={visibleFiles.length > 0}
+                volume={player.volume}
                 playMode={player.playMode}
                 playModeLabel={player.playModeLabel}
                 onTogglePlay={player.togglePlay}
@@ -102,6 +103,8 @@ function App() {
                 onSeek={player.seekTo}
                 onPrev={player.goPrev}
                 onNext={player.goNext}
+                onVolumeChange={player.setSystemVolume}
+                onToggleMute={player.toggleMute}
                 onCyclePlayMode={player.cyclePlayMode}
             />
         </div>

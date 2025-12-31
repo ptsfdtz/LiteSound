@@ -17,8 +17,10 @@ export function usePlayer(options: UsePlayerOptions) {
     const [duration, setDuration] = useState(0);
     const [position, setPosition] = useState(0);
     const [playMode, setPlayMode] = useState<PlayMode>('order');
+    const [volume, setVolume] = useState(100);
     const howlRef = useRef<Howl | null>(null);
     const rafRef = useRef<number | null>(null);
+    const lastVolumeRef = useRef(100);
 
     const activeIndex = useMemo(() => {
         if (!active) return -1;
@@ -35,6 +37,26 @@ export function usePlayer(options: UsePlayerOptions) {
             .catch(() => {
                 if (!mounted) return;
                 setStreamBaseURL('');
+            });
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    useEffect(() => {
+        let mounted = true;
+        api.getSystemVolume()
+            .then((value) => {
+                if (!mounted) return;
+                const next = Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 100;
+                setVolume(next);
+                if (next > 0) {
+                    lastVolumeRef.current = next;
+                }
+            })
+            .catch(() => {
+                if (!mounted) return;
+                setVolume(100);
             });
         return () => {
             mounted = false;
@@ -85,11 +107,12 @@ export function usePlayer(options: UsePlayerOptions) {
         void selectTrack(filteredFiles[nextIndex]);
     };
 
-    const selectTrack = async (file?: MusicFile) => {
+    const selectTrack = async (file?: MusicFile, options?: {autoplay?: boolean}) => {
         if (!file) {
             setActive(undefined);
             return;
         }
+        const shouldAutoplay = options?.autoplay !== false;
         setActive(file);
         onStatusChange?.(`Loading ${file.name}...`);
         setPosition(0);
@@ -128,7 +151,12 @@ export function usePlayer(options: UsePlayerOptions) {
                 },
             });
             howlRef.current = howl;
-            howl.play();
+            if (shouldAutoplay) {
+                howl.play();
+            } else {
+                howl.load();
+                setIsPlaying(false);
+            }
             onStatusChange?.('Ready');
             void api.setLastPlayed(file.path);
         } catch (err: any) {
@@ -181,6 +209,23 @@ export function usePlayer(options: UsePlayerOptions) {
         setPosition(value);
     };
 
+    const setSystemVolume = (value: number) => {
+        const next = Math.min(100, Math.max(0, Math.round(value)));
+        setVolume(next);
+        if (next > 0) {
+            lastVolumeRef.current = next;
+        }
+        void api.setSystemVolume(next);
+    };
+
+    const toggleMute = () => {
+        if (volume === 0) {
+            setSystemVolume(lastVolumeRef.current || 50);
+            return;
+        }
+        setSystemVolume(0);
+    };
+
     const cyclePlayMode = () => {
         setPlayMode((current) => {
             if (current === 'order') return 'repeat';
@@ -200,6 +245,7 @@ export function usePlayer(options: UsePlayerOptions) {
         isPlaying,
         duration,
         position,
+        volume,
         playMode,
         playModeLabel,
         selectTrack,
@@ -208,6 +254,8 @@ export function usePlayer(options: UsePlayerOptions) {
         goPrev,
         goNext,
         seekTo,
+        setSystemVolume,
+        toggleMute,
         cyclePlayMode,
     };
 }

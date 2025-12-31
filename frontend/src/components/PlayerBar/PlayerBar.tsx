@@ -1,5 +1,6 @@
-import {Button} from '@headlessui/react';
-import {FaListUl, FaPause, FaPlay, FaRandom, FaRetweet, FaStepBackward, FaStepForward, FaStop} from 'react-icons/fa';
+import {Button, Transition} from '@headlessui/react';
+import {FaListUl, FaPause, FaPlay, FaRandom, FaRetweet, FaStepBackward, FaStepForward, FaStop, FaVolumeMute, FaVolumeUp} from 'react-icons/fa';
+import {Fragment, useState} from 'react';
 import type {CSSProperties} from 'react';
 import {formatTime} from '../../utils/media';
 import type {MusicFile, PlayMode} from '../../types/media';
@@ -11,6 +12,7 @@ type PlayerBarProps = {
     duration: number;
     position: number;
     hasTracks: boolean;
+    volume: number;
     playMode: PlayMode;
     playModeLabel: string;
     onTogglePlay: () => void;
@@ -18,6 +20,8 @@ type PlayerBarProps = {
     onSeek: (value: number) => void;
     onPrev: () => void;
     onNext: () => void;
+    onVolumeChange: (value: number) => void;
+    onToggleMute: () => void;
     onCyclePlayMode: () => void;
 };
 
@@ -34,6 +38,7 @@ export function PlayerBar(props: PlayerBarProps) {
         duration,
         position,
         hasTracks,
+        volume,
         playMode,
         playModeLabel,
         onTogglePlay,
@@ -41,10 +46,14 @@ export function PlayerBar(props: PlayerBarProps) {
         onSeek,
         onPrev,
         onNext,
+        onVolumeChange,
+        onToggleMute,
         onCyclePlayMode,
     } = props;
 
+    const [isVolumeOpen, setIsVolumeOpen] = useState(false);
     const progressPercent = duration ? `${Math.min(100, Math.max(0, (position / duration) * 100))}%` : '0%';
+    const volumePercent = `${Math.min(100, Math.max(0, volume))}%`;
 
     return (
         <section className={styles.player}>
@@ -105,6 +114,43 @@ export function PlayerBar(props: PlayerBarProps) {
                     >
                         {getPlayModeIcon(playMode)}
                     </Button>
+                    <div
+                        className={styles.volume}
+                        onMouseEnter={() => setIsVolumeOpen(true)}
+                        onMouseLeave={() => setIsVolumeOpen(false)}
+                    >
+                        <Button
+                            className={`${styles.button} ${styles.ghost}`}
+                            onClick={onToggleMute}
+                            aria-label={volume === 0 ? 'Unmute' : 'Mute'}
+                        >
+                            {volume === 0 ? <FaVolumeMute /> : <FaVolumeUp />}
+                        </Button>
+                        <Transition
+                            as={Fragment}
+                            show={isVolumeOpen}
+                            enter={styles.volumeEnter}
+                            enterFrom={styles.volumeEnterFrom}
+                            enterTo={styles.volumeEnterTo}
+                            leave={styles.volumeLeave}
+                            leaveFrom={styles.volumeLeaveFrom}
+                            leaveTo={styles.volumeLeaveTo}
+                        >
+                            <div className={styles.volumePopover}>
+                                <div className={styles.volumeValue}>{volume}%</div>
+                                <input
+                                    className={styles.volumeSlider}
+                                    type="range"
+                                    min={0}
+                                    max={100}
+                                    step={1}
+                                    value={volume}
+                                    onChange={(event) => onVolumeChange(Number(event.target.value))}
+                                    style={{'--volume': volumePercent} as CSSProperties}
+                                />
+                            </div>
+                        </Transition>
+                    </div>
                 </div>
             </div>
         </section>

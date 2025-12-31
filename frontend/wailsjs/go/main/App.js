@@ -30,6 +30,10 @@ export function GetStreamBaseURL() {
   return window['go']['main']['App']['GetStreamBaseURL']();
 }
 
+export function GetSystemVolume() {
+  return window['go']['main']['App']['GetSystemVolume']();
+}
+
 export function ListMusicFiles() {
   return window['go']['main']['App']['ListMusicFiles']();
 }
@@ -44,4 +48,8 @@ export function SetFilters(arg1, arg2) {
 
 export function SetLastPlayed(arg1) {
   return window['go']['main']['App']['SetLastPlayed'](arg1);
+}
+
+export function SetSystemVolume(arg1) {
+  return window['go']['main']['App']['SetSystemVolume'](arg1);
 }
