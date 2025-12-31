@@ -2,7 +2,7 @@ import {Howl} from 'howler';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {api} from '../services/api';
 import type {MusicFile, PlayMode} from '../types/media';
-import {mimeByExt, pickRandomIndex, toBytes} from '../utils/media';
+import {pickRandomIndex} from '../utils/media';
 
 type UsePlayerOptions = {
     filteredFiles: MusicFile[];
@@ -12,7 +12,7 @@ type UsePlayerOptions = {
 export function usePlayer(options: UsePlayerOptions) {
     const {filteredFiles, onStatusChange} = options;
     const [active, setActive] = useState<MusicFile | undefined>(undefined);
-    const [audioUrl, setAudioUrl] = useState<string | null>(null);
+    const [streamBaseURL, setStreamBaseURL] = useState('');
     const [isPlaying, setIsPlaying] = useState(false);
     const [duration, setDuration] = useState(0);
     const [position, setPosition] = useState(0);
@@ -26,12 +26,20 @@ export function usePlayer(options: UsePlayerOptions) {
     }, [active, filteredFiles]);
 
     useEffect(() => {
+        let mounted = true;
+        api.getStreamBaseURL()
+            .then((url) => {
+                if (!mounted) return;
+                setStreamBaseURL(url);
+            })
+            .catch(() => {
+                if (!mounted) return;
+                setStreamBaseURL('');
+            });
         return () => {
-            if (audioUrl) {
-                URL.revokeObjectURL(audioUrl);
-            }
+            mounted = false;
         };
-    }, [audioUrl]);
+    }, []);
 
     useEffect(() => {
         return () => {
@@ -86,21 +94,18 @@ export function usePlayer(options: UsePlayerOptions) {
         onStatusChange?.(`Loading ${file.name}...`);
         setPosition(0);
         try {
-            const data = await api.readMusicFile(file.path);
-            const bytes = toBytes(data as unknown);
-            const type = mimeByExt[file.ext] ?? 'audio/mpeg';
-            const arrayBuffer = bytes.slice().buffer;
-            const blob = new Blob([arrayBuffer], {type});
-            const url = URL.createObjectURL(blob);
-            if (audioUrl) {
-                URL.revokeObjectURL(audioUrl);
+            const baseURL = streamBaseURL || (await api.getStreamBaseURL());
+            if (!baseURL) {
+                onStatusChange?.('Stream server unavailable.');
+                return;
             }
-            setAudioUrl(url);
+            const url = new URL('/media', baseURL);
+            url.searchParams.set('path', file.path);
             if (howlRef.current) {
                 howlRef.current.unload();
             }
             const howl = new Howl({
-                src: [url],
+                src: [url.toString()],
                 html5: true,
                 onload: () => {
                     setDuration(howl.duration() || 0);

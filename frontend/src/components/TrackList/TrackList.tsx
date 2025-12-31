@@ -19,8 +19,8 @@ export function TrackList(props: TrackListProps) {
                 <Listbox.Options className={styles.options} static>
                     {files.map((file) => (
                         <Listbox.Option key={file.path} value={file}>
-                            {({active: optionActive, selected}) => (
-                                <div className={selected || optionActive ? `${styles.track} ${styles.active}` : styles.track}>
+                            {({selected}) => (
+                                <div className={selected ? `${styles.track} ${styles.active}` : styles.track}>
                                     <span className={styles.name}>{file.name}</span>
                                     <span className={styles.ext}>{selected ? 'playing' : file.ext}</span>
                                 </div>

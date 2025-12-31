@@ -5,6 +5,8 @@ import "context"
 // App struct
 type App struct {
 	ctx context.Context
+	streamServer  *StreamServer
+	streamBaseURL string
 }
 
 // NewApp creates a new App application struct
@@ -16,4 +18,20 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	server, err := StartStreamServer()
+	if err == nil {
+		a.streamServer = server
+		a.streamBaseURL = server.BaseURL()
+	}
+}
+
+func (a *App) GetStreamBaseURL() string {
+	return a.streamBaseURL
+}
+
+func (a *App) shutdown(ctx context.Context) {
+	if a.streamServer == nil {
+		return
+	}
+	_ = a.streamServer.Close(ctx)
 }

@@ -26,6 +26,10 @@ export function GetPlaylists() {
   return window['go']['main']['App']['GetPlaylists']();
 }
 
+export function GetStreamBaseURL() {
+  return window['go']['main']['App']['GetStreamBaseURL']();
+}
+
 export function ListMusicFiles() {
   return window['go']['main']['App']['ListMusicFiles']();
 }

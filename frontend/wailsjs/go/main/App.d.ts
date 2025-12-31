@@ -14,6 +14,8 @@ export function GetMusicDir():Promise<string>;
 
 export function GetPlaylists():Promise<Array<main.Playlist>>;
 
+export function GetStreamBaseURL():Promise<string>;
+
 export function ListMusicFiles():Promise<Array<main.MusicFile>>;
 
 export function ReadMusicFile(arg1:string):Promise<Array<number>>;
