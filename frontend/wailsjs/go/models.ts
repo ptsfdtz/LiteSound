@@ -20,6 +20,20 @@ export namespace main {
 	        this.album = source["album"];
 	    }
 	}
+	export class Playlist {
+	    name: string;
+	    tracks: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Playlist(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.tracks = source["tracks"];
+	    }
+	}
 
 }
 

@@ -1,0 +1,104 @@
+.player {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.card {
+    width: min(960px, 100%);
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 16px 32px var(--panel-glow);
+}
+
+.title {
+    font-size: 16px;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.button {
+    border: 1px solid var(--panel-border-strong);
+    background: var(--panel-bg-strong);
+    color: inherit;
+    padding: 8px 12px;
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ghost {
+    border: 1px solid var(--panel-border-strong);
+    background: var(--panel-bg-strong);
+}
+
+.button:hover,
+.ghost:hover {
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.button:disabled,
+.ghost:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.time {
+    font-size: 13px;
+    opacity: 0.7;
+    margin-left: auto;
+}
+
+.progress {
+    flex: 1;
+    min-width: 180px;
+    height: 6px;
+    cursor: pointer;
+    appearance: none;
+    background: transparent;
+    accent-color: var(--panel-accent);
+    --progress: 0%;
+}
+
+.progress:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.progress::-webkit-slider-runnable-track {
+    height: 6px;
+    background: linear-gradient(
+        to right,
+        var(--panel-accent) 0,
+        var(--panel-accent) var(--progress),
+        rgba(255, 255, 255, 0.15) var(--progress),
+        rgba(255, 255, 255, 0.15) 100%
+    );
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.progress::-webkit-slider-thumb {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--panel-accent);
+    border: 2px solid rgba(14, 18, 24, 0.9);
+    box-shadow: 0 0 0 4px rgba(111, 179, 255, 0.15);
+    margin-top: -4px;
+}
