@@ -1,0 +1,28 @@
+.app {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 32px 36px 40px;
+}
+
+.body {
+    display: grid;
+    grid-template-columns: minmax(240px, 320px) 1fr;
+    gap: 24px;
+    flex: 1;
+    overflow: hidden;
+    max-height: calc(100% - 88px);
+}
+
+@media (max-width: 900px) {
+    .app {
+        padding: 24px;
+    }
+
+    .body {
+        grid-template-columns: 1fr;
+    }
+}

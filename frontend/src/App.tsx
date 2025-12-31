@@ -1,176 +1,111 @@
-import {Listbox, Menu, Transition} from '@headlessui/react';
-import {Fragment, useEffect, useMemo, useState} from 'react';
-import './App.css';
-import {GetMusicDir, ListMusicFiles, ReadMusicFile} from '../wailsjs/go/main/App';
-
-type MusicFile = {
-    name: string;
-    path: string;
-    ext: string;
-};
-
-const mimeByExt: Record<string, string> = {
-    '.mp3': 'audio/mpeg',
-    '.flac': 'audio/flac',
-    '.wav': 'audio/wav',
-    '.ogg': 'audio/ogg',
-    '.m4a': 'audio/mp4',
-    '.aac': 'audio/aac',
-};
+import {useEffect, useMemo, useRef} from 'react';
+import styles from './App.module.css';
+import {FiltersBar, HeaderBar, PlayerBar, PlaylistSidebar, TrackList} from './components';
+import {useMusicLibrary} from './hooks/useMusicLibrary';
+import {usePlaylists} from './hooks/usePlaylists';
+import {usePlayer} from './hooks/usePlayer';
+import {findTrackByPath} from './utils/media';
 
 function App() {
-    const [musicDir, setMusicDir] = useState('');
-    const [files, setFiles] = useState<MusicFile[]>([]);
-    const [active, setActive] = useState<MusicFile | null>(null);
-    const [audioUrl, setAudioUrl] = useState<string | null>(null);
-    const [status, setStatus] = useState('Loading...');
+    const {
+        musicDir,
+        files,
+        filteredFiles,
+        status,
+        setStatus,
+        composerFilter,
+        setComposerFilter,
+        albumFilter,
+        setAlbumFilter,
+        composers,
+        albums,
+        lastPlayedPath,
+        refresh,
+    } = useMusicLibrary();
+
+    const {
+        playlists,
+        activePlaylist,
+        setActivePlaylist,
+        playlistStatus,
+        createPlaylist,
+        addTracksToPlaylist,
+    } = usePlaylists();
+
+    const playlistFiles = useMemo(() => {
+        if (!activePlaylist) return null;
+        const fileMap = new Map(files.map((file) => [file.path, file]));
+        return activePlaylist.tracks
+            .map((path) => fileMap.get(path))
+            .filter((file): file is NonNullable<typeof file> => Boolean(file));
+    }, [activePlaylist, files]);
+
+    const visibleFiles = useMemo(() => {
+        if (activePlaylist) {
+            return playlistFiles ?? [];
+        }
+        return filteredFiles;
+    }, [activePlaylist, filteredFiles, playlistFiles]);
+
+    const player = usePlayer({
+        filteredFiles: visibleFiles,
+        onStatusChange: setStatus,
+    });
+
+    const hasRestoredRef = useRef(false);
 
     useEffect(() => {
-        let mounted = true;
-        Promise.all([GetMusicDir(), ListMusicFiles()])
-            .then(([dir, list]) => {
-                if (!mounted) return;
-                setMusicDir(dir);
-                setFiles(list);
-                setStatus(list.length ? 'Ready' : 'No audio files found.');
-            })
-            .catch((err) => {
-                if (!mounted) return;
-                setStatus(err?.message ?? 'Failed to load music directory.');
-            });
-        return () => {
-            mounted = false;
-        };
-    }, []);
-
-    useEffect(() => {
-        return () => {
-            if (audioUrl) {
-                URL.revokeObjectURL(audioUrl);
-            }
-        };
-    }, [audioUrl]);
-
-    const subtitle = useMemo(() => {
-        if (!musicDir) return status;
-        return `${musicDir} - ${status}`;
-    }, [musicDir, status]);
-
-    const refresh = async () => {
-        setStatus('Loading...');
-        try {
-            const list = await ListMusicFiles();
-            setFiles(list);
-            setStatus(list.length ? 'Ready' : 'No audio files found.');
-        } catch (err: any) {
-            setStatus(err?.message ?? 'Failed to refresh.');
+        if (hasRestoredRef.current || !lastPlayedPath || !files.length) {
+            return;
         }
-    };
-
-    const selectTrack = async (file: MusicFile) => {
-        setActive(file);
-        setStatus(`Loading ${file.name}...`);
-        try {
-            const data = await ReadMusicFile(file.path);
-            const bytes = toBytes(data as unknown);
-            const type = mimeByExt[file.ext] ?? 'audio/mpeg';
-            const arrayBuffer = bytes.slice().buffer;
-            const blob = new Blob([arrayBuffer], {type});
-            const url = URL.createObjectURL(blob);
-            if (audioUrl) {
-                URL.revokeObjectURL(audioUrl);
-            }
-            setAudioUrl(url);
-            setStatus('Ready');
-        } catch (err: any) {
-            setStatus(err?.message ?? 'Failed to load audio file.');
+        const match = findTrackByPath(files, lastPlayedPath);
+        if (match) {
+            hasRestoredRef.current = true;
+            void player.selectTrack(match);
         }
-    };
+    }, [files, lastPlayedPath]);
 
     return (
-        <div className="app">
-            <header className="app-header">
-                <div>
-                    <h1>LiteSound</h1>
-                    <p>{subtitle}</p>
-                </div>
-                <Menu as="div" className="menu">
-                    <Menu.Button className="ghost">Actions</Menu.Button>
-                    <Transition
-                        as={Fragment}
-                        enter="menu-enter"
-                        enterFrom="menu-enter-from"
-                        enterTo="menu-enter-to"
-                        leave="menu-leave"
-                        leaveFrom="menu-leave-from"
-                        leaveTo="menu-leave-to"
-                    >
-                        <Menu.Items className="menu-items">
-                            <Menu.Item>
-                                {({active: isActive}) => (
-                                    <button
-                                        className={isActive ? 'menu-item active' : 'menu-item'}
-                                        onClick={refresh}
-                                    >
-                                        Refresh
-                                    </button>
-                                )}
-                            </Menu.Item>
-                        </Menu.Items>
-                    </Transition>
-                </Menu>
-            </header>
-            <div className="app-body">
-                <aside className="track-list">
-                    <Listbox value={active} by="path" onChange={selectTrack}>
-                        <Listbox.Button className="track-list-trigger">
-                            {active ? active.name : 'Select a track'}
-                        </Listbox.Button>
-                        <Listbox.Options className="track-options">
-                            {files.map((file) => (
-                                <Listbox.Option key={file.path} value={file} className="track-option">
-                                    {({active: optionActive, selected}) => (
-                                        <div className={optionActive ? 'track active' : 'track'}>
-                                            <span className="track-name">{file.name}</span>
-                                            <span className="track-ext">{selected ? 'playing' : file.ext}</span>
-                                        </div>
-                                    )}
-                                </Listbox.Option>
-                            ))}
-                            {!files.length && <div className="empty">Add audio files to the music folder.</div>}
-                        </Listbox.Options>
-                    </Listbox>
-                </aside>
-                <section className="player">
-                    <div className="player-card">
-                        <div className="player-title">
-                            {active ? active.name : 'Select a track'}
-                        </div>
-                        <audio controls src={audioUrl ?? undefined} />
-                    </div>
-                </section>
+        <div className={styles.app}>
+            <HeaderBar title="LiteSound" onRefresh={refresh} />
+            <FiltersBar
+                composers={composers}
+                composerFilter={composerFilter}
+                onComposerChange={setComposerFilter}
+                albums={albums}
+                albumFilter={albumFilter}
+                onAlbumChange={setAlbumFilter}
+            />
+            <div className={styles.body}>
+                <PlaylistSidebar
+                    playlists={playlists}
+                    activePlaylist={activePlaylist}
+                    onSelectPlaylist={setActivePlaylist}
+                    onCreatePlaylist={createPlaylist}
+                    onAddTracks={addTracksToPlaylist}
+                    files={files}
+                    status={playlistStatus}
+                    totalTracks={files.length}
+                />
+                <TrackList files={visibleFiles} active={player.active} onSelect={player.selectTrack} />
             </div>
+            <PlayerBar
+                active={player.active}
+                isPlaying={player.isPlaying}
+                duration={player.duration}
+                position={player.position}
+                hasTracks={visibleFiles.length > 0}
+                playMode={player.playMode}
+                playModeLabel={player.playModeLabel}
+                onTogglePlay={player.togglePlay}
+                onStop={player.stopPlayback}
+                onSeek={player.seekTo}
+                onPrev={player.goPrev}
+                onNext={player.goNext}
+                onCyclePlayMode={player.cyclePlayMode}
+            />
         </div>
-    )
+    );
 }
 
-export default App
-
-function toBytes(data: unknown): Uint8Array {
-    if (typeof data === 'string') {
-        const binary = atob(data);
-        const len = binary.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i += 1) {
-            bytes[i] = binary.charCodeAt(i);
-        }
-        return bytes;
-    }
-    if (Array.isArray(data)) {
-        return new Uint8Array(data);
-    }
-    if (data instanceof ArrayBuffer) {
-        return new Uint8Array(data);
-    }
-    return new Uint8Array();
-}
+export default App;
