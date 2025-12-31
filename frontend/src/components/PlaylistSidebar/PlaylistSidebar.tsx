@@ -42,11 +42,12 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
         [selectedTracks]
     );
 
-    const toggleTrack = (path: string) => {
-        if (selectedPlaylist?.tracks.includes(path)) {
-            return;
-        }
-        setSelectedTracks((prev) => ({...prev, [path]: !prev[path]}));
+    const toggleTrack = (path: string, defaultChecked: boolean) => {
+        setSelectedTracks((prev) => {
+            const current = prev[path];
+            const resolved = current ?? defaultChecked;
+            return {...prev, [path]: !resolved};
+        });
     };
 
     const handleCreate = () => {
@@ -69,9 +70,11 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
 
     const handleAdd = () => {
         if (!selectedPlaylist) return;
+        const existing = new Set(selectedPlaylist.tracks);
         const paths = Object.entries(selectedTracks)
             .filter(([, checked]) => checked)
-            .map(([path]) => path);
+            .map(([path]) => path)
+            .filter((path) => !existing.has(path));
         onAddTracks(selectedPlaylist.name, paths);
         setSelectedTracks({});
         setIsOpen(false);
@@ -204,15 +207,14 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
                                             const alreadyInPlaylist = Boolean(
                                                 selectedPlaylist?.tracks.includes(file.path)
                                             );
-                                            const isChecked = alreadyInPlaylist || Boolean(selectedTracks[file.path]);
+                                            const isChecked = selectedTracks[file.path] ?? alreadyInPlaylist;
                                             return (
                                             <div key={file.path} className={styles.trackRow}>
                                                 <span>{file.name}</span>
                                                 <Checkbox
                                                     className={styles.checkbox}
                                                     checked={isChecked}
-                                                    disabled={alreadyInPlaylist}
-                                                    onChange={() => toggleTrack(file.path)}
+                                                    onChange={() => toggleTrack(file.path, alreadyInPlaylist)}
                                                 >
                                                     <span className={styles.checkboxMark} />
                                                 </Checkbox>
