@@ -51,37 +51,6 @@ export function PlayerBar(props: PlayerBarProps) {
             <div className={styles.card}>
                 <div className={styles.controls}>
                     <Button
-                        className={styles.button}
-                        onClick={onStop}
-                        disabled={!active}
-                        aria-label="Stop"
-                    >
-                        <FaStop />
-                    </Button>
-                    <Button
-                        className={`${styles.button} ${styles.ghost}`}
-                        onClick={onCyclePlayMode}
-                        disabled={!hasTracks}
-                        aria-label={playModeLabel}
-                        title={playModeLabel}
-                    >
-                        {getPlayModeIcon(playMode)}
-                    </Button>
-                    <input
-                        className={styles.progress}
-                        type="range"
-                        min={0}
-                        max={duration || 0}
-                        step={0.1}
-                        value={Math.min(position, duration || 0)}
-                        onChange={(event) => onSeek(Number(event.target.value))}
-                        disabled={!active}
-                        style={{'--progress': progressPercent} as CSSProperties}
-                    />
-                    <div className={styles.time}>
-                        {formatTime(position)} / {formatTime(duration)}
-                    </div>
-                    <Button
                         className={`${styles.button} ${styles.ghost}`}
                         onClick={onPrev}
                         disabled={!hasTracks}
@@ -104,6 +73,37 @@ export function PlayerBar(props: PlayerBarProps) {
                         aria-label="Next"
                     >
                         <FaStepForward />
+                    </Button>
+                    <input
+                        className={styles.progress}
+                        type="range"
+                        min={0}
+                        max={duration || 0}
+                        step={0.1}
+                        value={Math.min(position, duration || 0)}
+                        onChange={(event) => onSeek(Number(event.target.value))}
+                        disabled={!active}
+                        style={{'--progress': progressPercent} as CSSProperties}
+                    />
+                    <div className={styles.time}>
+                        {formatTime(position)} / {formatTime(duration)}
+                    </div>
+                    <Button
+                        className={styles.button}
+                        onClick={onStop}
+                        disabled={!active}
+                        aria-label="Stop"
+                    >
+                        <FaStop />
+                    </Button>
+                    <Button
+                        className={`${styles.button} ${styles.ghost}`}
+                        onClick={onCyclePlayMode}
+                        disabled={!hasTracks}
+                        aria-label={playModeLabel}
+                        title={playModeLabel}
+                    >
+                        {getPlayModeIcon(playMode)}
                     </Button>
                 </div>
             </div>
