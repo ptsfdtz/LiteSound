@@ -52,19 +52,20 @@ export function PlayerBar(props: PlayerBarProps) {
                 <div className={styles.controls}>
                     <Button
                         className={styles.button}
-                        onClick={onTogglePlay}
-                        disabled={!active}
-                        aria-label={isPlaying ? 'Pause' : 'Play'}
-                    >
-                        {isPlaying ? <FaPause /> : <FaPlay />}
-                    </Button>
-                    <Button
-                        className={styles.button}
                         onClick={onStop}
                         disabled={!active}
                         aria-label="Stop"
                     >
                         <FaStop />
+                    </Button>
+                    <Button
+                        className={`${styles.button} ${styles.ghost}`}
+                        onClick={onCyclePlayMode}
+                        disabled={!hasTracks}
+                        aria-label={playModeLabel}
+                        title={playModeLabel}
+                    >
+                        {getPlayModeIcon(playMode)}
                     </Button>
                     <input
                         className={styles.progress}
@@ -89,13 +90,12 @@ export function PlayerBar(props: PlayerBarProps) {
                         <FaStepBackward />
                     </Button>
                     <Button
-                        className={`${styles.button} ${styles.ghost}`}
-                        onClick={onCyclePlayMode}
-                        disabled={!hasTracks}
-                        aria-label={playModeLabel}
-                        title={playModeLabel}
+                        className={styles.button}
+                        onClick={onTogglePlay}
+                        disabled={!active}
+                        aria-label={isPlaying ? 'Pause' : 'Play'}
                     >
-                        {getPlayModeIcon(playMode)}
+                        {isPlaying ? <FaPause /> : <FaPlay />}
                     </Button>
                     <Button
                         className={`${styles.button} ${styles.ghost}`}
