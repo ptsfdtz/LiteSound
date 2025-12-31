@@ -1,5 +1,5 @@
 import {Button, Checkbox, Dialog, Input, Listbox, Transition} from '@headlessui/react';
-import {FaPlus} from 'react-icons/fa';
+import {FaPlus, FaPen} from 'react-icons/fa';
 import {Fragment, useEffect, useMemo, useState} from 'react';
 import type {MusicFile, Playlist} from '../../types/media';
 import styles from './PlaylistSidebar.module.css';
@@ -12,6 +12,7 @@ type PlaylistSidebarProps = {
     onAddTracks: (playlistName: string, trackPaths: string[]) => void;
     files: MusicFile[];
     status: string;
+    totalTracks: number;
 };
 
 export function PlaylistSidebar(props: PlaylistSidebarProps) {
@@ -23,12 +24,14 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
         onAddTracks,
         files,
         status,
+        totalTracks,
     } = props;
 
     const [isOpen, setIsOpen] = useState(false);
     const [newPlaylistName, setNewPlaylistName] = useState('');
     const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | undefined>(activePlaylist);
     const [selectedTracks, setSelectedTracks] = useState<Record<string, boolean>>({});
+    const [mode, setMode] = useState<'create' | 'edit'>('create');
 
     useEffect(() => {
         setSelectedPlaylist(activePlaylist);
@@ -40,6 +43,9 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
     );
 
     const toggleTrack = (path: string) => {
+        if (selectedPlaylist?.tracks.includes(path)) {
+            return;
+        }
         setSelectedTracks((prev) => ({...prev, [path]: !prev[path]}));
     };
 
@@ -51,6 +57,14 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
         setSelectedPlaylist(nextPlaylist);
         onSelectPlaylist(nextPlaylist);
         setNewPlaylistName('');
+    };
+
+    const handleEdit = (playlist: Playlist) => {
+        setSelectedPlaylist(playlist);
+        onSelectPlaylist(playlist);
+        setSelectedTracks({});
+        setMode('edit');
+        setIsOpen(true);
     };
 
     const handleAdd = () => {
@@ -67,11 +81,27 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
         <aside className={styles.sidebar}>
             <div className={styles.header}>
                 <div className={styles.title}>Playlist</div>
-                <Button className={styles.button} onClick={() => setIsOpen(true)} aria-label="Add playlist">
+                <Button
+                    className={styles.button}
+                    onClick={() => {
+                        setMode('create');
+                        setIsOpen(true);
+                    }}
+                    aria-label="Add playlist"
+                >
                     <FaPlus />
                 </Button>
             </div>
             <div className={styles.list}>
+                <div
+                    className={
+                        !activePlaylist ? `${styles.item} ${styles.itemActive}` : styles.item
+                    }
+                    onClick={() => onSelectPlaylist(undefined)}
+                >
+                    <span>All tracks</span>
+                    <span className={styles.itemCount}>{totalTracks}</span>
+                </div>
                 {playlists.map((playlist) => (
                     <div
                         key={playlist.name}
@@ -83,7 +113,19 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
                         onClick={() => onSelectPlaylist(playlist)}
                     >
                         <span>{playlist.name}</span>
-                        <span>{playlist.tracks.length}</span>
+                        <span className={styles.itemActions}>
+                            <Button
+                                className={`${styles.button} ${styles.editButton}`}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleEdit(playlist);
+                                }}
+                                aria-label={`Edit ${playlist.name}`}
+                            >
+                                <FaPen />
+                            </Button>
+                            <span className={styles.itemCount}>{playlist.tracks.length}</span>
+                        </span>
                     </div>
                 ))}
                 {!playlists.length && <div>No playlists.</div>}
@@ -113,54 +155,69 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
                             leaveTo={styles.menuLeaveTo}
                         >
                             <Dialog.Panel className={styles.dialogPanel}>
-                                <Dialog.Title className={styles.dialogTitle}>Add to playlist</Dialog.Title>
+                                <Dialog.Title className={styles.dialogTitle}>
+                                    {mode === 'edit' ? 'Edit playlist' : 'Add to playlist'}
+                                </Dialog.Title>
                                 <div className={styles.dialogBody}>
-                                    <div className={styles.fieldRow}>
-                                        <Input
-                                            className={styles.input}
-                                            placeholder="New playlist name"
-                                            value={newPlaylistName}
-                                            onChange={(event) => setNewPlaylistName(event.target.value)}
-                                        />
-                                        <Button className={styles.button} onClick={handleCreate}>
-                                            Create
-                                        </Button>
-                                    </div>
+                                    {mode === 'create' && (
+                                        <div className={styles.fieldRow}>
+                                            <Input
+                                                className={styles.input}
+                                                placeholder="New playlist name"
+                                                value={newPlaylistName}
+                                                onChange={(event) => setNewPlaylistName(event.target.value)}
+                                            />
+                                            <Button className={styles.button} onClick={handleCreate}>
+                                                Create
+                                            </Button>
+                                        </div>
+                                    )}
                                     <div className={styles.fieldRow}>
                                         <Listbox value={selectedPlaylist} onChange={setSelectedPlaylist} by="name">
-                                            <Listbox.Button className={styles.button}>
-                                                {selectedPlaylist ? selectedPlaylist.name : 'Select playlist'}
-                                            </Listbox.Button>
-                                            <Listbox.Options className={styles.dialogList}>
-                                                {playlists.map((playlist) => (
-                                                    <Listbox.Option key={playlist.name} value={playlist}>
-                                                        {({active: optionActive}) => (
-                                                            <div
-                                                                className={
-                                                                    optionActive
-                                                                        ? `${styles.item} ${styles.itemActive}`
-                                                                        : styles.item
-                                                                }
-                                                            >
-                                                                <span>{playlist.name}</span>
-                                                                <span>{playlist.tracks.length}</span>
-                                                            </div>
-                                                        )}
-                                                    </Listbox.Option>
-                                                ))}
-                                            </Listbox.Options>
+                                            <div className={styles.listbox}>
+                                                <Listbox.Button className={styles.button}>
+                                                    {selectedPlaylist ? selectedPlaylist.name : 'Select playlist'}
+                                                </Listbox.Button>
+                                                <Listbox.Options className={styles.dialogList}>
+                                                    {playlists.map((playlist) => (
+                                                        <Listbox.Option key={playlist.name} value={playlist}>
+                                                            {({active: optionActive}) => (
+                                                                <div
+                                                                    className={
+                                                                        optionActive
+                                                                            ? `${styles.item} ${styles.itemActive}`
+                                                                            : styles.item
+                                                                    }
+                                                                >
+                                                                    <span>{playlist.name}</span>
+                                                                    <span>{playlist.tracks.length}</span>
+                                                                </div>
+                                                            )}
+                                                        </Listbox.Option>
+                                                    ))}
+                                                </Listbox.Options>
+                                            </div>
                                         </Listbox>
                                     </div>
                                     <div className={styles.trackList}>
-                                        {files.map((file) => (
+                                        {files.map((file) => {
+                                            const alreadyInPlaylist = Boolean(
+                                                selectedPlaylist?.tracks.includes(file.path)
+                                            );
+                                            const isChecked = alreadyInPlaylist || Boolean(selectedTracks[file.path]);
+                                            return (
                                             <div key={file.path} className={styles.trackRow}>
                                                 <span>{file.name}</span>
                                                 <Checkbox
-                                                    checked={Boolean(selectedTracks[file.path])}
+                                                    className={styles.checkbox}
+                                                    checked={isChecked}
+                                                    disabled={alreadyInPlaylist}
                                                     onChange={() => toggleTrack(file.path)}
-                                                />
+                                                >
+                                                    <span className={styles.checkboxMark} />
+                                                </Checkbox>
                                             </div>
-                                        ))}
+                                        )})}
                                     </div>
                                     {status && <div className={styles.status}>{status}</div>}
                                     <div className={styles.actions}>

@@ -49,6 +49,11 @@
     border-radius: 12px;
     background: var(--panel-bg);
     border: 1px solid var(--panel-border);
+    position: absolute;
+    left: 0;
+    top: calc(100% + 6px);
+    width: 100%;
+    z-index: 30;
 }
 
 .item {
@@ -65,6 +70,27 @@
 .itemActive {
     border-color: var(--panel-accent);
     background: var(--panel-bg-strong);
+}
+
+.itemCount {
+    opacity: 0.7;
+}
+
+.itemActions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.editButton {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms ease;
+}
+
+.item:hover .editButton {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .dialogPanel {
@@ -96,6 +122,11 @@
     flex-wrap: wrap;
 }
 
+.listbox {
+    position: relative;
+    min-width: 220px;
+}
+
 .input {
     min-width: 220px;
     border: 1px solid var(--panel-border-strong);
@@ -122,6 +153,34 @@
     align-items: center;
     gap: 8px;
     justify-content: space-between;
+}
+
+.checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--panel-border-strong);
+    border-radius: 4px;
+    background: var(--panel-bg-strong);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkbox[data-checked] {
+    border-color: var(--panel-accent);
+    background: var(--panel-accent);
+}
+
+.checkbox:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.checkboxMark {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--panel-bg);
 }
 
 .status {

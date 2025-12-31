@@ -1,4 +1,4 @@
-import {useEffect, useRef} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import styles from './App.module.css';
 import {FiltersBar, HeaderBar, PlayerBar, PlaylistSidebar, TrackList} from './components';
 import {useMusicLibrary} from './hooks/useMusicLibrary';
@@ -32,8 +32,23 @@ function App() {
         addTracksToPlaylist,
     } = usePlaylists();
 
+    const playlistFiles = useMemo(() => {
+        if (!activePlaylist) return null;
+        const fileMap = new Map(files.map((file) => [file.path, file]));
+        return activePlaylist.tracks
+            .map((path) => fileMap.get(path))
+            .filter((file): file is NonNullable<typeof file> => Boolean(file));
+    }, [activePlaylist, files]);
+
+    const visibleFiles = useMemo(() => {
+        if (activePlaylist) {
+            return playlistFiles ?? [];
+        }
+        return filteredFiles;
+    }, [activePlaylist, filteredFiles, playlistFiles]);
+
     const player = usePlayer({
-        filteredFiles,
+        filteredFiles: visibleFiles,
         onStatusChange: setStatus,
     });
 
@@ -70,15 +85,16 @@ function App() {
                     onAddTracks={addTracksToPlaylist}
                     files={files}
                     status={playlistStatus}
+                    totalTracks={files.length}
                 />
-                <TrackList files={filteredFiles} active={player.active} onSelect={player.selectTrack} />
+                <TrackList files={visibleFiles} active={player.active} onSelect={player.selectTrack} />
             </div>
             <PlayerBar
                 active={player.active}
                 isPlaying={player.isPlaying}
                 duration={player.duration}
                 position={player.position}
-                hasTracks={filteredFiles.length > 0}
+                hasTracks={visibleFiles.length > 0}
                 playMode={player.playMode}
                 playModeLabel={player.playModeLabel}
                 onTogglePlay={player.togglePlay}
