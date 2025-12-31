@@ -4,7 +4,6 @@ import type {Playlist} from '../types/media';
 
 export function usePlaylists() {
     const [playlists, setPlaylists] = useState<Playlist[]>([]);
-    const [playlistName, setPlaylistName] = useState('');
     const [activePlaylist, setActivePlaylist] = useState<Playlist | undefined>(undefined);
     const [playlistStatus, setPlaylistStatus] = useState('');
 
@@ -25,15 +24,14 @@ export function usePlaylists() {
         void refreshPlaylists();
     }, []);
 
-    const createPlaylist = async () => {
-        const name = playlistName.trim();
-        if (!name) {
+    const createPlaylist = async (name: string) => {
+        const trimmed = name.trim();
+        if (!trimmed) {
             setPlaylistStatus('Playlist name is required.');
             return;
         }
         try {
-            await api.createPlaylist(name);
-            setPlaylistName('');
+            await api.createPlaylist(trimmed);
             setPlaylistStatus('Playlist created.');
             await refreshPlaylists();
         } catch (err: any) {
@@ -41,13 +39,15 @@ export function usePlaylists() {
         }
     };
 
-    const addTrackToActivePlaylist = async (trackPath?: string) => {
-        if (!trackPath || !activePlaylist) {
-            setPlaylistStatus('Select a playlist and track.');
+    const addTracksToPlaylist = async (playlistName: string, trackPaths: string[]) => {
+        if (!playlistName || !trackPaths.length) {
+            setPlaylistStatus('Select a playlist and tracks.');
             return;
         }
         try {
-            await api.addToPlaylist(activePlaylist.name, trackPath);
+            for (const path of trackPaths) {
+                await api.addToPlaylist(playlistName, path);
+            }
             setPlaylistStatus('Added to playlist.');
             await refreshPlaylists();
         } catch (err: any) {
@@ -57,13 +57,11 @@ export function usePlaylists() {
 
     return {
         playlists,
-        playlistName,
-        setPlaylistName,
         activePlaylist,
         setActivePlaylist,
         playlistStatus,
         refreshPlaylists,
         createPlaylist,
-        addTrackToActivePlaylist,
+        addTracksToPlaylist,
     };
 }

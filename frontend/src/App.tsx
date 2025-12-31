@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useRef} from 'react';
 import styles from './App.module.css';
-import {FiltersBar, HeaderBar, PlayerBar, PlaylistControls, TrackList} from './components';
+import {FiltersBar, HeaderBar, PlayerBar, PlaylistSidebar, TrackList} from './components';
 import {useMusicLibrary} from './hooks/useMusicLibrary';
 import {usePlaylists} from './hooks/usePlaylists';
 import {usePlayer} from './hooks/usePlayer';
@@ -25,13 +25,11 @@ function App() {
 
     const {
         playlists,
-        playlistName,
-        setPlaylistName,
         activePlaylist,
         setActivePlaylist,
         playlistStatus,
         createPlaylist,
-        addTrackToActivePlaylist,
+        addTracksToPlaylist,
     } = usePlaylists();
 
     const player = usePlayer({
@@ -67,19 +65,17 @@ function App() {
                 albums={albums}
                 albumFilter={albumFilter}
                 onAlbumChange={setAlbumFilter}
-                playlists={playlists}
-                activePlaylist={activePlaylist}
-                onPlaylistChange={(value) => setActivePlaylist(value)}
-            />
-            <PlaylistControls
-                playlistName={playlistName}
-                onNameChange={setPlaylistName}
-                onCreate={createPlaylist}
-                onAddCurrent={() => addTrackToActivePlaylist(player.active?.path)}
-                status={playlistStatus}
-                canAdd={Boolean(player.active && activePlaylist)}
             />
             <div className={styles.body}>
+                <PlaylistSidebar
+                    playlists={playlists}
+                    activePlaylist={activePlaylist}
+                    onSelectPlaylist={setActivePlaylist}
+                    onCreatePlaylist={createPlaylist}
+                    onAddTracks={addTracksToPlaylist}
+                    files={files}
+                    status={playlistStatus}
+                />
                 <TrackList files={filteredFiles} active={player.active} onSelect={player.selectTrack} />
             </div>
             <PlayerBar

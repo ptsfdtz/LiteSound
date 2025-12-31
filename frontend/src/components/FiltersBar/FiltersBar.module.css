@@ -70,11 +70,6 @@
     letter-spacing: 0.8px;
 }
 
-.empty {
-    font-size: 13px;
-    opacity: 0.6;
-    padding: 12px;
-}
 
 .menuEnter,
 .menuLeave {

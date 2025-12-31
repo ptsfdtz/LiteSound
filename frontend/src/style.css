@@ -4,9 +4,48 @@
     margin: 0;
 }
 
+ :root {
+    --app-bg: #0f1218;
+    --app-text: #f3f5f7;
+    --panel-bg: rgba(22, 26, 34, 0.86);
+    --panel-bg-strong: rgba(24, 29, 38, 0.92);
+    --panel-border: rgba(255, 255, 255, 0.08);
+    --panel-border-strong: rgba(255, 255, 255, 0.16);
+    --panel-glow: rgba(0, 0, 0, 0.25);
+    --panel-text-soft: rgba(255, 255, 255, 0.7);
+    --panel-accent: #6fb3ff;
+    --scroll-track: rgba(22, 26, 34, 0.9);
+    --scroll-thumb: rgba(111, 179, 255, 0.5);
+    --scroll-thumb-hover: rgba(111, 179, 255, 0.7);
+}
+
 body {
     margin: 0;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background: #0f1218;
-    color: #f3f5f7;
+    background: var(--app-bg);
+    color: var(--app-text);
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
+
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--scroll-track);
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--scroll-thumb);
+    border-radius: 10px;
+    border: 2px solid var(--scroll-track);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scroll-thumb-hover);
 }

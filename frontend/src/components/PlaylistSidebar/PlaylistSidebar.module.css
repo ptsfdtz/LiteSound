@@ -1,0 +1,172 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    background: var(--panel-bg);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.button {
+    border: 1px solid var(--panel-border-strong);
+    background: var(--panel-bg-strong);
+    color: inherit;
+    padding: 6px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 4px;
+    max-height: 360px;
+    overflow: auto;
+}
+
+.dialogList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 12px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.itemActive {
+    border-color: rgba(111, 179, 255, 0.55);
+    background: rgba(111, 179, 255, 0.12);
+}
+
+.dialogPanel {
+    width: min(600px, 90vw);
+    background: var(--panel-bg-strong);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dialogTitle {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.dialogBody {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fieldRow {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.input {
+    min-width: 220px;
+    border: 1px solid var(--panel-border-strong);
+    background: var(--panel-bg-strong);
+    color: inherit;
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+.trackList {
+    max-height: 240px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--panel-bg-strong);
+}
+
+.trackRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.status {
+    opacity: 0.8;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.dialog {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+}
+
+.dialogContainer {
+    position: relative;
+    z-index: 21;
+}
+
+.menuEnter,
+.menuLeave {
+    transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.menuEnterFrom,
+.menuLeaveTo {
+    opacity: 0;
+    transform: translateY(-6px);
+}
+
+.menuEnterTo,
+.menuLeaveFrom {
+    opacity: 1;
+    transform: translateY(0);
+}

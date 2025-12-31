@@ -11,31 +11,10 @@
     box-shadow: 0 16px 32px var(--panel-glow);
 }
 
-.trigger {
-    border: 1px solid var(--panel-border-strong);
-    background: var(--panel-bg-strong);
-    color: inherit;
-    padding: 8px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 6px;
-    min-width: 220px;
-    height: 40px;
-    text-align: left;
-}
-
-.trigger:hover {
-    border-color: rgba(255, 255, 255, 0.35);
-}
-
 .options {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-top: 8px;
 }
 
 .track {

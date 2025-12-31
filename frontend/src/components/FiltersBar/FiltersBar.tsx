@@ -1,6 +1,5 @@
 import {Listbox, Transition} from '@headlessui/react';
 import {Fragment} from 'react';
-import type {Playlist} from '../../types/media';
 import styles from './FiltersBar.module.css';
 
 type FiltersBarProps = {
@@ -10,9 +9,6 @@ type FiltersBarProps = {
     albums: string[];
     albumFilter: string;
     onAlbumChange: (value: string) => void;
-    playlists: Playlist[];
-    activePlaylist?: Playlist;
-    onPlaylistChange: (value: Playlist) => void;
 };
 
 export function FiltersBar(props: FiltersBarProps) {
@@ -23,9 +19,6 @@ export function FiltersBar(props: FiltersBarProps) {
         albums,
         albumFilter,
         onAlbumChange,
-        playlists,
-        activePlaylist,
-        onPlaylistChange,
     } = props;
 
     return (
@@ -84,36 +77,6 @@ export function FiltersBar(props: FiltersBarProps) {
                                     )}
                                 </Listbox.Option>
                             ))}
-                        </Listbox.Options>
-                    </Transition>
-                </Listbox>
-            </div>
-            <div className={styles.item}>
-                <Listbox value={activePlaylist} onChange={onPlaylistChange} by="name">
-                    <Listbox.Button className={styles.trigger}>
-                        Playlist: {activePlaylist ? activePlaylist.name : 'Select'}
-                    </Listbox.Button>
-                    <Transition
-                        as={Fragment}
-                        enter={styles.menuEnter}
-                        enterFrom={styles.menuEnterFrom}
-                        enterTo={styles.menuEnterTo}
-                        leave={styles.menuLeave}
-                        leaveFrom={styles.menuLeaveFrom}
-                        leaveTo={styles.menuLeaveTo}
-                    >
-                        <Listbox.Options className={styles.options}>
-                            {playlists.map((playlist) => (
-                                <Listbox.Option key={playlist.name} value={playlist}>
-                                    {({active: optionActive}) => (
-                                        <div className={optionActive ? `${styles.row} ${styles.rowActive}` : styles.row}>
-                                            <span>{playlist.name}</span>
-                                            <span>{playlist.tracks.length}</span>
-                                        </div>
-                                    )}
-                                </Listbox.Option>
-                            ))}
-                            {!playlists.length && <div className={styles.empty}>No playlists.</div>}
                         </Listbox.Options>
                     </Transition>
                 </Listbox>

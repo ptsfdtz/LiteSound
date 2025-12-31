@@ -13,9 +13,6 @@ export function TrackList(props: TrackListProps) {
     return (
         <aside className={styles.list}>
             <Listbox value={active} by="path" onChange={onSelect}>
-                <Listbox.Button className={styles.trigger}>
-                    {active ? active.name : 'Select a track'}
-                </Listbox.Button>
                 <Listbox.Options className={styles.options} static>
                     {files.map((file) => (
                         <Listbox.Option key={file.path} value={file}>

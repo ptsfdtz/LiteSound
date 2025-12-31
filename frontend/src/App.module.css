@@ -1,17 +1,11 @@
 .app {
-    min-height: 100vh;
+    height: 100%;
+    width: 100%;
+    position: fixed;
     display: flex;
     flex-direction: column;
     gap: 24px;
     padding: 32px 36px 40px;
-
-    --panel-bg: rgba(22, 26, 34, 0.86);
-    --panel-bg-strong: rgba(24, 29, 38, 0.92);
-    --panel-border: rgba(255, 255, 255, 0.08);
-    --panel-border-strong: rgba(255, 255, 255, 0.16);
-    --panel-glow: rgba(0, 0, 0, 0.25);
-    --panel-text-soft: rgba(255, 255, 255, 0.7);
-    --panel-accent: #6fb3ff;
 }
 
 .body {
@@ -19,6 +13,8 @@
     grid-template-columns: minmax(240px, 320px) 1fr;
     gap: 24px;
     flex: 1;
+    overflow: hidden;
+    max-height: calc(100% - 88px);
 }
 
 @media (max-width: 900px) {
