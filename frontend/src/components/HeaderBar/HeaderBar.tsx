@@ -5,17 +5,15 @@ import styles from './HeaderBar.module.css';
 
 type HeaderBarProps = {
     title: string;
-    subtitle: string;
     onRefresh: () => void;
 };
 
 export function HeaderBar(props: HeaderBarProps) {
-    const {title, subtitle, onRefresh} = props;
+    const {title, onRefresh} = props;
     return (
         <header className={styles.header}>
             <div>
                 <h1>{title}</h1>
-                <p>{subtitle}</p>
             </div>
             <Menu as="div" className={styles.menu}>
                 <Menu.Button className={styles.ghost} aria-label="Settings">

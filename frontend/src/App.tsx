@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import styles from './App.module.css';
 import {FiltersBar, HeaderBar, PlayerBar, PlaylistSidebar, TrackList} from './components';
 import {useMusicLibrary} from './hooks/useMusicLibrary';
@@ -50,14 +50,9 @@ function App() {
         }
     }, [files, lastPlayedPath]);
 
-    const subtitle = useMemo(() => {
-        if (!musicDir) return status;
-        return `${musicDir} - ${status}`;
-    }, [musicDir, status]);
-
     return (
         <div className={styles.app}>
-            <HeaderBar title="LiteSound" subtitle={subtitle} onRefresh={refresh} />
+            <HeaderBar title="LiteSound" onRefresh={refresh} />
             <FiltersBar
                 composers={composers}
                 composerFilter={composerFilter}

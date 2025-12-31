@@ -3,7 +3,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    min-height: 72px;
+    min-height: 48px;
 }
 
 .header h1 {
@@ -12,11 +12,6 @@
     letter-spacing: 0.5px;
 }
 
-.header p {
-    margin: 6px 0 0;
-    opacity: 0.7;
-    min-height: 20px;
-}
 
 .menu {
     position: relative;
