@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/dhowden/tag"
 )
 
 const defaultMusicDir = `C:\Users\user\Music`
@@ -21,9 +23,11 @@ var allowedAudioExt = map[string]string{
 }
 
 type MusicFile struct {
-	Name string `json:"name"`
-	Path string `json:"path"`
-	Ext  string `json:"ext"`
+	Name     string `json:"name"`
+	Path     string `json:"path"`
+	Ext      string `json:"ext"`
+	Composer string `json:"composer"`
+	Album    string `json:"album"`
 }
 
 // App struct
@@ -61,10 +65,13 @@ func (a *App) ListMusicFiles() ([]MusicFile, error) {
 		if _, ok := allowedAudioExt[ext]; !ok {
 			return nil
 		}
+		composer, album := readAudioMetadata(path)
 		entries = append(entries, MusicFile{
-			Name: d.Name(),
-			Path: path,
-			Ext:  ext,
+			Name:     d.Name(),
+			Path:     path,
+			Ext:      ext,
+			Composer: composer,
+			Album:    album,
 		})
 		return nil
 	})
@@ -77,6 +84,27 @@ func (a *App) ListMusicFiles() ([]MusicFile, error) {
 	})
 
 	return entries, nil
+}
+
+func readAudioMetadata(path string) (string, string) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", ""
+	}
+	defer file.Close()
+
+	metadata, err := tag.ReadFrom(file)
+	if err != nil {
+		return "", ""
+	}
+
+	album := strings.TrimSpace(metadata.Album())
+	composer := strings.TrimSpace(metadata.Composer())
+	if composer == "" {
+		composer = strings.TrimSpace(metadata.Artist())
+	}
+
+	return composer, album
 }
 
 func (a *App) ReadMusicFile(path string) ([]byte, error) {

@@ -99,6 +99,71 @@
     transform: translateY(-6px);
 }
 
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.filter-item {
+    position: relative;
+}
+
+.filter-trigger {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    color: inherit;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    min-width: 220px;
+    text-align: left;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.filter-options {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 8px);
+    min-width: 240px;
+    margin-top: 8px;
+    background: rgba(20, 24, 32, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 240px;
+    overflow: auto;
+    z-index: 10;
+}
+
+.filter-option {
+    outline: none;
+}
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    border-radius: 8px;
+}
+
+.filter-row.active {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.filter-selected {
+    font-size: 11px;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
 .app-body {
     display: grid;
     grid-template-columns: minmax(240px, 320px) 1fr;

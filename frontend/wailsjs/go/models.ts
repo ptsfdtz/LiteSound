@@ -4,6 +4,8 @@ export namespace main {
 	    name: string;
 	    path: string;
 	    ext: string;
+	    composer: string;
+	    album: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new MusicFile(source);
@@ -14,6 +16,8 @@ export namespace main {
 	        this.name = source["name"];
 	        this.path = source["path"];
 	        this.ext = source["ext"];
+	        this.composer = source["composer"];
+	        this.album = source["album"];
 	    }
 	}
 

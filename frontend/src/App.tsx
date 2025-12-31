@@ -7,6 +7,8 @@ type MusicFile = {
     name: string;
     path: string;
     ext: string;
+    composer: string;
+    album: string;
 };
 
 const mimeByExt: Record<string, string> = {
@@ -21,9 +23,11 @@ const mimeByExt: Record<string, string> = {
 function App() {
     const [musicDir, setMusicDir] = useState('');
     const [files, setFiles] = useState<MusicFile[]>([]);
-    const [active, setActive] = useState<MusicFile | null>(null);
+    const [active, setActive] = useState<MusicFile | undefined>(undefined);
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
     const [status, setStatus] = useState('Loading...');
+    const [composerFilter, setComposerFilter] = useState('All');
+    const [albumFilter, setAlbumFilter] = useState('All');
 
     useEffect(() => {
         let mounted = true;
@@ -67,7 +71,43 @@ function App() {
         }
     };
 
-    const selectTrack = async (file: MusicFile) => {
+    const composers = useMemo(() => {
+        const set = new Set<string>();
+        files.forEach((file) => {
+            const name = file.composer?.trim() || 'Unknown';
+            set.add(name);
+        });
+        return ['All', ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+    }, [files]);
+
+    const albums = useMemo(() => {
+        const set = new Set<string>();
+        files.forEach((file) => {
+            const name = file.album?.trim() || 'Unknown';
+            set.add(name);
+        });
+        return ['All', ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+    }, [files]);
+
+    const filteredFiles = useMemo(() => {
+        return files.filter((file) => {
+            const composer = file.composer?.trim() || 'Unknown';
+            const album = file.album?.trim() || 'Unknown';
+            if (composerFilter !== 'All' && composer !== composerFilter) {
+                return false;
+            }
+            if (albumFilter !== 'All' && album !== albumFilter) {
+                return false;
+            }
+            return true;
+        });
+    }, [files, composerFilter, albumFilter]);
+
+    const selectTrack = async (file?: MusicFile) => {
+        if (!file) {
+            setActive(undefined);
+            return;
+        }
         setActive(file);
         setStatus(`Loading ${file.name}...`);
         try {
@@ -120,14 +160,74 @@ function App() {
                     </Transition>
                 </Menu>
             </header>
+            <div className="filters">
+                <div className="filter-item">
+                    <Listbox value={composerFilter} onChange={setComposerFilter}>
+                        <Listbox.Button className="filter-trigger">
+                            Composer: {composerFilter}
+                        </Listbox.Button>
+                        <Transition
+                            as={Fragment}
+                            enter="menu-enter"
+                            enterFrom="menu-enter-from"
+                            enterTo="menu-enter-to"
+                            leave="menu-leave"
+                            leaveFrom="menu-leave-from"
+                            leaveTo="menu-leave-to"
+                        >
+                            <Listbox.Options className="filter-options">
+                                {composers.map((name) => (
+                                    <Listbox.Option key={name} value={name} className="filter-option">
+                                        {({active: optionActive, selected}) => (
+                                            <div className={optionActive ? 'filter-row active' : 'filter-row'}>
+                                                <span>{name}</span>
+                                                {selected && <span className="filter-selected">selected</span>}
+                                            </div>
+                                        )}
+                                    </Listbox.Option>
+                                ))}
+                            </Listbox.Options>
+                        </Transition>
+                    </Listbox>
+                </div>
+                <div className="filter-item">
+                    <Listbox value={albumFilter} onChange={setAlbumFilter}>
+                        <Listbox.Button className="filter-trigger">
+                            Album: {albumFilter}
+                        </Listbox.Button>
+                        <Transition
+                            as={Fragment}
+                            enter="menu-enter"
+                            enterFrom="menu-enter-from"
+                            enterTo="menu-enter-to"
+                            leave="menu-leave"
+                            leaveFrom="menu-leave-from"
+                            leaveTo="menu-leave-to"
+                        >
+                            <Listbox.Options className="filter-options">
+                                {albums.map((name) => (
+                                    <Listbox.Option key={name} value={name} className="filter-option">
+                                        {({active: optionActive, selected}) => (
+                                            <div className={optionActive ? 'filter-row active' : 'filter-row'}>
+                                                <span>{name}</span>
+                                                {selected && <span className="filter-selected">selected</span>}
+                                            </div>
+                                        )}
+                                    </Listbox.Option>
+                                ))}
+                            </Listbox.Options>
+                        </Transition>
+                    </Listbox>
+                </div>
+            </div>
             <div className="app-body">
                 <aside className="track-list">
                     <Listbox value={active} by="path" onChange={selectTrack}>
                         <Listbox.Button className="track-list-trigger">
                             {active ? active.name : 'Select a track'}
                         </Listbox.Button>
-                        <Listbox.Options className="track-options">
-                            {files.map((file) => (
+                        <Listbox.Options className="track-options" static>
+                            {filteredFiles.map((file) => (
                                 <Listbox.Option key={file.path} value={file} className="track-option">
                                     {({active: optionActive, selected}) => (
                                         <div className={optionActive ? 'track active' : 'track'}>
@@ -137,19 +237,19 @@ function App() {
                                     )}
                                 </Listbox.Option>
                             ))}
-                            {!files.length && <div className="empty">Add audio files to the music folder.</div>}
+                            {!filteredFiles.length && <div className="empty">No tracks match the filters.</div>}
                         </Listbox.Options>
                     </Listbox>
                 </aside>
-                <section className="player">
-                    <div className="player-card">
-                        <div className="player-title">
-                            {active ? active.name : 'Select a track'}
-                        </div>
-                        <audio controls src={audioUrl ?? undefined} />
-                    </div>
-                </section>
             </div>
+            <section className="player">
+                <div className="player-card">
+                    <div className="player-title">
+                        {active ? active.name : 'Select a track'}
+                    </div>
+                    <audio controls src={audioUrl ?? undefined} />
+                </div>
+            </section>
         </div>
     )
 }
