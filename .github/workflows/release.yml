@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows/amd64
+            artifact: LiteSound-windows-amd64-${{ github.ref_name }}.zip
+          - os: macos-latest
+            platform: darwin/arm64
+            artifact: LiteSound-macos-arm64-${{ github.ref_name }}.zip
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.11.0
+
+      - name: Install frontend deps
+        run: pnpm install
+        working-directory: frontend
+
+      - name: Build
+        run: wails build -platform ${{ matrix.platform }}
+
+      - name: Package (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $artifact = "${{ matrix.artifact }}"
+          Compress-Archive -Path build/bin/LiteSound.exe -DestinationPath $artifact
+
+      - name: Package (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent build/bin/LiteSound.app "${{ matrix.artifact }}"
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.artifact }}
