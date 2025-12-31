@@ -20,6 +20,7 @@ func main() {
 		Title:  "LiteSound",
 		Width:  1024,
 		Height: 768,
+		Frameless: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

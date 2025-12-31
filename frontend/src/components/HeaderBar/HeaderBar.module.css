@@ -4,12 +4,45 @@
     justify-content: space-between;
     gap: 16px;
     min-height: 48px;
+    --wails-draggable: drag;
 }
 
 .header h1 {
     margin: 0;
     font-size: 28px;
     letter-spacing: 0.5px;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.windowControls {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    --wails-draggable: no-drag;
+}
+
+.windowButton {
+    border: 1px solid var(--panel-border-strong);
+    background: var(--panel-bg-strong);
+    color: inherit;
+    padding: 8px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+    --wails-draggable: no-drag;
+}
+
+.windowButton:hover {
+    border-color: var(--panel-border-strong);
 }
 
 
@@ -21,13 +54,16 @@
     border: 1px solid var(--panel-border-strong);
     background: var(--panel-bg-strong);
     color: inherit;
-    padding: 8px 12px;
+    padding: 8px 10px;
     border-radius: 10px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 6px;
+    min-width: 36px;
+    min-height: 36px;
+    --wails-draggable: no-drag;
 }
 
 .ghost:hover {
@@ -49,6 +85,7 @@
     gap: 4px;
     max-height: 240px;
     overflow: auto;
+    --wails-draggable: no-drag;
 }
 
 .menuItem {
@@ -62,6 +99,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    --wails-draggable: no-drag;
 }
 
 .menuItemActive {
