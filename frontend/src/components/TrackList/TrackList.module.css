@@ -34,8 +34,8 @@
 }
 
 .active {
-    border-color: rgba(111, 179, 255, 0.55);
-    background: rgba(111, 179, 255, 0.12);
+    border-color: var(--panel-accent);
+    background: var(--panel-bg-strong);
 }
 
 .name {

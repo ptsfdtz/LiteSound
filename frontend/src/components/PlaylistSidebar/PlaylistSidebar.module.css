@@ -63,8 +63,8 @@
 }
 
 .itemActive {
-    border-color: rgba(111, 179, 255, 0.55);
-    background: rgba(111, 179, 255, 0.12);
+    border-color: var(--panel-accent);
+    background: var(--panel-bg-strong);
 }
 
 .dialogPanel {
@@ -137,7 +137,7 @@
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--overlay-bg);
 }
 
 .dialog {

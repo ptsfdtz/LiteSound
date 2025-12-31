@@ -36,7 +36,7 @@
 }
 
 .ghost:hover {
-    border-color: rgba(255, 255, 255, 0.35);
+    border-color: var(--panel-border-strong);
 }
 
 .menuItems {
@@ -70,7 +70,7 @@
 }
 
 .menuItemActive {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--panel-bg-strong);
 }
 
 .menuEnter,
