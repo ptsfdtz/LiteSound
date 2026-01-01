@@ -1,8 +1,8 @@
 import {Howl} from 'howler';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import {api} from '../services/api';
-import type {MusicFile, PlayMode} from '../types/media';
-import {pickRandomIndex} from '../utils/media';
+import {api} from '@/services/api';
+import type {MusicFile, PlayMode} from '@/types/media';
+import {pickRandomIndex} from '@/utils/media';
 
 type UsePlayerOptions = {
     filteredFiles: MusicFile[];

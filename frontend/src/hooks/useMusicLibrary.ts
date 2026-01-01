@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
-import {api} from '../services/api';
-import type {MusicFile} from '../types/media';
+import {api} from '@/services/api';
+import type {MusicFile} from '@/types/media';
 
 export function useMusicLibrary() {
     const [musicDir, setMusicDir] = useState('');

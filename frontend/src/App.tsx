@@ -1,10 +1,10 @@
 import {useEffect, useMemo, useRef} from 'react';
-import styles from './App.module.css';
-import {FiltersBar, HeaderBar, PlayerBar, PlaylistSidebar, TrackList} from './components';
-import {useMusicLibrary} from './hooks/useMusicLibrary';
-import {usePlaylists} from './hooks/usePlaylists';
-import {usePlayer} from './hooks/usePlayer';
-import {findTrackByPath} from './utils/media';
+import styles from '@/App.module.css';
+import {FiltersBar, HeaderBar, PlayerBar, PlaylistSidebar, TrackList} from '@/components';
+import {useMusicLibrary} from '@/hooks/useMusicLibrary';
+import {usePlaylists} from '@/hooks/usePlaylists';
+import {usePlayer} from '@/hooks/usePlayer';
+import {findTrackByPath} from '@/utils/media';
 
 function App() {
     const {

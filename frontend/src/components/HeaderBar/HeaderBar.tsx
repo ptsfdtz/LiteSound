@@ -2,7 +2,8 @@ import {Button, Menu, Transition} from '@headlessui/react';
 import {FaCog, FaTimes, FaWindowMaximize, FaWindowMinimize, FaWindowRestore} from 'react-icons/fa';
 import {Fragment, useEffect, useState} from 'react';
 import {Quit, WindowIsMaximised, WindowMaximise, WindowMinimise, WindowUnmaximise} from '../../../wailsjs/runtime/runtime';
-import styles from './HeaderBar.module.css';
+import appIcon from '@/assets/appicon.svg';
+import styles from '@/components/HeaderBar/HeaderBar.module.css';
 
 type HeaderBarProps = {
     title: string;
@@ -65,7 +66,8 @@ export function HeaderBar(props: HeaderBarProps) {
     };
     return (
         <header className={styles.header}>
-            <div>
+            <div className={styles.brand}>
+                <img className={styles.logo} src={appIcon} alt="LiteSound" />
                 <h1>{title}</h1>
             </div>
             <div className={styles.actions}>

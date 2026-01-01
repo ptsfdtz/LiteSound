@@ -3,8 +3,17 @@
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "Node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
     "allowSyntheticDefaultImports": true,
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "6.0",
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "vite.config.ts"

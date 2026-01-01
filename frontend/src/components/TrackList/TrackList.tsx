@@ -1,6 +1,6 @@
 import {Listbox} from '@headlessui/react';
-import type {MusicFile} from '../../types/media';
-import styles from './TrackList.module.css';
+import type {MusicFile} from '@/types/media';
+import styles from '@/components/TrackList/TrackList.module.css';
 
 type TrackListProps = {
     files: MusicFile[];

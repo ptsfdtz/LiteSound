@@ -1,4 +1,4 @@
-import type {MusicFile} from '../types/media';
+import type {MusicFile} from '@/types/media';
 
 export const mimeByExt: Record<string, string> = {
     '.mp3': 'audio/mpeg',

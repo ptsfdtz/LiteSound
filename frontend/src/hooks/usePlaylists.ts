@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
-import {api} from '../services/api';
-import type {Playlist} from '../types/media';
+import {api} from '@/services/api';
+import type {Playlist} from '@/types/media';
 
 export function usePlaylists() {
     const [playlists, setPlaylists] = useState<Playlist[]>([]);

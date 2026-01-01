@@ -2,9 +2,9 @@ import {Button, Transition} from '@headlessui/react';
 import {FaListUl, FaPause, FaPlay, FaRandom, FaRetweet, FaStepBackward, FaStepForward, FaStop, FaVolumeMute, FaVolumeUp} from 'react-icons/fa';
 import {Fragment, useState} from 'react';
 import type {CSSProperties} from 'react';
-import {formatTime} from '../../utils/media';
-import type {MusicFile, PlayMode} from '../../types/media';
-import styles from './PlayerBar.module.css';
+import {formatTime} from '@/utils/media';
+import type {MusicFile, PlayMode} from '@/types/media';
+import styles from '@/components/PlayerBar/PlayerBar.module.css';
 
 type PlayerBarProps = {
     active?: MusicFile;

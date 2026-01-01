@@ -1,8 +1,8 @@
 import {Button, Checkbox, Dialog, Input, Listbox, Transition} from '@headlessui/react';
 import {FaPlus, FaPen} from 'react-icons/fa';
 import {Fragment, useEffect, useMemo, useState} from 'react';
-import type {MusicFile, Playlist} from '../../types/media';
-import styles from './PlaylistSidebar.module.css';
+import type {MusicFile, Playlist} from '@/types/media';
+import styles from '@/components/PlaylistSidebar/PlaylistSidebar.module.css';
 
 type PlaylistSidebarProps = {
     playlists: Playlist[];

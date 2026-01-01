@@ -1,6 +1,6 @@
 import {Listbox, Transition} from '@headlessui/react';
 import {Fragment} from 'react';
-import styles from './FiltersBar.module.css';
+import styles from '@/components/FiltersBar/FiltersBar.module.css';
 
 type FiltersBarProps = {
     composers: string[];
