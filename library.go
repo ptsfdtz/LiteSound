@@ -8,7 +8,13 @@ import (
 	"strings"
 )
 
-const defaultMusicDir = `C:\Users\user\Music`
+func defaultMusicDir() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(home, "Music"), nil
+}
 
 var allowedAudioExt = map[string]string{
 	".mp3":  "audio/mpeg",
@@ -28,14 +34,27 @@ type MusicFile struct {
 }
 
 func (a *App) GetMusicDir() string {
-	return defaultMusicDir
+	dir, err := defaultMusicDir()
+	if err != nil {
+		return ""
+	}
+	return dir
 }
 
 func (a *App) ListMusicFiles() ([]MusicFile, error) {
-	dir := defaultMusicDir
+	dir, err := defaultMusicDir()
+	if err != nil {
+		return nil, err
+	}
+	if dir == "" {
+		return nil, errors.New("music directory not found")
+	}
+	if _, statErr := os.Stat(dir); statErr != nil {
+		return nil, statErr
+	}
 	entries := make([]MusicFile, 0)
 
-	err := filepath.WalkDir(dir, func(path string, d os.DirEntry, walkErr error) error {
+	err = filepath.WalkDir(dir, func(path string, d os.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
 		}
@@ -76,7 +95,11 @@ func (a *App) ReadMusicFile(path string) ([]byte, error) {
 		return nil, errors.New("unsupported audio type")
 	}
 
-	absDir, err := filepath.Abs(defaultMusicDir)
+	dir, err := defaultMusicDir()
+	if err != nil {
+		return nil, err
+	}
+	absDir, err := filepath.Abs(dir)
 	if err != nil {
 		return nil, err
 	}

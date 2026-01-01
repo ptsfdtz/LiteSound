@@ -71,7 +71,12 @@ func (s *StreamServer) handleMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	absDir, err := filepath.Abs(defaultMusicDir)
+	dir, err := defaultMusicDir()
+	if err != nil {
+		http.Error(w, "invalid music directory", http.StatusInternalServerError)
+		return
+	}
+	absDir, err := filepath.Abs(dir)
 	if err != nil {
 		http.Error(w, "invalid music directory", http.StatusInternalServerError)
 		return
