@@ -1,4 +1,4 @@
-import { Button, Dialog, Input, Transition } from "@headlessui/react";
+import { Button, Dialog, Input, Transition } from '@headlessui/react';
 import {
   FaCog,
   FaFolderOpen,
@@ -10,18 +10,18 @@ import {
   FaWindowMaximize,
   FaWindowMinimize,
   FaWindowRestore,
-} from "react-icons/fa";
-import { Fragment, useEffect, useState } from "react";
+} from 'react-icons/fa';
+import { Fragment, useEffect, useState } from 'react';
 import {
   Quit,
   WindowIsMaximised,
   WindowMaximise,
   WindowMinimise,
   WindowUnmaximise,
-} from "../../../wailsjs/runtime/runtime";
-import { api } from "@/services/api";
-import appIcon from "@/assets/appicon.svg";
-import styles from "@/components/HeaderBar/HeaderBar.module.css";
+} from '../../../wailsjs/runtime/runtime';
+import { api } from '@/services/api';
+import appIcon from '@/assets/appicon.svg';
+import styles from '@/components/HeaderBar/HeaderBar.module.css';
 
 type HeaderBarProps = {
   title: string;
@@ -115,7 +115,7 @@ export function HeaderBar(props: HeaderBarProps) {
       const picked = await api.pickMusicDir(fallback);
       if (picked) {
         addDir(picked);
-        setDirValue("");
+        setDirValue('');
       }
     } catch {
       // Ignore dialog errors
@@ -150,42 +150,23 @@ export function HeaderBar(props: HeaderBarProps) {
         <h1>{title}</h1>
       </div>
       <div className={styles.actions}>
-        <Button
-          className={styles.ghost}
-          aria-label="Settings"
-          onClick={openSettings}
-        >
+        <Button className={styles.ghost} aria-label="Settings" onClick={openSettings}>
           <FaCog />
         </Button>
         <div className={styles.windowControls}>
-          <Button
-            className={styles.windowButton}
-            onClick={handleMinimise}
-            aria-label="Minimise"
-          >
+          <Button className={styles.windowButton} onClick={handleMinimise} aria-label="Minimise">
             <FaWindowMinimize />
           </Button>
-          <Button
-            className={styles.windowButton}
-            onClick={toggleMaximise}
-            aria-label="Maximise"
-          >
+          <Button className={styles.windowButton} onClick={toggleMaximise} aria-label="Maximise">
             {isMaximised ? <FaWindowRestore /> : <FaWindowMaximize />}
           </Button>
-          <Button
-            className={styles.windowButton}
-            onClick={handleClose}
-            aria-label="Close"
-          >
+          <Button className={styles.windowButton} onClick={handleClose} aria-label="Close">
             <FaTimes />
           </Button>
         </div>
       </div>
       <Transition show={isSettingsOpen} as={Fragment}>
-        <Dialog
-          onClose={() => setIsSettingsOpen(false)}
-          className={styles.dialog}
-        >
+        <Dialog onClose={() => setIsSettingsOpen(false)} className={styles.dialog}>
           <Transition.Child
             as={Fragment}
             enter={styles.menuEnter}
@@ -208,9 +189,7 @@ export function HeaderBar(props: HeaderBarProps) {
               leaveTo={styles.menuLeaveTo}
             >
               <Dialog.Panel className={styles.dialogPanel}>
-                <Dialog.Title className={styles.dialogTitle}>
-                  Settings
-                </Dialog.Title>
+                <Dialog.Title className={styles.dialogTitle}>Settings</Dialog.Title>
                 <div className={styles.dialogBody}>
                   <div className={styles.fieldRow}>
                     <Input
@@ -223,7 +202,7 @@ export function HeaderBar(props: HeaderBarProps) {
                       className={styles.button}
                       onClick={() => {
                         addDir(dirValue);
-                        setDirValue("");
+                        setDirValue('');
                       }}
                       aria-label="Add folder"
                     >
@@ -238,46 +217,30 @@ export function HeaderBar(props: HeaderBarProps) {
                       <div key={dir} className={styles.directoryItem}>
                         <span className={styles.directoryPath}>{dir}</span>
                         <Button
-                          className={styles.button  }
-                          onClick={() =>
-                            setDirs((prev) =>
-                              prev.filter((item) => item !== dir)
-                            )
-                          }
+                          className={styles.button}
+                          onClick={() => setDirs((prev) => prev.filter((item) => item !== dir))}
                           aria-label="Remove folder"
                         >
                           <FaTrash />
-                        </Button>   
+                        </Button>
                       </div>
                     ))}
                     {!dirs.length && (
-                      <div className={styles.hint}>
-                        Using default system Music folder.
-                      </div>
+                      <div className={styles.hint}>Using default system Music folder.</div>
                     )}
                   </div>
                   <div className={styles.hint}>
                     Default music folder is the system Music directory.
                   </div>
                   <div className={styles.actionsRow}>
-                    <Button
-                      className={styles.button}
-                      onClick={handleRefresh}
-                      aria-label="Refresh"
-                    >
-                      <FaSyncAlt
-                        className={isRefreshing ? styles.spin : undefined}
-                      />
+                    <Button className={styles.button} onClick={handleRefresh} aria-label="Refresh">
+                      <FaSyncAlt className={isRefreshing ? styles.spin : undefined} />
                     </Button>
                     <div className={styles.actionsGroup}>
                       <Button className={styles.button} onClick={handleReset}>
                         Use default
                       </Button>
-                      <Button
-                        className={styles.button}
-                        onClick={handleSave}
-                        aria-label="Save"
-                      >
+                      <Button className={styles.button} onClick={handleSave} aria-label="Save">
                         <FaSave />
                       </Button>
                     </div>

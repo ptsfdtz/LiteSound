@@ -79,7 +79,9 @@
 
 .menuEnter,
 .menuLeave {
-  transition: opacity 120ms ease, transform 120ms ease;
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
 }
 
 .menuEnterFrom,
