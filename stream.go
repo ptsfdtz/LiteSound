@@ -11,8 +11,8 @@ import (
 )
 
 type StreamServer struct {
-	server   *http.Server
-	baseURL  string
+	server    *http.Server
+	baseURL   string
 	musicDirs func() ([]string, error)
 }
 
