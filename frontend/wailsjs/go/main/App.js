@@ -22,6 +22,10 @@ export function GetMusicDir() {
   return window['go']['main']['App']['GetMusicDir']();
 }
 
+export function GetMusicDirs() {
+  return window['go']['main']['App']['GetMusicDirs']();
+}
+
 export function GetPlaylists() {
   return window['go']['main']['App']['GetPlaylists']();
 }
@@ -56,6 +60,10 @@ export function SetLastPlayed(arg1) {
 
 export function SetMusicDir(arg1) {
   return window['go']['main']['App']['SetMusicDir'](arg1);
+}
+
+export function SetMusicDirs(arg1) {
+  return window['go']['main']['App']['SetMusicDirs'](arg1);
 }
 
 export function SetSystemVolume(arg1) {

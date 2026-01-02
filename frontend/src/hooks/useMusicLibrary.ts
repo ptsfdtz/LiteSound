@@ -4,6 +4,7 @@ import type {MusicFile} from '@/types/media';
 
 export function useMusicLibrary() {
     const [musicDir, setMusicDir] = useState('');
+    const [musicDirs, setMusicDirs] = useState<string[]>([]);
     const [files, setFiles] = useState<MusicFile[]>([]);
     const [status, setStatus] = useState('Loading...');
     const [composerFilter, setComposerFilter] = useState('All');
@@ -12,10 +13,11 @@ export function useMusicLibrary() {
 
     useEffect(() => {
         let mounted = true;
-        Promise.all([api.getMusicDir(), api.listMusicFiles(), api.getLastPlayed(), api.getFilters()])
-            .then(([dir, list, lastPlayed, filters]) => {
+        Promise.all([api.getMusicDirs(), api.listMusicFiles(), api.getLastPlayed(), api.getFilters()])
+            .then(([dirs, list, lastPlayed, filters]) => {
                 if (!mounted) return;
-                setMusicDir(dir);
+                setMusicDirs(dirs);
+                setMusicDir(dirs[0] ?? '');
                 setFiles(list);
                 setStatus(list.length ? 'Ready' : 'No audio files found.');
                 setLastPlayedPath(lastPlayed || '');
@@ -51,11 +53,12 @@ export function useMusicLibrary() {
         }
     };
 
-    const updateMusicDir = async (path: string) => {
+    const updateMusicDirs = async (paths: string[]) => {
         setStatus('Updating music directory...');
         try {
-            const nextDir = await api.setMusicDir(path);
-            setMusicDir(nextDir);
+            const nextDirs = await api.setMusicDirs(paths);
+            setMusicDirs(nextDirs);
+            setMusicDir(nextDirs[0] ?? '');
             await refresh();
         } catch (err: any) {
             setStatus(err?.message ?? 'Failed to update music directory.');
@@ -96,6 +99,7 @@ export function useMusicLibrary() {
 
     return {
         musicDir,
+        musicDirs,
         files,
         status,
         setStatus,
@@ -104,7 +108,7 @@ export function useMusicLibrary() {
         albumFilter,
         setAlbumFilter,
         lastPlayedPath,
-        updateMusicDir,
+        updateMusicDirs,
         refresh,
         composers,
         albums,

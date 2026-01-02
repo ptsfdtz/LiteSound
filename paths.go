@@ -17,3 +17,15 @@ func isPathWithinDir(dir string, file string) bool {
 	}
 	return strings.HasPrefix(file, dir)
 }
+
+func isPathWithinAnyDir(dirs []string, file string) bool {
+	for _, dir := range dirs {
+		if dir == "" {
+			continue
+		}
+		if isPathWithinDir(dir, file) {
+			return true
+		}
+	}
+	return false
+}

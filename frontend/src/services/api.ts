@@ -4,6 +4,7 @@ import {
     GetFilters,
     GetLastPlayed,
     GetMusicDir,
+    GetMusicDirs,
     GetPlaylists,
     GetStreamBaseURL,
     GetSystemVolume,
@@ -13,6 +14,7 @@ import {
     SetFilters,
     SetLastPlayed,
     SetMusicDir,
+    SetMusicDirs,
     SetSystemVolume,
 } from '../../wailsjs/go/main/App';
 
@@ -22,6 +24,7 @@ export const api = {
     getFilters: GetFilters,
     getLastPlayed: GetLastPlayed,
     getMusicDir: GetMusicDir,
+    getMusicDirs: GetMusicDirs,
     getPlaylists: GetPlaylists,
     getStreamBaseURL: GetStreamBaseURL,
     getSystemVolume: GetSystemVolume,
@@ -31,5 +34,6 @@ export const api = {
     setFilters: SetFilters,
     setLastPlayed: SetLastPlayed,
     setMusicDir: SetMusicDir,
+    setMusicDirs: SetMusicDirs,
     setSystemVolume: SetSystemVolume,
 };

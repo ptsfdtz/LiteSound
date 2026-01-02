@@ -13,6 +13,7 @@ type appState struct {
 	ComposerFilter string     `json:"composerFilter"`
 	AlbumFilter    string     `json:"albumFilter"`
 	MusicDir       string     `json:"musicDir"`
+	MusicDirs      []string   `json:"musicDirs"`
 	Playlists      []Playlist `json:"playlists"`
 }
 
@@ -35,11 +36,7 @@ func (a *App) SetLastPlayed(path string) error {
 	if _, ok := allowedAudioExt[ext]; !ok {
 		return errors.New("unsupported audio type")
 	}
-	dir, err := a.resolveMusicDir()
-	if err != nil {
-		return err
-	}
-	absDir, err := filepath.Abs(dir)
+	dirs, err := a.resolveMusicDirs()
 	if err != nil {
 		return err
 	}
@@ -47,7 +44,7 @@ func (a *App) SetLastPlayed(path string) error {
 	if err != nil {
 		return err
 	}
-	if !isPathWithinDir(absDir, absFile) {
+	if !isPathWithinAnyDir(dirs, absFile) {
 		return errors.New("file not in music directory")
 	}
 	state := appState{LastPlayedPath: absFile}
@@ -102,6 +99,12 @@ func (a *App) loadState() (appState, error) {
 	}
 	if state.Playlists == nil {
 		state.Playlists = []Playlist{}
+	}
+	if state.MusicDirs == nil {
+		state.MusicDirs = []string{}
+	}
+	if len(state.MusicDirs) == 0 && strings.TrimSpace(state.MusicDir) != "" {
+		state.MusicDirs = []string{state.MusicDir}
 	}
 	return state, nil
 }

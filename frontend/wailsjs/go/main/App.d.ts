@@ -12,6 +12,8 @@ export function GetLastPlayed():Promise<string>;
 
 export function GetMusicDir():Promise<string>;
 
+export function GetMusicDirs():Promise<Array<string>>;
+
 export function GetPlaylists():Promise<Array<main.Playlist>>;
 
 export function GetStreamBaseURL():Promise<string>;
@@ -29,5 +31,7 @@ export function SetFilters(arg1:string,arg2:string):Promise<void>;
 export function SetLastPlayed(arg1:string):Promise<void>;
 
 export function SetMusicDir(arg1:string):Promise<string>;
+
+export function SetMusicDirs(arg1:Array<string>):Promise<Array<string>>;
 
 export function SetSystemVolume(arg1:number):Promise<number>;

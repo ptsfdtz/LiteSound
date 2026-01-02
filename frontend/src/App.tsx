@@ -9,6 +9,7 @@ import {findTrackByPath} from '@/utils/media';
 function App() {
     const {
         musicDir,
+        musicDirs,
         files,
         filteredFiles,
         status,
@@ -20,7 +21,7 @@ function App() {
         composers,
         albums,
         lastPlayedPath,
-        updateMusicDir,
+        updateMusicDirs,
         refresh,
     } = useMusicLibrary();
 
@@ -68,7 +69,13 @@ function App() {
 
     return (
         <div className={styles.app}>
-            <HeaderBar title="LiteSound" onRefresh={refresh} musicDir={musicDir} onSetMusicDir={updateMusicDir} />
+            <HeaderBar
+                title="LiteSound"
+                onRefresh={refresh}
+                musicDir={musicDir}
+                musicDirs={musicDirs}
+                onSetMusicDirs={updateMusicDirs}
+            />
             <FiltersBar
                 composers={composers}
                 composerFilter={composerFilter}

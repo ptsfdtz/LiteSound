@@ -52,11 +52,7 @@ func (a *App) AddToPlaylist(name string, path string) error {
 	if _, ok := allowedAudioExt[ext]; !ok {
 		return errors.New("unsupported audio type")
 	}
-	dir, err := a.resolveMusicDir()
-	if err != nil {
-		return err
-	}
-	absDir, err := filepath.Abs(dir)
+	dirs, err := a.resolveMusicDirs()
 	if err != nil {
 		return err
 	}
@@ -64,7 +60,7 @@ func (a *App) AddToPlaylist(name string, path string) error {
 	if err != nil {
 		return err
 	}
-	if !isPathWithinDir(absDir, absFile) {
+	if !isPathWithinAnyDir(dirs, absFile) {
 		return errors.New("file not in music directory")
 	}
 

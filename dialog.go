@@ -9,9 +9,9 @@ import (
 func (a *App) PickMusicDir(current string) (string, error) {
 	dir := strings.TrimSpace(current)
 	if dir == "" {
-		resolved, err := a.resolveMusicDir()
-		if err == nil {
-			dir = resolved
+		resolved, err := a.resolveMusicDirs()
+		if err == nil && len(resolved) > 0 {
+			dir = resolved[0]
 		}
 	}
 	return runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{

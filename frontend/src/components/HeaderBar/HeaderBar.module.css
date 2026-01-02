@@ -1,181 +1,221 @@
 .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    min-height: 48px;
-    --wails-draggable: drag;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 48px;
+  --wails-draggable: drag;
 }
 
 .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .logo {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
 }
 
 .header h1 {
-    margin-bottom: 3px;
-    font-size: 28px;
-    letter-spacing: 0.5px;
+  margin-bottom: 3px;
+  font-size: 28px;
+  letter-spacing: 0.5px;
 }
 
 .actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .windowControls {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    --wails-draggable: no-drag;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  --wails-draggable: no-drag;
 }
 
 .windowButton {
-    border: 1px solid var(--panel-border-strong);
-    background: var(--panel-bg-strong);
-    color: inherit;
-    padding: 8px 10px;
-    border-radius: 10px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 36px;
-    min-height: 36px;
-    --wails-draggable: no-drag;
+  border: 1px solid var(--panel-border-strong);
+  background: var(--panel-bg-strong);
+  color: inherit;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+  --wails-draggable: no-drag;
 }
 
 .windowButton:hover {
-    border-color: var(--panel-border-strong);
+  border-color: var(--panel-border-strong);
 }
 
 .ghost {
-    border: 1px solid var(--panel-border-strong);
-    background: var(--panel-bg-strong);
-    color: inherit;
-    padding: 8px 10px;
-    border-radius: 10px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    min-width: 36px;
-    min-height: 36px;
-    --wails-draggable: no-drag;
+  border: 1px solid var(--panel-border-strong);
+  background: var(--panel-bg-strong);
+  color: inherit;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 36px;
+  min-height: 36px;
+  --wails-draggable: no-drag;
 }
 
 .ghost:hover {
-    border-color: var(--panel-border-strong);
+  border-color: var(--panel-border-strong);
 }
 
 .menuEnter,
 .menuLeave {
-    transition: opacity 120ms ease, transform 120ms ease;
+  transition: opacity 120ms ease, transform 120ms ease;
 }
 
 .menuEnterFrom,
 .menuLeaveTo {
-    opacity: 0;
-    transform: translateY(-6px);
+  opacity: 0;
+  transform: translateY(-6px);
 }
 
 .menuEnterTo,
 .menuLeaveFrom {
-    opacity: 1;
-    transform: translateY(0);
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .dialog {
-    position: fixed;
-    inset: 0;
-    z-index: 40;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
 }
 
 .overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--overlay-bg);
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg);
 }
 
 .dialogContainer {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
 }
 
 .dialogPanel {
-    width: min(560px, 100%);
-    background: var(--panel-bg);
-    border: 1px solid var(--panel-border);
-    border-radius: 18px;
-    padding: 20px 22px;
-    box-shadow: 0 20px 40px var(--panel-glow);
+  width: min(560px, 100%);
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  padding: 20px 22px;
+  box-shadow: 0 20px 40px var(--panel-glow);
 }
 
 .dialogTitle {
-    margin: 0 0 12px 0;
-    font-size: 18px;
+  margin: 0 0 12px 0;
+  font-size: 18px;
 }
 
 .dialogBody {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .fieldRow {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .input {
-    flex: 1;
-    border: 1px solid var(--panel-border-strong);
-    background: transparent;
-    color: inherit;
-    padding: 10px 12px;
-    border-radius: 10px;
+  flex: 1;
+  border: 1px solid var(--panel-border-strong);
+  background: transparent;
+  color: inherit;
+  padding: 10px 12px;
+  border-radius: 10px;
+  min-width: 220px;
 }
 
 .button {
-    border: 1px solid var(--panel-border-strong);
-    background: var(--panel-bg-strong);
-    color: inherit;
-    padding: 8px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+  border: 1px solid var(--panel-border-strong);
+  background: var(--panel-bg-strong);
+  color: inherit;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .hint {
-    font-size: 12px;
-    opacity: 0.7;
+  font-size: 12px;
+  opacity: 0.7;
 }
 
 .actionsRow {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .actionsGroup {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.directoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 160px;
+  overflow: auto;
+}
+
+.directoryItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.directoryPath {
+  flex: 1;
+  font-size: 12px;
+  opacity: 0.85;
+  word-break: break-all;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

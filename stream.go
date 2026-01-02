@@ -13,12 +13,12 @@ import (
 type StreamServer struct {
 	server   *http.Server
 	baseURL  string
-	musicDir func() (string, error)
+	musicDirs func() ([]string, error)
 }
 
-func StartStreamServer(musicDir func() (string, error)) (*StreamServer, error) {
+func StartStreamServer(musicDirs func() ([]string, error)) (*StreamServer, error) {
 	mux := http.NewServeMux()
-	s := &StreamServer{musicDir: musicDir}
+	s := &StreamServer{musicDirs: musicDirs}
 	mux.HandleFunc("/media", s.handleMedia)
 
 	server := &http.Server{
@@ -72,12 +72,7 @@ func (s *StreamServer) handleMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dir, err := s.musicDir()
-	if err != nil {
-		http.Error(w, "invalid music directory", http.StatusInternalServerError)
-		return
-	}
-	absDir, err := filepath.Abs(dir)
+	dirs, err := s.musicDirs()
 	if err != nil {
 		http.Error(w, "invalid music directory", http.StatusInternalServerError)
 		return
@@ -87,7 +82,7 @@ func (s *StreamServer) handleMedia(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid path", http.StatusBadRequest)
 		return
 	}
-	if !isPathWithinDir(absDir, absFile) {
+	if !isPathWithinAnyDir(dirs, absFile) {
 		http.Error(w, "file not in music directory", http.StatusForbidden)
 		return
 	}
