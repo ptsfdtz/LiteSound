@@ -33,16 +33,58 @@ type MusicFile struct {
 	Album    string `json:"album"`
 }
 
+func (a *App) resolveMusicDir() (string, error) {
+	state, err := a.loadState()
+	if err != nil {
+		return "", err
+	}
+	if strings.TrimSpace(state.MusicDir) != "" {
+		return state.MusicDir, nil
+	}
+	return defaultMusicDir()
+}
+
 func (a *App) GetMusicDir() string {
-	dir, err := defaultMusicDir()
+	dir, err := a.resolveMusicDir()
 	if err != nil {
 		return ""
 	}
 	return dir
 }
 
+func (a *App) SetMusicDir(path string) (string, error) {
+	trimmed := strings.TrimSpace(path)
+	if trimmed == "" {
+		state, err := a.loadState()
+		if err != nil {
+			return "", err
+		}
+		state.MusicDir = ""
+		if err := a.saveState(state); err != nil {
+			return "", err
+		}
+		return a.GetMusicDir(), nil
+	}
+	info, err := os.Stat(trimmed)
+	if err != nil {
+		return "", err
+	}
+	if !info.IsDir() {
+		return "", errors.New("path is not a directory")
+	}
+	state, err := a.loadState()
+	if err != nil {
+		return "", err
+	}
+	state.MusicDir = trimmed
+	if err := a.saveState(state); err != nil {
+		return "", err
+	}
+	return trimmed, nil
+}
+
 func (a *App) ListMusicFiles() ([]MusicFile, error) {
-	dir, err := defaultMusicDir()
+	dir, err := a.resolveMusicDir()
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +137,7 @@ func (a *App) ReadMusicFile(path string) ([]byte, error) {
 		return nil, errors.New("unsupported audio type")
 	}
 
-	dir, err := defaultMusicDir()
+	dir, err := a.resolveMusicDir()
 	if err != nil {
 		return nil, err
 	}

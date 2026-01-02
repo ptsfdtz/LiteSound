@@ -18,7 +18,7 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	server, err := StartStreamServer()
+	server, err := StartStreamServer(a.resolveMusicDir)
 	if err == nil {
 		a.streamServer = server
 		a.streamBaseURL = server.BaseURL()

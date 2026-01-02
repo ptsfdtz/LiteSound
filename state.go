@@ -12,6 +12,7 @@ type appState struct {
 	LastPlayedPath string     `json:"lastPlayedPath"`
 	ComposerFilter string     `json:"composerFilter"`
 	AlbumFilter    string     `json:"albumFilter"`
+	MusicDir       string     `json:"musicDir"`
 	Playlists      []Playlist `json:"playlists"`
 }
 
@@ -34,7 +35,7 @@ func (a *App) SetLastPlayed(path string) error {
 	if _, ok := allowedAudioExt[ext]; !ok {
 		return errors.New("unsupported audio type")
 	}
-	dir, err := defaultMusicDir()
+	dir, err := a.resolveMusicDir()
 	if err != nil {
 		return err
 	}

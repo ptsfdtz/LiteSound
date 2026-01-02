@@ -20,6 +20,7 @@ function App() {
         composers,
         albums,
         lastPlayedPath,
+        updateMusicDir,
         refresh,
     } = useMusicLibrary();
 
@@ -67,7 +68,7 @@ function App() {
 
     return (
         <div className={styles.app}>
-            <HeaderBar title="LiteSound" onRefresh={refresh} />
+            <HeaderBar title="LiteSound" onRefresh={refresh} musicDir={musicDir} onSetMusicDir={updateMusicDir} />
             <FiltersBar
                 composers={composers}
                 composerFilter={composerFilter}

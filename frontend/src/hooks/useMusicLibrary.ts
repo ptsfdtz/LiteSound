@@ -51,6 +51,17 @@ export function useMusicLibrary() {
         }
     };
 
+    const updateMusicDir = async (path: string) => {
+        setStatus('Updating music directory...');
+        try {
+            const nextDir = await api.setMusicDir(path);
+            setMusicDir(nextDir);
+            await refresh();
+        } catch (err: any) {
+            setStatus(err?.message ?? 'Failed to update music directory.');
+        }
+    };
+
     const composers = useMemo(() => {
         const set = new Set<string>();
         files.forEach((file) => {
@@ -93,6 +104,7 @@ export function useMusicLibrary() {
         albumFilter,
         setAlbumFilter,
         lastPlayedPath,
+        updateMusicDir,
         refresh,
         composers,
         albums,

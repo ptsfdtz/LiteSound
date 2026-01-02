@@ -38,6 +38,10 @@ export function ListMusicFiles() {
   return window['go']['main']['App']['ListMusicFiles']();
 }
 
+export function PickMusicDir(arg1) {
+  return window['go']['main']['App']['PickMusicDir'](arg1);
+}
+
 export function ReadMusicFile(arg1) {
   return window['go']['main']['App']['ReadMusicFile'](arg1);
 }
@@ -48,6 +52,10 @@ export function SetFilters(arg1, arg2) {
 
 export function SetLastPlayed(arg1) {
   return window['go']['main']['App']['SetLastPlayed'](arg1);
+}
+
+export function SetMusicDir(arg1) {
+  return window['go']['main']['App']['SetMusicDir'](arg1);
 }
 
 export function SetSystemVolume(arg1) {
