@@ -3,7 +3,9 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
+    branches:
+      - release
 
 permissions:
   contents: write
@@ -16,10 +18,8 @@ jobs:
         include:
           - os: windows-latest
             platform: windows/amd64
-            artifact: LiteSound-windows-amd64-${{ github.ref_name }}.zip
           - os: macos-latest
             platform: darwin/arm64
-            artifact: LiteSound-macos-arm64-${{ github.ref_name }}.zip
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -54,15 +54,21 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          $artifact = "${{ matrix.artifact }}"
+          $tag = "${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}"
+          $artifact = "LiteSound-windows-amd64-$tag.zip"
           Compress-Archive -Path build/bin/LiteSound.exe -DestinationPath $artifact
 
       - name: Package (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          ditto -c -k --sequesterRsrc --keepParent build/bin/LiteSound.app "${{ matrix.artifact }}"
+          tag="${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}"
+          artifact="LiteSound-macos-arm64-$tag.zip"
+          ditto -c -k --sequesterRsrc --keepParent build/bin/LiteSound.app "$artifact"
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ matrix.artifact }}
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}
+          name: ${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}
+          prerelease: ${{ github.ref_type != 'tag' }}
+          files: LiteSound-*-${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}.*
