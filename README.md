@@ -1,29 +1,35 @@
 # LiteSound
 
-LiteSound is a desktop music player built with Wails.
+LiteSound 是一款基于 Wails 的桌面音乐播放器（当前以 Windows 为主）。
 
-## Features
+## 主要功能
 
-- Local music library scanning
-- Composer/album filtering
-- Playlists
-- System volume control
+- 自动扫描本地音乐库
+- 作曲者 / 专辑筛选
+- 歌单管理
+- 系统音量控制
+- 全局快捷键（后台也可用）
 
-## Usage
+## 使用方式
 
-1. Download or copy your music files to the system Music folder.
-2. Launch LiteSound. It will scan the Music folder automatically.
+1. 将音乐文件放到系统「音乐」文件夹，或在设置中添加自定义音乐目录。
+2. 启动 LiteSound，应用会自动扫描并展示音乐。
 
-Default Music folder paths:
+默认音乐文件夹（Windows）：
 
-- Windows: `C:\Users\<YourName>\Music`
-- macOS: `~/Music`
+- `C:\Users\<你的用户名>\Music`
 
-## Supported formats
+## 全局快捷键（Windows）
 
-`mp3`, `flac`, `wav`, `ogg`, `m4a`, `aac`
+- 播放 / 暂停：`Ctrl + Alt + Space`
+- 下一首：`Ctrl + Alt + →`
+- 上一首：`Ctrl + Alt + ←`
 
-## Development
+## 支持的格式
+
+`mp3`、`flac`、`wav`、`ogg`、`m4a`、`aac`
+
+## 开发
 
 ```bash
 pnpm install
@@ -34,9 +40,9 @@ pnpm run build
 wails dev
 ```
 
-## Release
+## 发布
 
-Tag a version to trigger GitHub Actions release builds:
+打 tag 会触发 GitHub Actions 生成 Release：
 
 ```bash
 git tag -a v0.0.1 -m "v0.0.1"
