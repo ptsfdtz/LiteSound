@@ -23,6 +23,7 @@ func (a *App) startup(ctx context.Context) {
 		a.streamServer = server
 		a.streamBaseURL = server.BaseURL()
 	}
+	startHotkeys(a)
 	a.startTray()
 	if theme, err := a.GetTheme(); err == nil {
 		a.applyTheme(theme)
@@ -38,4 +39,5 @@ func (a *App) shutdown(ctx context.Context) {
 		return
 	}
 	_ = a.streamServer.Close(ctx)
+	stopHotkeys()
 }

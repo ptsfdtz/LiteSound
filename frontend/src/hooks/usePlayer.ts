@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '@/services/api';
 import type { MusicFile, PlayMode } from '@/types/media';
 import { pickRandomIndex } from '@/utils/media';
+import { EventsOn } from '../../wailsjs/runtime/runtime';
 
 type UsePlayerOptions = {
   filteredFiles: MusicFile[];
@@ -241,6 +242,27 @@ export function usePlayer(options: UsePlayerOptions) {
     if (playMode === 'shuffle') return 'Shuffle';
     return 'Play in order';
   }, [playMode]);
+
+  useEffect(() => {
+    const unsubscribePlay = EventsOn('hotkey:playpause', () => {
+      if (!active && filteredFiles.length) {
+        void selectTrack(filteredFiles[0]);
+        return;
+      }
+      togglePlay();
+    });
+    const unsubscribeNext = EventsOn('hotkey:next', () => {
+      goNext();
+    });
+    const unsubscribePrev = EventsOn('hotkey:prev', () => {
+      goPrev();
+    });
+    return () => {
+      unsubscribePlay();
+      unsubscribeNext();
+      unsubscribePrev();
+    };
+  }, [active, filteredFiles, goNext, goPrev, togglePlay, selectTrack]);
 
   return {
     active,
