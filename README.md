@@ -1,50 +1,89 @@
-# LiteSound
+# 🎵 LiteSound
 
-LiteSound 是一款基于 Wails 的桌面音乐播放器（当前以 Windows 为主）。
+> A **lightweight**, **fast**, and **modern** desktop music player built with [Wails](https://wails.io/) — native feel, no Electron bloat.
 
-## 主要功能
+<p align="center">
+  <img src="assets/preview.png" width="600" alt="LiteSound Preview">
+</p>
 
-- 自动扫描本地音乐库
-- 作曲者 / 专辑筛选
-- 歌单管理
-- 系统音量控制
-- 全局快捷键（后台也可用）
+## 🎨 Themes
 
-## 使用方式
+LiteSound supports light, dark, and system themes for a comfortable listening experience.
 
-1. 将音乐文件放到系统「音乐」文件夹，或在设置中添加自定义音乐目录。
-2. 启动 LiteSound，应用会自动扫描并展示音乐。
+|                                     Light Theme                                      |                                     Dark Theme                                     |
+| :----------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: |
+| <img src="assets/preview-light.png" width="480" alt="LiteSound Light Theme Preview"> | <img src="assets/preview-dark.png" width="480" alt="LiteSound Dark Theme Preview"> |
 
-默认音乐文件夹（Windows）：
+---
 
-- `C:\Users\<你的用户名>\Music`
+## ✨ Features
 
-## 全局快捷键（Windows）
+- ⚡ **Lightweight & Fast** — Wails + native webview, quick startup.
+- 🎵 **Local Library** — scan your system Music folder (or custom folders).
+- 🎧 **Playback Modes** — order, repeat one, shuffle.
+- 🧩 **Playlists** — create and manage your own lists.
+- 🎚️ **System Volume** — adjust volume with live sync.
+- 🌓 **Light / Dark / System** — seamless theme switching.
+- 🪟 **Custom Tray Menu** — quick control from the system tray.
 
-- 播放 / 暂停：`Ctrl + Alt + Space`
-- 下一首：`Ctrl + Alt + →`
-- 上一首：`Ctrl + Alt + ←`
+---
 
-## 支持的格式
+## ❓ Why make it?
 
-`mp3`、`flac`、`wav`、`ogg`、`m4a`、`aac`
+1. I wanted a clean, native-feeling player without Electron overhead.
+2. Many existing players are heavy, over-designed, or lack modern UI polish.
+3. Building LiteSound helps me sharpen my skills and create a tool I actually use.
 
-## 开发
+---
+
+## 📦 Installation
+
+### 📥 Prebuilt binaries
+
+Check the [Releases](https://github.com/ptsfdtz/litesound/releases) page to download the latest version for Windows.
+
+### 🛠️ Build from source
 
 ```bash
+# Clone
+git clone https://github.com/ptsfdtz/LiteSound.git
+cd LiteSound
+
+# Install dependencies
 pnpm install
-pnpm run build
-```
 
-```bash
+# Run in dev mode
 wails dev
+
+# Build production
+wails build
 ```
 
-## 发布
+---
 
-打 tag 会触发 GitHub Actions 生成 Release：
+## 🧰 Tech Stack
 
-```bash
-git tag -a v0.0.1 -m "v0.0.1"
-git push origin v0.0.1
-```
+| Layer           | Technology                 |
+| --------------- | -------------------------- |
+| Desktop Runtime | [Wails](https://wails.io/) |
+| Frontend        | React + TypeScript         |
+| Styling         | CSS Modules                |
+| Audio           | Howler.js                  |
+| Backend         | Go                         |
+
+---
+
+## 👤 Author
+
+**Haoran Tong (ptsfdtz)**
+
+- 💻 [GitHub @ptsfdtz](https://github.com/ptsfdtz)
+- ❤️ Building minimal, fast, and beautiful desktop tools.
+
+---
+
+⭐ **Star this repo if you love clean music tools!**
+
+welcome contributions and feedback.
+Feel free to open issues or PRs on GitHub.
+Happy listening! 🎶
