@@ -5,23 +5,23 @@
 }
 
 :root {
-  --app-bg: #0f1218;
+  --app-bg: #0f1218b8;
   --app-text: #f3f5f7;
-  --panel-bg: rgba(22, 26, 34, 0.86);
-  --panel-bg-strong: rgba(24, 29, 38, 0.92);
-  --panel-border: rgba(255, 255, 255, 0.08);
-  --panel-border-strong: rgba(255, 255, 255, 0.16);
-  --panel-glow: rgba(0, 0, 0, 0.25);
+  --panel-bg: #161a22db;
+  --panel-bg-strong: #181d26eb;
+  --panel-border: #ffffff14;
+  --panel-border-strong: #ffffff29;
+  --panel-glow: #00000040;
   --panel-accent: #6fb3ff;
-  --overlay-bg: rgba(0, 0, 0, 0.7);
-  --scroll-track: rgba(22, 26, 34, 0.9);
-  --scroll-thumb: rgba(111, 179, 255, 0.5);
+  --overlay-bg: #000000b3;
+  --scroll-track: #161a22e6;
+  --scroll-thumb: #6fb3ff80;
 }
 
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: var(--app-bg);
+  background: transparent;
   color: var(--app-text);
 }
 

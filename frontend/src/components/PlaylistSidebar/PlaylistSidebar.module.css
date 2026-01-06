@@ -95,7 +95,7 @@
 
 .dialogPanel {
   width: min(600px, 90vw);
-  background: var(--panel-bg-strong);
+  background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   border-radius: 16px;
   padding: 16px;
@@ -130,7 +130,7 @@
 .input {
   min-width: 220px;
   border: 1px solid var(--panel-border-strong);
-  background: var(--panel-bg-strong);
+  background: transparent;
   color: inherit;
   padding: 8px 12px;
   border-radius: 10px;
@@ -145,7 +145,7 @@
   padding: 8px;
   border: 1px solid var(--panel-border);
   border-radius: 10px;
-  background: var(--panel-bg-strong);
+  background: var(--panel-bg);
 }
 
 .trackRow {
@@ -160,7 +160,7 @@
   height: 18px;
   border: 1px solid var(--panel-border-strong);
   border-radius: 4px;
-  background: var(--panel-bg-strong);
+  background: var(--panel-bg);
   display: inline-flex;
   align-items: center;
   justify-content: center;

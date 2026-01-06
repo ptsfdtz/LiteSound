@@ -6,6 +6,7 @@
   flex-direction: column;
   gap: 24px;
   padding: 20px 32px 30px;
+  background: var(--app-bg);
 }
 
 .body {
