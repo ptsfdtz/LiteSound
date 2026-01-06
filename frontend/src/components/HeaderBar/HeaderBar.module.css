@@ -169,7 +169,10 @@
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  min-height: 36px;
+  min-width: 36px;
   transition:
     border-color 160ms ease,
     color 160ms ease,
@@ -203,13 +206,29 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .themeButtons {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+.settingGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.settingLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  opacity: 0.7;
 }
 
 .themeButtonActive {

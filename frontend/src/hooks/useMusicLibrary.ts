@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/services/api';
 import type { MusicFile } from '@/types/media';
+import { useI18n } from '@/locales';
 
 export function useMusicLibrary() {
+  const { t } = useI18n();
   const [musicDir, setMusicDir] = useState('');
   const [musicDirs, setMusicDirs] = useState<string[]>([]);
   const [files, setFiles] = useState<MusicFile[]>([]);
-  const [status, setStatus] = useState('Loading...');
+  const [status, setStatus] = useState(t('status.loading'));
   const [composerFilter, setComposerFilter] = useState('All');
   const [albumFilter, setAlbumFilter] = useState('All');
   const [lastPlayedPath, setLastPlayedPath] = useState('');
@@ -19,7 +21,7 @@ export function useMusicLibrary() {
         setMusicDirs(dirs);
         setMusicDir(dirs[0] ?? '');
         setFiles(list);
-        setStatus(list.length ? 'Ready' : 'No audio files found.');
+        setStatus(list.length ? t('status.ready') : t('status.noFiles'));
         setLastPlayedPath(lastPlayed || '');
         const [savedComposer, savedAlbum] = filters ?? [];
         if (savedComposer) {
@@ -31,7 +33,7 @@ export function useMusicLibrary() {
       })
       .catch((err) => {
         if (!mounted) return;
-        setStatus(err?.message ?? 'Failed to load music directory.');
+        setStatus(err?.message ?? t('status.failedLoad'));
       });
     return () => {
       mounted = false;
@@ -43,25 +45,25 @@ export function useMusicLibrary() {
   }, [composerFilter, albumFilter]);
 
   const refresh = async () => {
-    setStatus('Loading...');
+    setStatus(t('status.loading'));
     try {
       const list = await api.listMusicFiles();
       setFiles(list);
-      setStatus(list.length ? 'Ready' : 'No audio files found.');
+      setStatus(list.length ? t('status.ready') : t('status.noFiles'));
     } catch (err: any) {
-      setStatus(err?.message ?? 'Failed to refresh.');
+      setStatus(err?.message ?? t('status.failedRefresh'));
     }
   };
 
   const updateMusicDirs = async (paths: string[]) => {
-    setStatus('Updating music directory...');
+    setStatus(t('status.updatingDir'));
     try {
       const nextDirs = await api.setMusicDirs(paths);
       setMusicDirs(nextDirs);
       setMusicDir(nextDirs[0] ?? '');
       await refresh();
     } catch (err: any) {
-      setStatus(err?.message ?? 'Failed to update music directory.');
+      setStatus(err?.message ?? t('status.failedUpdateDir'));
     }
   };
 

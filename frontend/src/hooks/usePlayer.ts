@@ -4,6 +4,7 @@ import { api } from '@/services/api';
 import type { MusicFile, PlayMode } from '@/types/media';
 import { pickRandomIndex } from '@/utils/media';
 import { EventsOn } from '../../wailsjs/runtime/runtime';
+import { useI18n } from '@/locales';
 
 type UsePlayerOptions = {
   filteredFiles: MusicFile[];
@@ -11,6 +12,7 @@ type UsePlayerOptions = {
 };
 
 export function usePlayer(options: UsePlayerOptions) {
+  const { t } = useI18n();
   const { filteredFiles, onStatusChange } = options;
   const [active, setActive] = useState<MusicFile | undefined>(undefined);
   const [streamBaseURL, setStreamBaseURL] = useState('');
@@ -117,12 +119,12 @@ export function usePlayer(options: UsePlayerOptions) {
     }
     const shouldAutoplay = options?.autoplay !== false;
     setActive(file);
-    onStatusChange?.(`Loading ${file.name}...`);
+    onStatusChange?.(t('playerStatus.loadingFile', { name: file.name }));
     setPosition(0);
     try {
       const baseURL = streamBaseURL || (await api.getStreamBaseURL());
       if (!baseURL) {
-        onStatusChange?.('Stream server unavailable.');
+        onStatusChange?.(t('playerStatus.streamUnavailable'));
         return;
       }
       const url = new URL('/media', baseURL);
@@ -160,10 +162,10 @@ export function usePlayer(options: UsePlayerOptions) {
         howl.load();
         setIsPlaying(false);
       }
-      onStatusChange?.('Ready');
+      onStatusChange?.(t('status.ready'));
       void api.setLastPlayed(file.path);
     } catch (err: any) {
-      onStatusChange?.(err?.message ?? 'Failed to load audio file.');
+      onStatusChange?.(err?.message ?? t('playerStatus.loadFailed'));
     }
   };
 
@@ -238,10 +240,10 @@ export function usePlayer(options: UsePlayerOptions) {
   };
 
   const playModeLabel = useMemo(() => {
-    if (playMode === 'repeat') return 'Repeat one';
-    if (playMode === 'shuffle') return 'Shuffle';
-    return 'Play in order';
-  }, [playMode]);
+    if (playMode === 'repeat') return t('player.playMode.repeat');
+    if (playMode === 'shuffle') return t('player.playMode.shuffle');
+    return t('player.playMode.order');
+  }, [playMode, t]);
 
   useEffect(() => {
     const unsubscribePlay = EventsOn('hotkey:playpause', () => {

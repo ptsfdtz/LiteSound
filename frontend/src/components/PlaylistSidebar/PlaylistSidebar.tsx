@@ -3,6 +3,7 @@ import { FaPlus, FaPen } from 'react-icons/fa';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import type { MusicFile, Playlist } from '@/types/media';
 import styles from '@/components/PlaylistSidebar/PlaylistSidebar.module.css';
+import { useI18n } from '@/locales';
 
 type PlaylistSidebarProps = {
   playlists: Playlist[];
@@ -26,6 +27,7 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
     status,
     totalTracks,
   } = props;
+  const { t } = useI18n();
 
   const [isOpen, setIsOpen] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
@@ -83,14 +85,14 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.header}>
-        <div className={styles.title}>Playlist</div>
+        <div className={styles.title}>{t('playlist.title')}</div>
         <Button
           className={styles.button}
           onClick={() => {
             setMode('create');
             setIsOpen(true);
           }}
-          aria-label="Add playlist"
+          aria-label={t('playlist.addTo')}
         >
           <FaPlus />
         </Button>
@@ -100,7 +102,7 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
           className={!activePlaylist ? `${styles.item} ${styles.itemActive}` : styles.item}
           onClick={() => onSelectPlaylist(undefined)}
         >
-          <span>All tracks</span>
+          <span>{t('playlist.allTracks')}</span>
           <span className={styles.itemCount}>{totalTracks}</span>
         </div>
         {playlists.map((playlist) => (
@@ -121,7 +123,8 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
                   event.stopPropagation();
                   handleEdit(playlist);
                 }}
-                aria-label={`Edit ${playlist.name}`}
+                aria-label={t('playlist.editWithName', { name: playlist.name })}
+                title={t('playlist.editWithName', { name: playlist.name })}
               >
                 <FaPen />
               </Button>
@@ -129,7 +132,7 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
             </span>
           </div>
         ))}
-        {!playlists.length && <div>No playlists.</div>}
+        {!playlists.length && <div>{t('playlist.noPlaylists')}</div>}
       </div>
 
       <Transition show={isOpen} as={Fragment}>
@@ -155,30 +158,30 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
               leaveFrom={styles.menuLeaveFrom}
               leaveTo={styles.menuLeaveTo}
             >
-              <Dialog.Panel className={styles.dialogPanel}>
-                <Dialog.Title className={styles.dialogTitle}>
-                  {mode === 'edit' ? 'Edit playlist' : 'Add to playlist'}
-                </Dialog.Title>
-                <div className={styles.dialogBody}>
-                  {mode === 'create' && (
-                    <div className={styles.fieldRow}>
-                      <Input
-                        className={styles.input}
-                        placeholder="New playlist name"
-                        value={newPlaylistName}
-                        onChange={(event) => setNewPlaylistName(event.target.value)}
-                      />
-                      <Button className={styles.button} onClick={handleCreate}>
-                        Create
-                      </Button>
-                    </div>
-                  )}
+            <Dialog.Panel className={styles.dialogPanel}>
+              <Dialog.Title className={styles.dialogTitle}>
+                {mode === 'edit' ? t('playlist.edit') : t('playlist.addTo')}
+              </Dialog.Title>
+              <div className={styles.dialogBody}>
+                {mode === 'create' && (
                   <div className={styles.fieldRow}>
-                    <Listbox value={selectedPlaylist} onChange={setSelectedPlaylist} by="name">
-                      <div className={styles.listbox}>
-                        <Listbox.Button className={styles.button}>
-                          {selectedPlaylist ? selectedPlaylist.name : 'Select playlist'}
-                        </Listbox.Button>
+                    <Input
+                      className={styles.input}
+                      placeholder={t('playlist.newNamePlaceholder')}
+                      value={newPlaylistName}
+                      onChange={(event) => setNewPlaylistName(event.target.value)}
+                    />
+                    <Button className={styles.button} onClick={handleCreate}>
+                      {t('playlist.create')}
+                    </Button>
+                  </div>
+                )}
+                <div className={styles.fieldRow}>
+                  <Listbox value={selectedPlaylist} onChange={setSelectedPlaylist} by="name">
+                    <div className={styles.listbox}>
+                      <Listbox.Button className={styles.button}>
+                        {selectedPlaylist ? selectedPlaylist.name : t('playlist.selectPlaylist')}
+                      </Listbox.Button>
                         <Listbox.Options className={styles.dialogList}>
                           {playlists.map((playlist) => (
                             <Listbox.Option key={playlist.name} value={playlist}>
@@ -220,20 +223,22 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
                       );
                     })}
                   </div>
-                  {status && <div className={styles.status}>{status}</div>}
-                  <div className={styles.actions}>
-                    <Button className={styles.button} onClick={() => setIsOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button
-                      className={styles.button}
-                      onClick={handleAdd}
-                      disabled={!selectedPlaylist || selectedCount === 0}
-                    >
-                      Add {selectedCount ? `(${selectedCount})` : ''}
-                    </Button>
-                  </div>
+                {status && <div className={styles.status}>{status}</div>}
+                <div className={styles.actions}>
+                  <Button className={styles.button} onClick={() => setIsOpen(false)}>
+                    {t('playlist.cancel')}
+                  </Button>
+                  <Button
+                    className={styles.button}
+                    onClick={handleAdd}
+                    disabled={!selectedPlaylist || selectedCount === 0}
+                  >
+                    {selectedCount
+                      ? t('playlist.addCount', { count: selectedCount })
+                      : t('playlist.add')}
+                  </Button>
                 </div>
+              </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>

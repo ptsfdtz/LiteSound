@@ -16,6 +16,7 @@ import type { CSSProperties } from 'react';
 import { formatTime } from '@/utils/media';
 import type { MusicFile, PlayMode } from '@/types/media';
 import styles from '@/components/PlayerBar/PlayerBar.module.css';
+import { useI18n } from '@/locales';
 
 type PlayerBarProps = {
   active?: MusicFile;
@@ -61,6 +62,7 @@ export function PlayerBar(props: PlayerBarProps) {
     onToggleMute,
     onCyclePlayMode,
   } = props;
+  const { t } = useI18n();
 
   const [isVolumeOpen, setIsVolumeOpen] = useState(false);
   const progressPercent = duration
@@ -76,7 +78,7 @@ export function PlayerBar(props: PlayerBarProps) {
             className={`${styles.button} ${styles.ghost}`}
             onClick={onPrev}
             disabled={!hasTracks}
-            aria-label="Previous"
+            aria-label={t('player.previous')}
           >
             <FaStepBackward />
           </Button>
@@ -84,7 +86,7 @@ export function PlayerBar(props: PlayerBarProps) {
             className={styles.button}
             onClick={onTogglePlay}
             disabled={!active}
-            aria-label={isPlaying ? 'Pause' : 'Play'}
+            aria-label={isPlaying ? t('player.pause') : t('player.play')}
           >
             {isPlaying ? <FaPause /> : <FaPlay />}
           </Button>
@@ -92,7 +94,7 @@ export function PlayerBar(props: PlayerBarProps) {
             className={`${styles.button} ${styles.ghost}`}
             onClick={onNext}
             disabled={!hasTracks}
-            aria-label="Next"
+            aria-label={t('player.next')}
           >
             <FaStepForward />
           </Button>
@@ -110,7 +112,12 @@ export function PlayerBar(props: PlayerBarProps) {
           <div className={styles.time}>
             {formatTime(position)} / {formatTime(duration)}
           </div>
-          <Button className={styles.button} onClick={onStop} disabled={!active} aria-label="Stop">
+          <Button
+            className={styles.button}
+            onClick={onStop}
+            disabled={!active}
+            aria-label={t('player.stop')}
+          >
             <FaStop />
           </Button>
           <Button
@@ -130,7 +137,7 @@ export function PlayerBar(props: PlayerBarProps) {
             <Button
               className={`${styles.button} ${styles.ghost}`}
               onClick={onToggleMute}
-              aria-label={volume === 0 ? 'Unmute' : 'Mute'}
+              aria-label={volume === 0 ? t('player.unmute') : t('player.mute')}
             >
               {volume === 0 ? <FaVolumeMute /> : <FaVolumeUp />}
             </Button>

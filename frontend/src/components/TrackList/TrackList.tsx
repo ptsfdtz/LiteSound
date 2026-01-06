@@ -1,6 +1,7 @@
 import { Listbox } from '@headlessui/react';
 import type { MusicFile } from '@/types/media';
 import styles from '@/components/TrackList/TrackList.module.css';
+import { useI18n } from '@/locales';
 
 type TrackListProps = {
   files: MusicFile[];
@@ -10,6 +11,7 @@ type TrackListProps = {
 
 export function TrackList(props: TrackListProps) {
   const { files, active, onSelect } = props;
+  const { t } = useI18n();
   return (
     <aside className={styles.list}>
       <Listbox value={active} by="path" onChange={onSelect}>
@@ -19,7 +21,9 @@ export function TrackList(props: TrackListProps) {
               {({ selected }) => (
                 <div className={selected ? `${styles.track} ${styles.active}` : styles.track}>
                   <span className={styles.name}>{file.name}</span>
-                  <span className={styles.ext}>{selected ? 'playing' : file.ext}</span>
+                  <span className={styles.ext}>
+                    {selected ? t('track.playing') : file.ext}
+                  </span>
                 </div>
               )}
             </Listbox.Option>

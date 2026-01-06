@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/services/api';
 import type { Playlist } from '@/types/media';
+import { useI18n } from '@/locales';
 
 export function usePlaylists() {
+  const { t } = useI18n();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [activePlaylist, setActivePlaylist] = useState<Playlist | undefined>(undefined);
   const [playlistStatus, setPlaylistStatus] = useState('');
@@ -16,7 +18,7 @@ export function usePlaylists() {
         setActivePlaylist(match);
       }
     } catch (err: any) {
-      setPlaylistStatus(err?.message ?? 'Failed to refresh playlists.');
+      setPlaylistStatus(err?.message ?? t('playlistStatus.failedRefresh'));
     }
   };
 
@@ -27,31 +29,31 @@ export function usePlaylists() {
   const createPlaylist = async (name: string) => {
     const trimmed = name.trim();
     if (!trimmed) {
-      setPlaylistStatus('Playlist name is required.');
+      setPlaylistStatus(t('playlistStatus.nameRequired'));
       return;
     }
     try {
       await api.createPlaylist(trimmed);
-      setPlaylistStatus('Playlist created.');
+      setPlaylistStatus(t('playlistStatus.created'));
       await refreshPlaylists();
     } catch (err: any) {
-      setPlaylistStatus(err?.message ?? 'Failed to create playlist.');
+      setPlaylistStatus(err?.message ?? t('playlistStatus.failedCreate'));
     }
   };
 
   const addTracksToPlaylist = async (playlistName: string, trackPaths: string[]) => {
     if (!playlistName || !trackPaths.length) {
-      setPlaylistStatus('Select a playlist and tracks.');
+      setPlaylistStatus(t('playlistStatus.selectPrompt'));
       return;
     }
     try {
       for (const path of trackPaths) {
         await api.addToPlaylist(playlistName, path);
       }
-      setPlaylistStatus('Added to playlist.');
+      setPlaylistStatus(t('playlistStatus.added'));
       await refreshPlaylists();
     } catch (err: any) {
-      setPlaylistStatus(err?.message ?? 'Failed to add to playlist.');
+      setPlaylistStatus(err?.message ?? t('playlistStatus.failedAdd'));
     }
   };
 
