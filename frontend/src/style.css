@@ -18,6 +18,20 @@
   --scroll-thumb: #6fb3ff80;
 }
 
+:root[data-theme='light'] {
+  --app-bg: #f4f6fbcc;
+  --app-text: #0f1218;
+  --panel-bg: #ffffffcc;
+  --panel-bg-strong: #ffffffea;
+  --panel-border: #0f12181a;
+  --panel-border-strong: #0f121833;
+  --panel-glow: #0000001a;
+  --panel-accent: #2f6fde;
+  --overlay-bg: #00000066;
+  --scroll-track: #e6eaf2cc;
+  --scroll-thumb: #2f6fde80;
+}
+
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

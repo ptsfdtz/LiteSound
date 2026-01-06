@@ -4,6 +4,7 @@ import { FiltersBar, HeaderBar, PlayerBar, PlaylistSidebar, TrackList } from '@/
 import { useMusicLibrary } from '@/hooks/useMusicLibrary';
 import { usePlaylists } from '@/hooks/usePlaylists';
 import { usePlayer } from '@/hooks/usePlayer';
+import { useTheme } from '@/hooks/useTheme';
 import { findTrackByPath } from '@/utils/media';
 
 function App() {
@@ -33,6 +34,8 @@ function App() {
     createPlaylist,
     addTracksToPlaylist,
   } = usePlaylists();
+
+  const { theme, setTheme } = useTheme();
 
   const playlistFiles = useMemo(() => {
     if (!activePlaylist) return null;
@@ -69,13 +72,15 @@ function App() {
 
   return (
     <div className={styles.app}>
-      <HeaderBar
-        title="LiteSound"
-        onRefresh={refresh}
-        musicDir={musicDir}
-        musicDirs={musicDirs}
-        onSetMusicDirs={updateMusicDirs}
-      />
+            <HeaderBar
+                title="LiteSound"
+                onRefresh={refresh}
+                musicDir={musicDir}
+                musicDirs={musicDirs}
+                onSetMusicDirs={updateMusicDirs}
+                theme={theme}
+                onSetTheme={setTheme}
+            />
       <FiltersBar
         composers={composers}
         composerFilter={composerFilter}

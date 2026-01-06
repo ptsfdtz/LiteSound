@@ -12,6 +12,7 @@ type appState struct {
 	LastPlayedPath string     `json:"lastPlayedPath"`
 	ComposerFilter string     `json:"composerFilter"`
 	AlbumFilter    string     `json:"albumFilter"`
+	Theme          string     `json:"theme"`
 	MusicDir       string     `json:"musicDir"`
 	MusicDirs      []string   `json:"musicDirs"`
 	Playlists      []Playlist `json:"playlists"`
@@ -47,7 +48,11 @@ func (a *App) SetLastPlayed(path string) error {
 	if !isPathWithinAnyDir(dirs, absFile) {
 		return errors.New("file not in music directory")
 	}
-	state := appState{LastPlayedPath: absFile}
+	state, err := a.loadState()
+	if err != nil {
+		return err
+	}
+	state.LastPlayedPath = absFile
 	return a.saveState(state)
 }
 
@@ -105,6 +110,9 @@ func (a *App) loadState() (appState, error) {
 	}
 	if len(state.MusicDirs) == 0 && strings.TrimSpace(state.MusicDir) != "" {
 		state.MusicDirs = []string{state.MusicDir}
+	}
+	if strings.TrimSpace(state.Theme) == "" {
+		state.Theme = "system"
 	}
 	return state, nil
 }

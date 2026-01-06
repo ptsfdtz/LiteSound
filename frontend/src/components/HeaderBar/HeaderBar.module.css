@@ -16,7 +16,13 @@
 .logo {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  background: var(--app-text);
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
 }
 
 .header h1 {
@@ -164,6 +170,15 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.button:active {
+  transform: scale(0.96);
 }
 
 .hint {
@@ -182,6 +197,25 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.themeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.themeButtons {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.themeButtonActive {
+  border-color: var(--panel-accent);
+  color: var(--panel-accent);
+  box-shadow: 0 0 0 2px rgba(111, 179, 255, 0.2);
 }
 
 .directoryList {

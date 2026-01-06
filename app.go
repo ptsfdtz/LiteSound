@@ -23,6 +23,9 @@ func (a *App) startup(ctx context.Context) {
 		a.streamServer = server
 		a.streamBaseURL = server.BaseURL()
 	}
+	if theme, err := a.GetTheme(); err == nil {
+		a.applyTheme(theme)
+	}
 }
 
 func (a *App) GetStreamBaseURL() string {

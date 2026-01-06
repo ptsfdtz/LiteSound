@@ -1,9 +1,12 @@
 import { Button, Dialog, Input, Transition } from '@headlessui/react';
 import {
+  FaAdjust,
   FaCog,
   FaFolderOpen,
+  FaMoon,
   FaPlus,
   FaSave,
+  FaSun,
   FaSyncAlt,
   FaTimes,
   FaTrash,
@@ -22,6 +25,7 @@ import {
 import { api } from '@/services/api';
 import appIcon from '@/assets/appicon.svg';
 import styles from '@/components/HeaderBar/HeaderBar.module.css';
+import type { ThemeMode } from '@/hooks/useTheme';
 
 type HeaderBarProps = {
   title: string;
@@ -29,10 +33,12 @@ type HeaderBarProps = {
   musicDir: string;
   musicDirs: string[];
   onSetMusicDirs: (paths: string[]) => void;
+  theme: ThemeMode;
+  onSetTheme: (theme: ThemeMode) => void;
 };
 
 export function HeaderBar(props: HeaderBarProps) {
-  const { title, onRefresh, musicDir, musicDirs, onSetMusicDirs } = props;
+  const { title, onRefresh, musicDir, musicDirs, onSetMusicDirs, theme, onSetTheme } = props;
   const [isMaximised, setIsMaximised] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [dirValue, setDirValue] = useState(musicDir);
@@ -146,7 +152,15 @@ export function HeaderBar(props: HeaderBarProps) {
   return (
     <header className={styles.header}>
       <div className={styles.brand}>
-        <img className={styles.logo} src={appIcon} alt="LiteSound" />
+        <span
+          className={styles.logo}
+          role="img"
+          aria-label="LiteSound logo"
+          style={{
+            maskImage: `url(${appIcon})`,
+            WebkitMaskImage: `url(${appIcon})`,
+          }}
+        />
         <h1>{title}</h1>
       </div>
       <div className={styles.actions}>
@@ -231,6 +245,41 @@ export function HeaderBar(props: HeaderBarProps) {
                   </div>
                   <div className={styles.hint}>
                     Default music folder is the system Music directory.
+                  </div>
+                  <div className={styles.themeRow}>
+                    <div className={styles.hint}>Theme</div>
+                    <div className={styles.themeButtons}>
+                      <Button
+                        className={`${styles.button} ${
+                          theme === 'system' ? styles.themeButtonActive : ''
+                        }`}
+                        onClick={() => onSetTheme('system')}
+                        aria-label="Follow system"
+                        title="Follow system"
+                      >
+                        <FaAdjust />
+                      </Button>
+                      <Button
+                        className={`${styles.button} ${
+                          theme === 'light' ? styles.themeButtonActive : ''
+                        }`}
+                        onClick={() => onSetTheme('light')}
+                        aria-label="Light"
+                        title="Light"
+                      >
+                        <FaSun />
+                      </Button>
+                      <Button
+                        className={`${styles.button} ${
+                          theme === 'dark' ? styles.themeButtonActive : ''
+                        }`}
+                        onClick={() => onSetTheme('dark')}
+                        aria-label="Dark"
+                        title="Dark"
+                      >
+                        <FaMoon />
+                      </Button>
+                    </div>
                   </div>
                   <div className={styles.actionsRow}>
                     <Button className={styles.button} onClick={handleRefresh} aria-label="Refresh">

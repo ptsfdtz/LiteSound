@@ -38,6 +38,10 @@ export function GetSystemVolume() {
   return window['go']['main']['App']['GetSystemVolume']();
 }
 
+export function GetTheme() {
+  return window['go']['main']['App']['GetTheme']();
+}
+
 export function ListMusicFiles() {
   return window['go']['main']['App']['ListMusicFiles']();
 }
@@ -68,4 +72,8 @@ export function SetMusicDirs(arg1) {
 
 export function SetSystemVolume(arg1) {
   return window['go']['main']['App']['SetSystemVolume'](arg1);
+}
+
+export function SetTheme(arg1) {
+  return window['go']['main']['App']['SetTheme'](arg1);
 }
