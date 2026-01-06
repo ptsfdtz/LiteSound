@@ -7,11 +7,12 @@ type App struct {
 	ctx           context.Context
 	streamServer  *StreamServer
 	streamBaseURL string
+	tray          *trayMenu
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	return &App{}
+	return &App{tray: newTrayMenu()}
 }
 
 // startup is called when the app starts. The context is saved

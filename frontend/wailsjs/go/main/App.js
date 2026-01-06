@@ -77,3 +77,7 @@ export function SetSystemVolume(arg1) {
 export function SetTheme(arg1) {
   return window['go']['main']['App']['SetTheme'](arg1);
 }
+
+export function UpdateTrayPlayback(arg1, arg2, arg3) {
+  return window['go']['main']['App']['UpdateTrayPlayback'](arg1, arg2, arg3);
+}

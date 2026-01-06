@@ -266,6 +266,22 @@ export function usePlayer(options: UsePlayerOptions) {
     };
   }, [active, filteredFiles, goNext, goPrev, togglePlay, selectTrack]);
 
+  useEffect(() => {
+    const track = active?.name ?? '';
+    void api.updateTrayPlayback(track, isPlaying, playMode);
+  }, [active, isPlaying, playMode]);
+
+  useEffect(() => {
+    const unsubscribePlayMode = EventsOn('tray:playmode', (mode) => {
+      if (mode === 'order' || mode === 'repeat' || mode === 'shuffle') {
+        setPlayMode(mode);
+      }
+    });
+    return () => {
+      unsubscribePlayMode();
+    };
+  }, []);
+
   return {
     active,
     isPlaying,

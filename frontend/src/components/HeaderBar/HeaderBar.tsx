@@ -19,6 +19,7 @@ import { Fragment, useEffect, useState } from 'react';
 import {
   Hide,
   Quit,
+  WindowMinimise,
   WindowIsMaximised,
   WindowMaximise,
   WindowUnmaximise,
@@ -85,7 +86,7 @@ export function HeaderBar(props: HeaderBarProps) {
 
   const handleMinimise = async () => {
     try {
-      await Hide();
+      await WindowMinimise();
     } catch {
       // Ignore errors from window control
     }
@@ -93,7 +94,7 @@ export function HeaderBar(props: HeaderBarProps) {
 
   const handleClose = async () => {
     try {
-      await Quit();
+      await Hide();
     } catch {
       // Ignore errors from window control
     }

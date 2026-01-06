@@ -39,3 +39,5 @@ export function SetMusicDirs(arg1:Array<string>):Promise<Array<string>>;
 export function SetSystemVolume(arg1:number):Promise<number>;
 
 export function SetTheme(arg1:string):Promise<void>;
+
+export function UpdateTrayPlayback(arg1:string,arg2:boolean,arg3:string):Promise<void>;
