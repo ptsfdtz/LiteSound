@@ -50,7 +50,10 @@ export function useTheme() {
       document.documentElement.dataset.theme = effectiveTheme;
     };
     if ('startViewTransition' in document) {
-      document.startViewTransition(() => apply());
+      const viewTransition = document as Document & {
+        startViewTransition?: (callback: () => void) => void;
+      };
+      viewTransition.startViewTransition?.(() => apply());
     } else {
       apply();
     }

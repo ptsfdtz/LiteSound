@@ -16,10 +16,10 @@ import {
 } from 'react-icons/fa';
 import { Fragment, useEffect, useState } from 'react';
 import {
+  Hide,
   Quit,
   WindowIsMaximised,
   WindowMaximise,
-  WindowMinimise,
   WindowUnmaximise,
 } from '../../../wailsjs/runtime/runtime';
 import { api } from '@/services/api';
@@ -82,7 +82,7 @@ export function HeaderBar(props: HeaderBarProps) {
 
   const handleMinimise = async () => {
     try {
-      await WindowMinimise();
+      await Hide();
     } catch {
       // Ignore errors from window control
     }

@@ -22,8 +22,6 @@ export function GetSystemVolume():Promise<number>;
 
 export function GetTheme():Promise<string>;
 
-export function GetTheme():Promise<string>;
-
 export function ListMusicFiles():Promise<Array<main.MusicFile>>;
 
 export function PickMusicDir(arg1:string):Promise<string>;
@@ -39,7 +37,5 @@ export function SetMusicDir(arg1:string):Promise<string>;
 export function SetMusicDirs(arg1:Array<string>):Promise<Array<string>>;
 
 export function SetSystemVolume(arg1:number):Promise<number>;
-
-export function SetTheme(arg1:string):Promise<void>;
 
 export function SetTheme(arg1:string):Promise<void>;

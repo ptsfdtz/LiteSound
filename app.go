@@ -4,7 +4,7 @@ import "context"
 
 // App struct
 type App struct {
-	ctx context.Context
+	ctx           context.Context
 	streamServer  *StreamServer
 	streamBaseURL string
 }
@@ -23,6 +23,7 @@ func (a *App) startup(ctx context.Context) {
 		a.streamServer = server
 		a.streamBaseURL = server.BaseURL()
 	}
+	a.startTray()
 	if theme, err := a.GetTheme(); err == nil {
 		a.applyTheme(theme)
 	}
