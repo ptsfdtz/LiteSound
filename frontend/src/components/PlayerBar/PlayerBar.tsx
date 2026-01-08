@@ -11,7 +11,7 @@ import {
   FaVolumeMute,
   FaVolumeUp,
 } from 'react-icons/fa';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { formatTime } from '@/utils/media';
 import type { MusicFile, PlayMode } from '@/types/media';
@@ -64,11 +64,40 @@ export function PlayerBar(props: PlayerBarProps) {
   } = props;
   const { t } = useI18n();
 
+  const [isSeeking, setIsSeeking] = useState(false);
+  const [seekValue, setSeekValue] = useState(0);
   const [isVolumeOpen, setIsVolumeOpen] = useState(false);
+  const seekValueRef = useRef(0);
+  const displayPosition = isSeeking ? seekValue : position;
+  const clampedPosition = Math.min(displayPosition, duration || 0);
   const progressPercent = duration
-    ? `${Math.min(100, Math.max(0, (position / duration) * 100))}%`
+    ? `${Math.min(100, Math.max(0, (clampedPosition / duration) * 100))}%`
     : '0%';
   const volumePercent = `${Math.min(100, Math.max(0, volume))}%`;
+
+  useEffect(() => {
+    seekValueRef.current = seekValue;
+  }, [seekValue]);
+
+  useEffect(() => {
+    if (!isSeeking) {
+      setSeekValue(clampedPosition);
+    }
+  }, [clampedPosition, isSeeking]);
+
+  useEffect(() => {
+    if (!isSeeking) return;
+    const handleCommit = () => {
+      setIsSeeking(false);
+      onSeek(seekValueRef.current);
+    };
+    window.addEventListener('pointerup', handleCommit);
+    window.addEventListener('pointercancel', handleCommit);
+    return () => {
+      window.removeEventListener('pointerup', handleCommit);
+      window.removeEventListener('pointercancel', handleCommit);
+    };
+  }, [isSeeking, onSeek]);
 
   return (
     <section className={styles.player}>
@@ -104,13 +133,24 @@ export function PlayerBar(props: PlayerBarProps) {
             min={0}
             max={duration || 0}
             step={0.1}
-            value={Math.min(position, duration || 0)}
-            onChange={(event) => onSeek(Number(event.target.value))}
+            value={clampedPosition}
+            onPointerDown={() => {
+              if (!active) return;
+              setIsSeeking(true);
+              setSeekValue(clampedPosition);
+            }}
+            onChange={(event) => {
+              const value = Number(event.target.value);
+              setSeekValue(value);
+              if (!isSeeking) {
+                onSeek(value);
+              }
+            }}
             disabled={!active}
             style={{ '--progress': progressPercent } as CSSProperties}
           />
           <div className={styles.time}>
-            {formatTime(position)} / {formatTime(duration)}
+            {formatTime(clampedPosition)} / {formatTime(duration)}
           </div>
           <Button
             className={styles.button}

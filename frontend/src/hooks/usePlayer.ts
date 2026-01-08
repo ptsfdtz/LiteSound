@@ -24,11 +24,26 @@ export function usePlayer(options: UsePlayerOptions) {
   const howlRef = useRef<Howl | null>(null);
   const rafRef = useRef<number | null>(null);
   const lastVolumeRef = useRef(100);
+  const playModeRef = useRef<PlayMode>('order');
+  const activeRef = useRef<MusicFile | undefined>(undefined);
+  const filteredFilesRef = useRef<MusicFile[]>([]);
 
   const activeIndex = useMemo(() => {
     if (!active) return -1;
     return filteredFiles.findIndex((file) => file.path === active.path);
   }, [active, filteredFiles]);
+
+  useEffect(() => {
+    playModeRef.current = playMode;
+  }, [playMode]);
+
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
+
+  useEffect(() => {
+    filteredFilesRef.current = filteredFiles;
+  }, [filteredFiles]);
 
   useEffect(() => {
     let mounted = true;
@@ -98,18 +113,21 @@ export function usePlayer(options: UsePlayerOptions) {
   };
 
   const handleTrackEnd = () => {
-    if (!filteredFiles.length) return;
-    if (playMode === 'repeat' && active) {
-      void selectTrack(active);
+    const files = filteredFilesRef.current;
+    const mode = playModeRef.current;
+    const current = activeRef.current;
+    if (!files.length) return;
+    if (mode === 'repeat' && current) {
+      void selectTrack(current);
       return;
     }
-    if (playMode === 'shuffle') {
-      void selectTrack(filteredFiles[pickRandomIndex(activeIndex, filteredFiles.length)]);
+    const index = current ? files.findIndex((file) => file.path === current.path) : -1;
+    if (mode === 'shuffle') {
+      void selectTrack(files[pickRandomIndex(index, files.length)]);
       return;
     }
-    const index = activeIndex === -1 ? -1 : activeIndex;
-    const nextIndex = (index + 1) % filteredFiles.length;
-    void selectTrack(filteredFiles[nextIndex]);
+    const nextIndex = (index + 1) % files.length;
+    void selectTrack(files[nextIndex]);
   };
 
   const selectTrack = async (file?: MusicFile, options?: { autoplay?: boolean }) => {
@@ -210,8 +228,11 @@ export function usePlayer(options: UsePlayerOptions) {
 
   const seekTo = (value: number) => {
     if (!howlRef.current) return;
-    howlRef.current.seek(value);
-    setPosition(value);
+    const epsilon = 0.25;
+    const safeMax = duration > epsilon ? duration - epsilon : 0;
+    const target = Math.min(Math.max(0, value), safeMax || 0);
+    howlRef.current.seek(target);
+    setPosition(target);
   };
 
   const setSystemVolume = (value: number) => {
