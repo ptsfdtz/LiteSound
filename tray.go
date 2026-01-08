@@ -1,6 +1,8 @@
 package main
 
 import (
+	"embed"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sync"
@@ -53,6 +55,9 @@ var (
 	procModifyMenuW = user32DLL.NewProc("ModifyMenuW")
 	procCheckMenu   = user32DLL.NewProc("CheckMenuItem")
 )
+
+//go:embed build/windows/icon.ico
+var trayAssets embed.FS
 
 func newTrayMenu() *trayMenu {
 	return &trayMenu{state: trayState{}}
@@ -283,8 +288,7 @@ func (t *trayMenu) showMenu(hwnd win.HWND) {
 }
 
 func (t *trayMenu) loadIcon() {
-	iconPath := "build/windows/icon.ico"
-	absPath, err := filepath.Abs(iconPath)
+	absPath, err := t.writeEmbeddedIcon()
 	if err != nil {
 		return
 	}
@@ -304,6 +308,21 @@ func (t *trayMenu) addTrayIcon() {
 	nid.HIcon = t.icon
 	copy(nid.SzTip[:], syscall.StringToUTF16("LiteSound"))
 	win.Shell_NotifyIcon(win.NIM_ADD, &nid)
+}
+
+func (t *trayMenu) writeEmbeddedIcon() (string, error) {
+	data, err := trayAssets.ReadFile("build/windows/icon.ico")
+	if err != nil {
+		return "", err
+	}
+	path := filepath.Join(os.TempDir(), "litesound-tray.ico")
+	if info, err := os.Stat(path); err == nil && info.Size() == int64(len(data)) {
+		return path, nil
+	}
+	if err := os.WriteFile(path, data, 0o644); err != nil {
+		return "", err
+	}
+	return path, nil
 }
 
 func appendMenu(menu win.HMENU, flags uint32, item uintptr, title string) bool {

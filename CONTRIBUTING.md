@@ -70,10 +70,12 @@ gofmt -w .
 以下为 LiteSound 的核心结构与主要实现，便于快速定位修改位置：
 
 - 前端入口：`frontend/src/App.tsx`
+
   - 组合 UI 层（Header / Filters / TrackList / PlayerBar / PlaylistSidebar）。
   - 托盘菜单为自定义 UI（见 `TrayMenu`）。
 
 - 组件结构：`frontend/src/components/`
+
   - `HeaderBar`：顶部栏 + 设置弹窗。
   - `FiltersBar`：作曲者 / 专辑筛选。
   - `TrackList`：歌曲列表。
@@ -82,12 +84,14 @@ gofmt -w .
   - `TrayMenu`：托盘自定义菜单 UI。
 
 - Hooks：`frontend/src/hooks/`
+
   - `useMusicLibrary`：加载本地音乐目录与筛选逻辑。
   - `usePlayer`：播放控制（Howler.js）与播放模式。
   - `usePlaylists`：歌单的创建与管理。
   - `useTheme`：主题切换（light/dark/system）。
 
 - i18n：`frontend/src/locales/`
+
   - `config.ts` 定义多语言入口与 key 类型。
   - `zh-CN` / `en` 下按模块拆分词条。
 
