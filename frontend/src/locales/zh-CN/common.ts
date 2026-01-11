@@ -12,6 +12,7 @@ const common = {
   'playlist.editWithName': '编辑 {name}',
   'playlist.newNamePlaceholder': '新歌单名称',
   'playlist.selectPlaylist': '选择歌单',
+  'playlist.label': '歌单: {name}',
   'playlist.cancel': '取消',
   'playlist.add': '添加',
   'playlist.addCount': '添加 ({count})',

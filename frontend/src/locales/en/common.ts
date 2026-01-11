@@ -12,6 +12,7 @@ const common = {
   'playlist.editWithName': 'Edit {name}',
   'playlist.newNamePlaceholder': 'New playlist name',
   'playlist.selectPlaylist': 'Select playlist',
+  'playlist.label': 'Playlist: {name}',
   'playlist.cancel': 'Cancel',
   'playlist.add': 'Add',
   'playlist.addCount': 'Add ({count})',

@@ -260,7 +260,7 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
                         <div className={styles.listbox}>
                           <Listbox.Button className={styles.button}>
                             {selectedPlaylist
-                              ? `Playlist: ${selectedPlaylist.name}`
+                              ? t('playlist.label', { name: selectedPlaylist.name })
                               : t('playlist.selectPlaylist')}
                           </Listbox.Button>
                           <Listbox.Options className={styles.dialogList}>
