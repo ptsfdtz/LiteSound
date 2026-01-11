@@ -29,11 +29,13 @@ function App() {
   const {
     playlists,
     activePlaylist,
-    setActivePlaylist,
+    selectPlaylist,
     playlistStatus,
     createPlaylist,
     deletePlaylist,
     addTracksToPlaylist,
+    favoritePaths,
+    toggleFavorite,
   } = usePlaylists();
 
   const { theme, setTheme } = useTheme();
@@ -64,24 +66,24 @@ function App() {
     if (hasRestoredRef.current || !lastPlayedPath || !files.length) {
       return;
     }
-    const match = findTrackByPath(files, lastPlayedPath);
+    const match = findTrackByPath(visibleFiles, lastPlayedPath);
     if (match) {
       hasRestoredRef.current = true;
       void player.selectTrack(match, { autoplay: false });
     }
-  }, [files, lastPlayedPath]);
+  }, [visibleFiles, lastPlayedPath]);
 
   return (
     <div className={styles.app}>
-            <HeaderBar
-                title="LiteSound"
-                onRefresh={refresh}
-                musicDir={musicDir}
-                musicDirs={musicDirs}
-                onSetMusicDirs={updateMusicDirs}
-                theme={theme}
-                onSetTheme={setTheme}
-            />
+      <HeaderBar
+        title="LiteSound"
+        onRefresh={refresh}
+        musicDir={musicDir}
+        musicDirs={musicDirs}
+        onSetMusicDirs={updateMusicDirs}
+        theme={theme}
+        onSetTheme={setTheme}
+      />
       <FiltersBar
         composers={composers}
         composerFilter={composerFilter}
@@ -94,7 +96,7 @@ function App() {
         <PlaylistSidebar
           playlists={playlists}
           activePlaylist={activePlaylist}
-          onSelectPlaylist={setActivePlaylist}
+          onSelectPlaylist={selectPlaylist}
           onCreatePlaylist={createPlaylist}
           onDeletePlaylist={deletePlaylist}
           onAddTracks={addTracksToPlaylist}
@@ -102,7 +104,13 @@ function App() {
           status={playlistStatus}
           totalTracks={files.length}
         />
-        <TrackList files={visibleFiles} active={player.active} onSelect={player.selectTrack} />
+        <TrackList
+          files={visibleFiles}
+          active={player.active}
+          favoritePaths={favoritePaths}
+          onToggleFavorite={toggleFavorite}
+          onSelect={player.selectTrack}
+        />
       </div>
       <PlayerBar
         active={player.active}

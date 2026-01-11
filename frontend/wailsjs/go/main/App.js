@@ -14,6 +14,10 @@ export function DeletePlaylist(arg1) {
   return window['go']['main']['App']['DeletePlaylist'](arg1);
 }
 
+export function GetActivePlaylist() {
+  return window['go']['main']['App']['GetActivePlaylist']();
+}
+
 export function GetFilters() {
   return window['go']['main']['App']['GetFilters']();
 }
@@ -56,6 +60,14 @@ export function PickMusicDir(arg1) {
 
 export function ReadMusicFile(arg1) {
   return window['go']['main']['App']['ReadMusicFile'](arg1);
+}
+
+export function RemoveFromPlaylist(arg1, arg2) {
+  return window['go']['main']['App']['RemoveFromPlaylist'](arg1, arg2);
+}
+
+export function SetActivePlaylist(arg1) {
+  return window['go']['main']['App']['SetActivePlaylist'](arg1);
 }
 
 export function SetFilters(arg1, arg2) {

@@ -16,6 +16,35 @@ type appState struct {
 	MusicDir       string     `json:"musicDir"`
 	MusicDirs      []string   `json:"musicDirs"`
 	Playlists      []Playlist `json:"playlists"`
+	ActivePlaylist string     `json:"activePlaylist"`
+}
+
+
+func (a *App) GetActivePlaylist() (string, error) {
+	state, err := a.loadState()
+	if err != nil {
+		return "", err
+	}
+	return state.ActivePlaylist, nil
+}
+
+func (a *App) SetActivePlaylist(name string) error {
+	name = strings.TrimSpace(name)
+	state, err := a.loadState()
+	if err != nil {
+		return err
+	}
+	if name == "" {
+		state.ActivePlaylist = ""
+		return a.saveState(state)
+	}
+	for _, playlist := range state.Playlists {
+		if strings.EqualFold(playlist.Name, name) {
+			state.ActivePlaylist = playlist.Name
+			return a.saveState(state)
+		}
+	}
+	return errors.New("playlist not found")
 }
 
 func (a *App) GetLastPlayed() (string, error) {
@@ -105,6 +134,7 @@ func (a *App) loadState() (appState, error) {
 	if state.Playlists == nil {
 		state.Playlists = []Playlist{}
 	}
+	ensureFavoritesPlaylist(&state)
 	if state.MusicDirs == nil {
 		state.MusicDirs = []string{}
 	}

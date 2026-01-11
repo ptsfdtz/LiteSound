@@ -43,9 +43,45 @@
   line-height: 1.3;
 }
 
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .ext {
   font-size: 12px;
   opacity: 0.6;
+}
+
+.favoriteButton {
+  border: none;
+  background: var(--panel-bg-strong);
+  color: inherit;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 120ms ease,
+    border-color 120ms ease;
+}
+
+.track:hover .favoriteButton {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.favoriteButton:hover {
+  border-color: var(--panel-accent);
+}
+
+.favoriteActive {
+  color: var(--panel-accent);
 }
 
 .empty {

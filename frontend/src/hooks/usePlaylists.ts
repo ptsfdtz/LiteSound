@@ -5,9 +5,28 @@ import { useI18n } from '@/locales';
 
 export function usePlaylists() {
   const { t } = useI18n();
+  const favoritesKey = '__favorites__';
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [activePlaylist, setActivePlaylist] = useState<Playlist | undefined>(undefined);
   const [playlistStatus, setPlaylistStatus] = useState('');
+
+  const favorites = playlists.find((playlist) => playlist.name === favoritesKey);
+  const favoritePaths = favorites ? favorites.tracks : [];
+
+
+  const initPlaylists = async () => {
+    try {
+      const [list, saved] = await Promise.all([
+        api.getPlaylists(),
+        api.getActivePlaylist(),
+      ]);
+      setPlaylists(list);
+      const match = saved ? list.find((playlist) => playlist.name === saved) : undefined;
+      setActivePlaylist(match);
+    } catch (err: any) {
+      setPlaylistStatus(err?.message ?? t('playlistStatus.failedRefresh'));
+    }
+  };
 
   const refreshPlaylists = async () => {
     try {
@@ -23,8 +42,18 @@ export function usePlaylists() {
   };
 
   useEffect(() => {
-    void refreshPlaylists();
+    void initPlaylists();
   }, []);
+
+
+  const selectPlaylist = async (playlist?: Playlist) => {
+    setActivePlaylist(playlist);
+    try {
+      await api.setActivePlaylist(playlist?.name ?? '');
+    } catch (err: any) {
+      setPlaylistStatus(err?.message ?? t('playlistStatus.failedRefresh'));
+    }
+  };
 
   const createPlaylist = async (name: string) => {
     const trimmed = name.trim();
@@ -48,10 +77,29 @@ export function usePlaylists() {
       setPlaylistStatus(t('playlistStatus.deleted'));
       if (activePlaylist?.name === name) {
         setActivePlaylist(undefined);
+        await api.setActivePlaylist('');
       }
       await refreshPlaylists();
     } catch (err: any) {
       setPlaylistStatus(err?.message ?? t('playlistStatus.failedDelete'));
+    }
+  };
+
+
+  const toggleFavorite = async (path: string) => {
+    if (!path) return;
+    const isFavorite = favoritePaths.includes(path);
+    try {
+      if (isFavorite) {
+        await api.removeFromPlaylist(favoritesKey, path);
+        setPlaylistStatus(t('playlistStatus.unfavorited'));
+      } else {
+        await api.addToPlaylist(favoritesKey, path);
+        setPlaylistStatus(t('playlistStatus.favorited'));
+      }
+      await refreshPlaylists();
+    } catch (err: any) {
+      setPlaylistStatus(err?.message ?? t('playlistStatus.failedFavorite'));
     }
   };
 
@@ -74,11 +122,13 @@ export function usePlaylists() {
   return {
     playlists,
     activePlaylist,
-    setActivePlaylist,
+    selectPlaylist,
     playlistStatus,
     refreshPlaylists,
     createPlaylist,
     deletePlaylist,
     addTracksToPlaylist,
+    favoritePaths,
+    toggleFavorite,
   };
 }

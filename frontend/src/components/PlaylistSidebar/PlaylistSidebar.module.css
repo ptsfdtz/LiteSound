@@ -18,6 +18,7 @@
 .title {
   font-size: 16px;
   font-weight: 600;
+  margin-left: 8px;
 }
 
 .button {
@@ -106,6 +107,12 @@
   pointer-events: auto;
 }
 
+.createButton {
+  padding: 8px 12px;
+  height: 40px;
+  border-radius: 10px;
+}
+
 .dialogPanel {
   width: min(600px, 90vw);
   background: var(--panel-bg);
@@ -154,6 +161,7 @@
   color: inherit;
   padding: 8px 12px;
   border-radius: 10px;
+  height: 40px;
 }
 
 .trackList {

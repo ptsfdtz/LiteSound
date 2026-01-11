@@ -8,6 +8,8 @@ export function CreatePlaylist(arg1:string):Promise<void>;
 
 export function DeletePlaylist(arg1:string):Promise<void>;
 
+export function GetActivePlaylist():Promise<string>;
+
 export function GetFilters():Promise<string>;
 
 export function GetLastPlayed():Promise<string>;
@@ -29,6 +31,10 @@ export function ListMusicFiles():Promise<Array<main.MusicFile>>;
 export function PickMusicDir(arg1:string):Promise<string>;
 
 export function ReadMusicFile(arg1:string):Promise<Array<number>>;
+
+export function RemoveFromPlaylist(arg1:string,arg2:string):Promise<void>;
+
+export function SetActivePlaylist(arg1:string):Promise<void>;
 
 export function SetFilters(arg1:string,arg2:string):Promise<void>;
 

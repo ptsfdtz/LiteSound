@@ -1,8 +1,9 @@
-import { Button, Checkbox, Dialog, Input, Listbox, Transition } from '@headlessui/react';
+import { Button, Checkbox, Dialog, Input, Transition } from '@headlessui/react';
 import { FaPlus, FaPen, FaTrash } from 'react-icons/fa';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import type { MusicFile, Playlist } from '@/types/media';
 import styles from '@/components/PlaylistSidebar/PlaylistSidebar.module.css';
+import { Dropdown } from '@/components/common/Dropdown/Dropdown';
 import { useI18n } from '@/locales';
 
 type PlaylistSidebarProps = {
@@ -31,6 +32,15 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
   } = props;
   const { t } = useI18n();
 
+  const favoritesPlaylistKey = '__favorites__';
+
+  const getPlaylistLabel = (playlist?: Playlist) => {
+    if (!playlist) return '';
+    return playlist.name === favoritesPlaylistKey ? t('playlist.favorites') : playlist.name;
+  };
+
+  const isFavoritesPlaylist = (playlist?: Playlist) => playlist?.name === favoritesPlaylistKey;
+
   const allFilter = '__all__';
   const unknownFilter = '__unknown__';
 
@@ -58,16 +68,8 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
       const value = file.composer?.trim() ? file.composer.trim() : unknownFilter;
       set.add(value);
     });
-    return [
-      { value: allFilter, label: t('filters.all') },
-      ...Array.from(set)
-        .sort((a, b) => a.localeCompare(b))
-        .map((value) => ({
-          value,
-          label: value === unknownFilter ? t('filters.unknown') : value,
-        })),
-    ];
-  }, [files, t]);
+    return [allFilter, ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+  }, [files]);
 
   const albumOptions = useMemo(() => {
     const set = new Set<string>();
@@ -75,16 +77,8 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
       const value = file.album?.trim() ? file.album.trim() : unknownFilter;
       set.add(value);
     });
-    return [
-      { value: allFilter, label: t('filters.all') },
-      ...Array.from(set)
-        .sort((a, b) => a.localeCompare(b))
-        .map((value) => ({
-          value,
-          label: value === unknownFilter ? t('filters.unknown') : value,
-        })),
-    ];
-  }, [files, t]);
+    return [allFilter, ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+  }, [files]);
 
   const filteredFiles = useMemo(() => {
     return files.filter((file) => {
@@ -96,9 +90,10 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
     });
   }, [albumFilter, composerFilter, files]);
 
-  const getFilterLabel = (value: string, options: { value: string; label: string }[]) => {
-    const match = options.find((option) => option.value === value);
-    return match ? match.label : t('filters.all');
+  const renderFilterLabel = (value: string) => {
+    if (value === allFilter) return t('filters.all');
+    if (value === unknownFilter) return t('filters.unknown');
+    return value;
   };
 
   const toggleTrack = (path: string, defaultChecked: boolean) => {
@@ -130,6 +125,7 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
   };
 
   const handleDelete = (playlist: Playlist) => {
+    if (isFavoritesPlaylist(playlist)) return;
     setDeleteTarget(playlist);
   };
 
@@ -156,7 +152,7 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
       <div className={styles.header}>
         <div className={styles.title}>{t('playlist.title')}</div>
         <Button
-          className={styles.button}
+          className={`${styles.button} ${styles.addButton}`}
           onClick={() => {
             setMode('create');
             setComposerFilter(allFilter);
@@ -176,44 +172,51 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
           <span>{t('playlist.allTracks')}</span>
           <span className={styles.itemCount}>{totalTracks}</span>
         </div>
-        {playlists.map((playlist) => (
-          <div
-            key={playlist.name}
-            className={
-              activePlaylist?.name === playlist.name
-                ? `${styles.item} ${styles.itemActive}`
-                : styles.item
-            }
-            onClick={() => onSelectPlaylist(playlist)}
-          >
-            <span>{playlist.name}</span>
-            <span className={styles.itemActions}>
-              <Button
-                className={`${styles.button} ${styles.editButton}`}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handleEdit(playlist);
-                }}
-                aria-label={t('playlist.editWithName', { name: playlist.name })}
-                title={t('playlist.editWithName', { name: playlist.name })}
-              >
-                <FaPen />
-              </Button>
-              <Button
-                className={`${styles.button} ${styles.deleteButton}`}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handleDelete(playlist);
-                }}
-                aria-label={t('playlist.deleteWithName', { name: playlist.name })}
-                title={t('playlist.deleteWithName', { name: playlist.name })}
-              >
-                <FaTrash />
-              </Button>
-              <span className={styles.itemCount}>{playlist.tracks.length}</span>
-            </span>
-          </div>
-        ))}
+        {playlists.map((playlist) => {
+          const playlistLabel = getPlaylistLabel(playlist);
+          const favorites = isFavoritesPlaylist(playlist);
+
+          return (
+            <div
+              key={playlist.name}
+              className={
+                activePlaylist?.name === playlist.name
+                  ? `${styles.item} ${styles.itemActive}`
+                  : styles.item
+              }
+              onClick={() => onSelectPlaylist(playlist)}
+            >
+              <span>{playlistLabel}</span>
+              <span className={styles.itemActions}>
+                <Button
+                  className={`${styles.button} ${styles.editButton}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleEdit(playlist);
+                  }}
+                  aria-label={t('playlist.editWithName', { name: playlistLabel })}
+                  title={t('playlist.editWithName', { name: playlistLabel })}
+                >
+                  <FaPen />
+                </Button>
+                {!favorites && (
+                  <Button
+                    className={`${styles.button} ${styles.deleteButton}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleDelete(playlist);
+                    }}
+                    aria-label={t('playlist.deleteWithName', { name: playlistLabel })}
+                    title={t('playlist.deleteWithName', { name: playlistLabel })}
+                  >
+                    <FaTrash />
+                  </Button>
+                )}
+                <span className={styles.itemCount}>{playlist.tracks.length}</span>
+              </span>
+            </div>
+          );
+        })}
         {!playlists.length && <div>{t('playlist.noPlaylists')}</div>}
       </div>
 
@@ -253,89 +256,46 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
                         value={newPlaylistName}
                         onChange={(event) => setNewPlaylistName(event.target.value)}
                       />
-                      <Button className={styles.button} onClick={handleCreate}>
+                      <Button
+                        className={`${styles.button} ${styles.createButton}`}
+                        onClick={handleCreate}
+                      >
                         {t('playlist.create')}
                       </Button>
-                      <Listbox value={selectedPlaylist} onChange={setSelectedPlaylist} by="name">
-                        <div className={styles.listbox}>
-                          <Listbox.Button className={styles.button}>
-                            {selectedPlaylist
-                              ? t('playlist.label', { name: selectedPlaylist.name })
-                              : t('playlist.selectPlaylist')}
-                          </Listbox.Button>
-                          <Listbox.Options className={styles.dialogList}>
-                            {playlists.map((playlist) => (
-                              <Listbox.Option key={playlist.name} value={playlist}>
-                                {({ active: optionActive }) => (
-                                  <div
-                                    className={
-                                      optionActive
-                                        ? `${styles.item} ${styles.itemActive}`
-                                        : styles.item
-                                    }
-                                  >
-                                    <span>{playlist.name}</span>
-                                    <span>{playlist.tracks.length}</span>
-                                  </div>
-                                )}
-                              </Listbox.Option>
-                            ))}
-                          </Listbox.Options>
-                        </div>
-                      </Listbox>
+                      <Dropdown
+                        value={selectedPlaylist}
+                        onChange={setSelectedPlaylist}
+                        options={playlists}
+                        getOptionLabel={getPlaylistLabel}
+                        getOptionKey={(playlist) => playlist.name}
+                        getOptionMeta={(playlist) => playlist.tracks.length}
+                        buttonLabel={
+                          selectedPlaylist
+                            ? t('playlist.label', { name: getPlaylistLabel(selectedPlaylist) })
+                            : t('playlist.selectPlaylist')
+                        }
+                        className={styles.listbox}
+                      />
                     </div>
                   )}
                   {mode === 'edit' && (
                     <div className={styles.filterRow}>
-                      <Listbox value={composerFilter} onChange={setComposerFilter}>
-                        <div className={styles.listbox}>
-                          <Listbox.Button className={styles.button}>
-                            {t('filters.composer')}:{' '}
-                            {getFilterLabel(composerFilter, composerOptions)}
-                          </Listbox.Button>
-                          <Listbox.Options className={styles.dialogList}>
-                            {composerOptions.map((option) => (
-                              <Listbox.Option key={option.value} value={option.value}>
-                                {({ active: optionActive }) => (
-                                  <div
-                                    className={
-                                      optionActive
-                                        ? `${styles.item} ${styles.itemActive}`
-                                        : styles.item
-                                    }
-                                  >
-                                    <span>{option.label}</span>
-                                  </div>
-                                )}
-                              </Listbox.Option>
-                            ))}
-                          </Listbox.Options>
-                        </div>
-                      </Listbox>
-                      <Listbox value={albumFilter} onChange={setAlbumFilter}>
-                        <div className={styles.listbox}>
-                          <Listbox.Button className={styles.button}>
-                            {t('filters.album')}: {getFilterLabel(albumFilter, albumOptions)}
-                          </Listbox.Button>
-                          <Listbox.Options className={styles.dialogList}>
-                            {albumOptions.map((option) => (
-                              <Listbox.Option key={option.value} value={option.value}>
-                                {({ active: optionActive }) => (
-                                  <div
-                                    className={
-                                      optionActive
-                                        ? `${styles.item} ${styles.itemActive}`
-                                        : styles.item
-                                    }
-                                  >
-                                    <span>{option.label}</span>
-                                  </div>
-                                )}
-                              </Listbox.Option>
-                            ))}
-                          </Listbox.Options>
-                        </div>
-                      </Listbox>
+                      <Dropdown
+                        value={composerFilter}
+                        onChange={setComposerFilter}
+                        options={composerOptions}
+                        getOptionLabel={renderFilterLabel}
+                        buttonLabel={`${t('filters.composer')}: ${renderFilterLabel(composerFilter)}`}
+                        className={styles.listbox}
+                      />
+                      <Dropdown
+                        value={albumFilter}
+                        onChange={setAlbumFilter}
+                        options={albumOptions}
+                        getOptionLabel={renderFilterLabel}
+                        buttonLabel={`${t('filters.album')}: ${renderFilterLabel(albumFilter)}`}
+                        className={styles.listbox}
+                      />
                     </div>
                   )}
 
@@ -408,7 +368,9 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
                 <Dialog.Title className={styles.dialogTitle}>{t('playlist.delete')}</Dialog.Title>
                 <div className={styles.dialogBody}>
                   <div className={styles.status}>
-                    {deleteTarget ? t('playlist.confirmDelete', { name: deleteTarget.name }) : ''}
+                    {deleteTarget
+                      ? t('playlist.confirmDelete', { name: getPlaylistLabel(deleteTarget) })
+                      : ''}
                   </div>
                   <div className={styles.actions}>
                     <Button className={styles.button} onClick={() => setDeleteTarget(null)}>

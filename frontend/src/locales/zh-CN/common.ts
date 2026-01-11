@@ -12,6 +12,7 @@ const common = {
   'playlist.editWithName': '编辑 {name}',
   'playlist.newNamePlaceholder': '新歌单名称',
   'playlist.selectPlaylist': '选择歌单',
+  'playlist.favorites': '收藏',
   'playlist.label': '歌单: {name}',
   'playlist.cancel': '取消',
   'playlist.add': '添加',
@@ -22,6 +23,9 @@ const common = {
   'playlist.confirmDelete': '确定删除 "{name}" 吗？',
   'playlistStatus.deleted': '歌单已删除。',
   'playlistStatus.failedDelete': '删除歌单失败。',
+  'playlistStatus.favorited': '已加入收藏。',
+  'playlistStatus.unfavorited': '已移出收藏。',
+  'playlistStatus.failedFavorite': '收藏更新失败。',
   'settings.title': '设置',
   'settings.musicFolderPlaceholder': '音乐文件夹路径',
   'settings.usingDefault': '使用系统默认音乐文件夹。',
@@ -71,6 +75,8 @@ const common = {
   'playerStatus.streamUnavailable': '播放服务不可用。',
   'playerStatus.loadFailed': '加载音频失败。',
   'track.playing': '正在播放',
+  'track.favorite': '加入收藏',
+  'track.unfavorite': '移出收藏',
 } as const;
 
 export default common;
