@@ -41,6 +41,20 @@ export function usePlaylists() {
     }
   };
 
+  const deletePlaylist = async (name: string) => {
+    if (!name) return;
+    try {
+      await api.deletePlaylist(name);
+      setPlaylistStatus(t('playlistStatus.deleted'));
+      if (activePlaylist?.name === name) {
+        setActivePlaylist(undefined);
+      }
+      await refreshPlaylists();
+    } catch (err: any) {
+      setPlaylistStatus(err?.message ?? t('playlistStatus.failedDelete'));
+    }
+  };
+
   const addTracksToPlaylist = async (playlistName: string, trackPaths: string[]) => {
     if (!playlistName || !trackPaths.length) {
       setPlaylistStatus(t('playlistStatus.selectPrompt'));
@@ -64,6 +78,7 @@ export function usePlaylists() {
     playlistStatus,
     refreshPlaylists,
     createPlaylist,
+    deletePlaylist,
     addTracksToPlaylist,
   };
 }

@@ -42,7 +42,9 @@
 }
 
 .dialogList {
+  height: 300px;
   display: flex;
+  overflow: auto;
   flex-direction: column;
   gap: 8px;
   padding: 8px;
@@ -93,6 +95,17 @@
   pointer-events: auto;
 }
 
+.deleteButton {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.item:hover .deleteButton {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .dialogPanel {
   width: min(600px, 90vw);
   background: var(--panel-bg);
@@ -122,6 +135,13 @@
   flex-wrap: wrap;
 }
 
+.filterRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .listbox {
   position: relative;
   min-width: 220px;
@@ -137,7 +157,7 @@
 }
 
 .trackList {
-  max-height: 240px;
+  height: 240px;
   overflow: auto;
   display: flex;
   flex-direction: column;

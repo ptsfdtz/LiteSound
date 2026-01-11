@@ -6,6 +6,8 @@ export function AddToPlaylist(arg1:string,arg2:string):Promise<void>;
 
 export function CreatePlaylist(arg1:string):Promise<void>;
 
+export function DeletePlaylist(arg1:string):Promise<void>;
+
 export function GetFilters():Promise<string>;
 
 export function GetLastPlayed():Promise<string>;

@@ -32,6 +32,7 @@ function App() {
     setActivePlaylist,
     playlistStatus,
     createPlaylist,
+    deletePlaylist,
     addTracksToPlaylist,
   } = usePlaylists();
 
@@ -95,6 +96,7 @@ function App() {
           activePlaylist={activePlaylist}
           onSelectPlaylist={setActivePlaylist}
           onCreatePlaylist={createPlaylist}
+          onDeletePlaylist={deletePlaylist}
           onAddTracks={addTracksToPlaylist}
           files={files}
           status={playlistStatus}

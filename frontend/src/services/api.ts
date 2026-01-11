@@ -1,6 +1,7 @@
 import {
   AddToPlaylist,
   CreatePlaylist,
+  DeletePlaylist,
   GetFilters,
   GetLastPlayed,
   GetMusicDir,
@@ -24,6 +25,7 @@ import {
 export const api = {
   addToPlaylist: AddToPlaylist,
   createPlaylist: CreatePlaylist,
+  deletePlaylist: DeletePlaylist,
   getFilters: GetFilters,
   getLastPlayed: GetLastPlayed,
   getMusicDir: GetMusicDir,

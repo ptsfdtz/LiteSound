@@ -81,3 +81,28 @@ func (a *App) AddToPlaylist(name string, path string) error {
 	}
 	return errors.New("playlist not found")
 }
+
+func (a *App) DeletePlaylist(name string) error {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return errors.New("playlist name is required")
+	}
+	state, err := a.loadState()
+	if err != nil {
+		return err
+	}
+	updated := make([]Playlist, 0, len(state.Playlists))
+	found := false
+	for _, playlist := range state.Playlists {
+		if strings.EqualFold(playlist.Name, name) {
+			found = true
+			continue
+		}
+		updated = append(updated, playlist)
+	}
+	if !found {
+		return errors.New("playlist not found")
+	}
+	state.Playlists = updated
+	return a.saveState(state)
+}

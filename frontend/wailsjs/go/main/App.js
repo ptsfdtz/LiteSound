@@ -10,6 +10,10 @@ export function CreatePlaylist(arg1) {
   return window['go']['main']['App']['CreatePlaylist'](arg1);
 }
 
+export function DeletePlaylist(arg1) {
+  return window['go']['main']['App']['DeletePlaylist'](arg1);
+}
+
 export function GetFilters() {
   return window['go']['main']['App']['GetFilters']();
 }
