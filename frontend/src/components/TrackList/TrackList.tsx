@@ -48,7 +48,7 @@ export function TrackList(props: TrackListProps) {
                           onClick={(event) => {
                             event.preventDefault();
                             event.stopPropagation();
-                            onRemoveFromPlaylist(playlistName, file.path);
+                            onRemoveFromPlaylist(playlistName || '', file.path);
                           }}
                           aria-label={t('track.removeFromPlaylist')}
                         >

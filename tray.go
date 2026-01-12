@@ -175,7 +175,7 @@ func (t *trayMenu) handleTrayMessage(a *App, hwnd win.HWND, lParam uintptr) uint
 		wailsruntime.Show(a.ctx)
 		wailsruntime.WindowUnminimise(a.ctx)
 	case win.WM_RBUTTONUP:
-		t.showMenu(hwnd)
+		t.showMenuAndHandle(a, hwnd)
 	}
 	return 0
 }
@@ -210,7 +210,7 @@ func (t *trayMenu) handleCommand(a *App, hwnd win.HWND, wParam uintptr) uintptr 
 		keepOpen = true
 	}
 	if keepOpen {
-		go t.showMenu(hwnd)
+		go t.showMenuAndHandle(a, hwnd)
 	}
 	return 0
 }
@@ -279,12 +279,19 @@ func truncateTitle(value string, limit int) string {
 	return string(runes[:limit]) + "..."
 }
 
-func (t *trayMenu) showMenu(hwnd win.HWND) {
+func (t *trayMenu) showMenuAndHandle(a *App, hwnd win.HWND) {
+	if cmd := t.showMenu(hwnd); cmd != 0 {
+		t.handleCommand(a, hwnd, uintptr(cmd))
+	}
+}
+
+func (t *trayMenu) showMenu(hwnd win.HWND) uint32 {
 	var point win.POINT
 	win.GetCursorPos(&point)
 	win.SetForegroundWindow(hwnd)
-	win.TrackPopupMenu(t.menu, win.TPM_BOTTOMALIGN|win.TPM_LEFTALIGN, point.X, point.Y, 0, hwnd, nil)
+	cmd := win.TrackPopupMenu(t.menu, win.TPM_RETURNCMD|win.TPM_RIGHTBUTTON|win.TPM_BOTTOMALIGN|win.TPM_LEFTALIGN, point.X, point.Y, 0, hwnd, nil)
 	win.PostMessage(hwnd, win.WM_NULL, 0, 0)
+	return cmd
 }
 
 func (t *trayMenu) loadIcon() {
