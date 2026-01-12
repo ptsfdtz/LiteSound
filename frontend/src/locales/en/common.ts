@@ -23,7 +23,6 @@ const common = {
   'playlist.confirmDelete': 'Delete "{name}"?',
   'playlistStatus.deleted': 'Playlist deleted.',
   'playlistStatus.failedDelete': 'Failed to delete playlist.',
-  'playlistStatus.favorited': 'Added to favorites.',
   'playlistStatus.unfavorited': 'Removed from favorites.',
   'playlistStatus.failedFavorite': 'Failed to update favorites.',
   'settings.title': 'Settings',

@@ -13,13 +13,9 @@ export function usePlaylists() {
   const favorites = playlists.find((playlist) => playlist.name === favoritesKey);
   const favoritePaths = favorites ? favorites.tracks : [];
 
-
   const initPlaylists = async () => {
     try {
-      const [list, saved] = await Promise.all([
-        api.getPlaylists(),
-        api.getActivePlaylist(),
-      ]);
+      const [list, saved] = await Promise.all([api.getPlaylists(), api.getActivePlaylist()]);
       setPlaylists(list);
       const match = saved ? list.find((playlist) => playlist.name === saved) : undefined;
       setActivePlaylist(match);
@@ -44,7 +40,6 @@ export function usePlaylists() {
   useEffect(() => {
     void initPlaylists();
   }, []);
-
 
   const selectPlaylist = async (playlist?: Playlist) => {
     setActivePlaylist(playlist);
@@ -85,7 +80,6 @@ export function usePlaylists() {
     }
   };
 
-
   const toggleFavorite = async (path: string) => {
     if (!path) return;
     const isFavorite = favoritePaths.includes(path);
@@ -93,9 +87,6 @@ export function usePlaylists() {
       if (isFavorite) {
         await api.removeFromPlaylist(favoritesKey, path);
         setPlaylistStatus(t('playlistStatus.unfavorited'));
-      } else {
-        await api.addToPlaylist(favoritesKey, path);
-        setPlaylistStatus(t('playlistStatus.favorited'));
       }
       await refreshPlaylists();
     } catch (err: any) {

@@ -23,7 +23,6 @@ const common = {
   'playlist.confirmDelete': '确定删除 "{name}" 吗？',
   'playlistStatus.deleted': '歌单已删除。',
   'playlistStatus.failedDelete': '删除歌单失败。',
-  'playlistStatus.favorited': '已加入收藏。',
   'playlistStatus.unfavorited': '已移出收藏。',
   'playlistStatus.failedFavorite': '收藏更新失败。',
   'settings.title': '设置',
