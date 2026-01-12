@@ -4,6 +4,7 @@ import (
 	"embed"
 
 	"github.com/wailsapp/wails/v2"
+	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
@@ -27,6 +28,16 @@ func main() {
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 160},
 		OnStartup:        app.startup,
 		OnShutdown:       app.shutdown,
+		SingleInstanceLock: &options.SingleInstanceLock{
+			UniqueId: "litesound",
+			OnSecondInstanceLaunch: func(_ options.SecondInstanceData) {
+				if app.ctx == nil {
+					return
+				}
+				wailsruntime.Show(app.ctx)
+				wailsruntime.WindowUnminimise(app.ctx)
+			},
+		},
 		Bind: []interface{}{
 			app,
 		},
