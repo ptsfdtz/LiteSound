@@ -54,6 +54,32 @@
   opacity: 0.6;
 }
 
+.removeButton {
+  border: none;
+  background: var(--panel-bg-strong);
+  color: inherit;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 120ms ease,
+    border-color 120ms ease;
+}
+
+.track:hover .removeButton {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.removeButton:hover {
+  border-color: var(--panel-accent);
+}
+
 .favoriteButton {
   border: none;
   background: var(--panel-bg-strong);

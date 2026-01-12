@@ -25,6 +25,8 @@ const common = {
   'playlistStatus.failedDelete': 'Failed to delete playlist.',
   'playlistStatus.unfavorited': 'Removed from favorites.',
   'playlistStatus.failedFavorite': 'Failed to update favorites.',
+  'playlistStatus.removed': 'Removed from playlist.',
+  'playlistStatus.failedRemove': 'Failed to remove from playlist.',
   'settings.title': 'Settings',
   'settings.musicFolderPlaceholder': 'Music folder path',
   'settings.usingDefault': 'Using default system Music folder.',
@@ -68,7 +70,6 @@ const common = {
   'playlistStatus.created': 'Playlist created.',
   'playlistStatus.failedCreate': 'Failed to create playlist.',
   'playlistStatus.selectPrompt': 'Select a playlist and tracks.',
-  'playlistStatus.added': 'Added to playlist.',
   'playlistStatus.failedAdd': 'Failed to add to playlist.',
   'playerStatus.loadingFile': 'Loading {name}...',
   'playerStatus.streamUnavailable': 'Stream server unavailable.',
@@ -76,6 +77,7 @@ const common = {
   'track.playing': 'playing',
   'track.favorite': 'Add to favorites',
   'track.unfavorite': 'Remove from favorites',
+  'track.removeFromPlaylist': 'Remove from playlist',
 } as const;
 
 export default common;

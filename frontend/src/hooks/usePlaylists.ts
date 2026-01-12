@@ -53,7 +53,6 @@ export function usePlaylists() {
   const createPlaylist = async (name: string) => {
     const trimmed = name.trim();
     if (!trimmed) {
-      setPlaylistStatus(t('playlistStatus.nameRequired'));
       return;
     }
     try {
@@ -69,7 +68,6 @@ export function usePlaylists() {
     if (!name) return;
     try {
       await api.deletePlaylist(name);
-      setPlaylistStatus(t('playlistStatus.deleted'));
       if (activePlaylist?.name === name) {
         setActivePlaylist(undefined);
         await api.setActivePlaylist('');
@@ -86,11 +84,20 @@ export function usePlaylists() {
     try {
       if (isFavorite) {
         await api.removeFromPlaylist(favoritesKey, path);
-        setPlaylistStatus(t('playlistStatus.unfavorited'));
       }
       await refreshPlaylists();
     } catch (err: any) {
       setPlaylistStatus(err?.message ?? t('playlistStatus.failedFavorite'));
+    }
+  };
+
+  const removeTrackFromPlaylist = async (playlistName: string, path: string) => {
+    if (!playlistName || !path) return;
+    try {
+      await api.removeFromPlaylist(playlistName, path);
+      await refreshPlaylists();
+    } catch (err: any) {
+      setPlaylistStatus(err?.message ?? t('playlistStatus.failedRemove'));
     }
   };
 
@@ -103,7 +110,6 @@ export function usePlaylists() {
       for (const path of trackPaths) {
         await api.addToPlaylist(playlistName, path);
       }
-      setPlaylistStatus(t('playlistStatus.added'));
       await refreshPlaylists();
     } catch (err: any) {
       setPlaylistStatus(err?.message ?? t('playlistStatus.failedAdd'));
@@ -119,6 +125,7 @@ export function usePlaylists() {
     createPlaylist,
     deletePlaylist,
     addTracksToPlaylist,
+    removeTrackFromPlaylist,
     favoritePaths,
     toggleFavorite,
   };

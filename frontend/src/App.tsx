@@ -34,6 +34,7 @@ function App() {
     createPlaylist,
     deletePlaylist,
     addTracksToPlaylist,
+    removeTrackFromPlaylist,
     favoritePaths,
     toggleFavorite,
   } = usePlaylists();
@@ -108,7 +109,9 @@ function App() {
           files={visibleFiles}
           active={player.active}
           favoritePaths={favoritePaths}
+          playlistName={activePlaylist?.name}
           onToggleFavorite={toggleFavorite}
+          onRemoveFromPlaylist={removeTrackFromPlaylist}
           onSelect={player.selectTrack}
         />
       </div>

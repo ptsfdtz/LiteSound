@@ -1,5 +1,5 @@
 import { Button, Listbox } from '@headlessui/react';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaTimes } from 'react-icons/fa';
 import { useMemo } from 'react';
 import type { MusicFile } from '@/types/media';
 import styles from '@/components/TrackList/TrackList.module.css';
@@ -9,14 +9,26 @@ type TrackListProps = {
   files: MusicFile[];
   active?: MusicFile;
   favoritePaths: string[];
+  playlistName?: string;
   onToggleFavorite: (path: string) => void;
+  onRemoveFromPlaylist: (playlistName: string, path: string) => void;
   onSelect: (file?: MusicFile) => void;
 };
 
 export function TrackList(props: TrackListProps) {
-  const { files, active, favoritePaths, onToggleFavorite, onSelect } = props;
+  const {
+    files,
+    active,
+    favoritePaths,
+    playlistName,
+    onToggleFavorite,
+    onRemoveFromPlaylist,
+    onSelect,
+  } = props;
   const { t } = useI18n();
   const favoriteSet = useMemo(() => new Set(favoritePaths), [favoritePaths]);
+  const favoritesKey = '__favorites__';
+  const showRemove = Boolean(playlistName && playlistName !== favoritesKey);
 
   return (
     <aside className={styles.list}>
@@ -30,7 +42,19 @@ export function TrackList(props: TrackListProps) {
                   <div className={selected ? `${styles.track} ${styles.active}` : styles.track}>
                     <span className={styles.name}>{file.name}</span>
                     <span className={styles.meta}>
-                      <span className={styles.ext}>{selected ? t('track.playing') : file.ext}</span>
+                      {showRemove && (
+                        <Button
+                          className={styles.removeButton}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            onRemoveFromPlaylist(playlistName, file.path);
+                          }}
+                          aria-label={t('track.removeFromPlaylist')}
+                        >
+                          <FaTimes />
+                        </Button>
+                      )}
                       <Button
                         className={
                           isFavorite
@@ -46,6 +70,7 @@ export function TrackList(props: TrackListProps) {
                       >
                         {isFavorite ? <FaHeart /> : <FaRegHeart />}
                       </Button>
+                      <span className={styles.ext}>{selected ? t('track.playing') : file.ext}</span>
                     </span>
                   </div>
                 )}
