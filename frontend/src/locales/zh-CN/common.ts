@@ -24,6 +24,7 @@ const common = {
   'playlistStatus.deleted': '歌单已删除。',
   'playlistStatus.failedDelete': '删除歌单失败。',
   'playlistStatus.unfavorited': '已移出收藏。',
+  'playlistStatus.favorited': '已加入收藏。',
   'playlistStatus.failedFavorite': '收藏更新失败。',
   'playlistStatus.removed': '已从歌单移除。',
   'playlistStatus.failedRemove': '从歌单移除失败。',

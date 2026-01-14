@@ -84,6 +84,10 @@ export function usePlaylists() {
     try {
       if (isFavorite) {
         await api.removeFromPlaylist(favoritesKey, path);
+        setPlaylistStatus(t('playlistStatus.unfavorited'));
+      } else {
+        await api.addToPlaylist(favoritesKey, path);
+        setPlaylistStatus(t('playlistStatus.favorited'));
       }
       await refreshPlaylists();
     } catch (err: any) {
