@@ -1,56 +1,34 @@
-# 🎵 LiteSound
+# LiteSound
 
-> A **lightweight**, **fast**, and **modern** desktop music player built with [Wails](https://wails.io/) — native feel, no Electron bloat.
+## Introduction
+LiteSound is a lightweight desktop music player built with Wails, Go, React, and TypeScript. It focuses on local music playback, fast startup, and a clean, native-feeling UI without Electron overhead.
 
-<p align="center">
-  <img src="assets/preview.png" width="600" alt="LiteSound Preview">
-</p>
+## Features
+- Local library scan (system Music folder by default, configurable)
+- Playlists with favorites
+- Playback modes: order, repeat one, shuffle
+- System volume control with live sync
+- Custom tray menu with playback controls
+- Light, dark, and system theme modes
+- Single-instance behavior
 
-## 🎨 Themes
+## Architecture
+See `ARCHITECTURE.md` for a detailed breakdown of the backend, frontend, and data flow.
 
-LiteSound supports light, dark, and system themes for a comfortable listening experience.
+## Installation
+### Prebuilt binaries
+Download the latest Windows build from the GitHub Releases page.
 
-|                                     Light Theme                                      |                                     Dark Theme                                     |
-| :----------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: |
-| <img src="assets/preview-light.png" width="480" alt="LiteSound Light Theme Preview"> | <img src="assets/preview-dark.png" width="480" alt="LiteSound Dark Theme Preview"> |
-
----
-
-## ✨ Features
-
-- ⚡ **Lightweight & Fast** — Wails + native webview, quick startup.
-- 🎵 **Local Library** — scan your system Music folder (or custom folders).
-- 🎧 **Playback Modes** — order, repeat one, shuffle.
-- 🧩 **Playlists** — create and manage your own lists.
-- 🎚️ **System Volume** — adjust volume with live sync.
-- 🌓 **Light / Dark / System** — seamless theme switching.
-- 🪟 **Custom Tray Menu** — quick control from the system tray.
-
----
-
-## ❓ Why make it?
-
-1. I wanted a clean, native-feeling player without Electron overhead.
-2. Many existing players are heavy, over-designed, or lack modern UI polish.
-3. Building LiteSound helps me sharpen my skills and create a tool I actually use.
-
----
-
-## 📦 Installation
-
-### 📥 Prebuilt binaries
-
-Check the [Releases](https://github.com/ptsfdtz/litesound/releases) page to download the latest version for Windows.
-
-### 🛠️ Build from source
-
+### Build from source
 ```bash
 # Clone
 git clone https://github.com/ptsfdtz/LiteSound.git
 cd LiteSound
 
-# Install dependencies
+# Install frontend dependencies
+cd frontend
 pnpm install
+cd ..
 
 # Run in dev mode
 wails dev
@@ -59,31 +37,29 @@ wails dev
 wails build
 ```
 
----
+## Usage
+- Place audio files in your system Music folder, or set custom folders in Settings.
+- Use the tray menu for quick play/pause/skip controls.
+- Create playlists and add/remove tracks from them.
 
-## 🧰 Tech Stack
+## Development
+- Requirements: Go, Wails CLI v2, Node.js, pnpm.
+- Backend code lives in the repo root (`*.go`).
+- Frontend code lives in `frontend/` (React + TypeScript + CSS Modules).
+- Generated Wails bindings are in `frontend/wailsjs/`.
 
-| Layer           | Technology                 |
-| --------------- | -------------------------- |
-| Desktop Runtime | [Wails](https://wails.io/) |
-| Frontend        | React + TypeScript         |
-| Styling         | CSS Modules                |
-| Audio           | Howler.js                  |
-| Backend         | Go                         |
+Common commands:
+```bash
+wails dev
+wails build
+```
 
----
+## FAQ
+**Where does LiteSound look for music?**
+By default it scans your system Music directory. You can add or replace folders in Settings.
 
-## 👤 Author
+**Why is there a local HTTP server?**
+The backend exposes a local stream server for the webview audio playback.
 
-**Haoran Tong (ptsfdtz)**
-
-- 💻 [GitHub @ptsfdtz](https://github.com/ptsfdtz)
-- ❤️ Building minimal, fast, and beautiful desktop tools.
-
----
-
-⭐ **Star this repo if you love clean music tools!**
-
-welcome contributions and feedback.
-Feel free to open issues or PRs on GitHub.
-Happy listening! 🎶
+**How is state persisted?**
+User state (last played track, filters, playlists, theme, and music folders) is stored under the user config directory.
