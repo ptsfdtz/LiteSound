@@ -1,65 +1,14 @@
-# LiteSound
+# 🎵 LiteSound
 
-## Introduction
-LiteSound is a lightweight desktop music player built with Wails, Go, React, and TypeScript. It focuses on local music playback, fast startup, and a clean, native-feeling UI without Electron overhead.
+> “当第一个音符从寂静中醒来，世界便收到了一份礼物——那是宇宙在人类耳边最温柔的私语。”  
+> _—— 致每一位仍能听见心跳的寻音者_
 
-## Features
-- Local library scan (system Music folder by default, configurable)
-- Playlists with favorites
-- Playback modes: order, repeat one, shuffle
-- System volume control with live sync
-- Custom tray menu with playback controls
-- Light, dark, and system theme modes
-- Single-instance behavior
+---
 
-## Architecture
-See `ARCHITECTURE.md` for a detailed breakdown of the backend, frontend, and data flow.
+## ✨ 缘起·一份念想
 
-## Installation
-### Prebuilt binaries
-Download the latest Windows build from the GitHub Releases page.
+[我们相信，每一段旋律都是时光的容器。](https://github.com/ptsfdtz/LiteSound/releases/latest)
 
-### Build from source
-```bash
-# Clone
-git clone https://github.com/ptsfdtz/LiteSound.git
-cd LiteSound
-
-# Install frontend dependencies
-cd frontend
-pnpm install
-cd ..
-
-# Run in dev mode
-wails dev
-
-# Build production
-wails build
-```
-
-## Usage
-- Place audio files in your system Music folder, or set custom folders in Settings.
-- Use the tray menu for quick play/pause/skip controls.
-- Create playlists and add/remove tracks from them.
-
-## Development
-- Requirements: Go, Wails CLI v2, Node.js, pnpm.
-- Backend code lives in the repo root (`*.go`).
-- Frontend code lives in `frontend/` (React + TypeScript + CSS Modules).
-- Generated Wails bindings are in `frontend/wailsjs/`.
-
-Common commands:
-```bash
-wails dev
-wails build
-```
-
-## FAQ
-**Where does LiteSound look for music?**
-By default it scans your system Music directory. You can add or replace folders in Settings.
-
-**Why is there a local HTTP server?**
-The backend exposes a local stream server for the webview audio playback.
-
-**How is state persisted?**
-User state (last played track, filters, playlists, theme, and music folders) is stored under the user config directory.
+<p align="center">
+  <img src="assets/preview.png" width="640" alt="LiteSound Preview">
+</p>
