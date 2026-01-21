@@ -4,9 +4,9 @@ import (
 	"embed"
 
 	"github.com/wailsapp/wails/v2"
-	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 //go:embed all:frontend/dist
@@ -18,11 +18,13 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:     "LiteSound",
-		Width:     1024,
-		Height:    768,
-		Frameless: true,
+		Title:             "LiteSound",
+		Width:             1024,
+		Height:            768,
+		Frameless:         true,
 		HideWindowOnClose: true,
+		MinWidth:          904,
+		MinHeight:         500,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
