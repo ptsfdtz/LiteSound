@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"embed"
 
+	"LiteSound/internal/app"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
-	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 //go:embed all:frontend/dist
@@ -14,7 +15,7 @@ var assets embed.FS
 
 func main() {
 	// Create an instance of the app structure
-	app := NewApp()
+	appInstance := app.NewApp()
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -29,20 +30,20 @@ func main() {
 			Assets: assets,
 		},
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 160},
-		OnStartup:        app.startup,
-		OnShutdown:       app.shutdown,
+		OnStartup: func(ctx context.Context) {
+			app.Startup(appInstance, ctx)
+		},
+		OnShutdown: func(ctx context.Context) {
+			app.Shutdown(appInstance, ctx)
+		},
 		SingleInstanceLock: &options.SingleInstanceLock{
 			UniqueId: "litesound",
 			OnSecondInstanceLaunch: func(_ options.SecondInstanceData) {
-				if app.ctx == nil {
-					return
-				}
-				wailsruntime.Show(app.ctx)
-				wailsruntime.WindowUnminimise(app.ctx)
+				app.BringToFront(appInstance)
 			},
 		},
 		Bind: []interface{}{
-			app,
+			appInstance,
 		},
 	})
 

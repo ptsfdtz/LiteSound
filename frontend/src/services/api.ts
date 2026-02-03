@@ -23,7 +23,7 @@ import {
   SetSystemVolume,
   SetTheme,
   UpdateTrayPlayback,
-} from '../../wailsjs/go/main/App';
+} from '../../wailsjs/go/app/App';
 
 export const api = {
   addToPlaylist: AddToPlaylist,

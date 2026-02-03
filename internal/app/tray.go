@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"embed"
@@ -56,7 +56,7 @@ var (
 	procCheckMenu   = user32DLL.NewProc("CheckMenuItem")
 )
 
-//go:embed build/windows/icon.ico
+//go:embed assets/icon.ico
 var trayAssets embed.FS
 
 func newTrayMenu() *trayMenu {
@@ -318,7 +318,7 @@ func (t *trayMenu) addTrayIcon() {
 }
 
 func (t *trayMenu) writeEmbeddedIcon() (string, error) {
-	data, err := trayAssets.ReadFile("build/windows/icon.ico")
+	data, err := trayAssets.ReadFile("assets/icon.ico")
 	if err != nil {
 		return "", err
 	}

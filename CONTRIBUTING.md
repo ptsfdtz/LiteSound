@@ -96,12 +96,12 @@ gofmt -w .
   - `zh-CN` / `en` 下按模块拆分词条。
 
 - 后端（Go）：
-  - `library.go`：扫描音乐目录与读取元数据。
-  - `stream.go`：本地流媒体服务（供前端播放）。
-  - `playlists.go`：歌单存储与操作。
-  - `state.go`：保存播放状态、筛选条件、主题等。
-  - `tray.go`：Windows 托盘逻辑（左键显示 / 右键打开自定义菜单）。
-  - `hotkeys.go`：全局快捷键（Windows）。
+- `internal/app/library.go`：扫描音乐目录与读取元数据。
+- `internal/app/stream.go`：本地流媒体服务（供前端播放）。
+- `internal/app/playlists.go`：歌单存储与操作。
+- `internal/app/state.go`：保存播放状态、筛选条件、主题等。
+- `internal/app/tray.go`：Windows 托盘逻辑（左键显示 / 右键打开自定义菜单）。
+- `internal/app/hotkeys.go`：全局快捷键（Windows）。
 
 ---
 
@@ -125,12 +125,14 @@ gofmt -w .
 ```
 LiteSound/
 ├─ app.go
-├─ library.go
-├─ playlists.go
-├─ state.go
-├─ stream.go
-├─ tray.go
-├─ hotkeys.go
+├─ internal/
+│  └─ app/
+│     ├─ library.go
+│     ├─ playlists.go
+│     ├─ state.go
+│     ├─ stream.go
+│     ├─ tray.go
+│     └─ hotkeys.go
 ├─ build/
 ├─ frontend/
 │  ├─ src/

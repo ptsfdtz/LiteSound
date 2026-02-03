@@ -1,6 +1,10 @@
-package main
+package app
 
-import "context"
+import (
+	"context"
+
+	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
+)
 
 // App struct
 type App struct {
@@ -13,6 +17,28 @@ type App struct {
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{tray: newTrayMenu()}
+}
+
+func Startup(a *App, ctx context.Context) {
+	if a == nil {
+		return
+	}
+	a.startup(ctx)
+}
+
+func Shutdown(a *App, ctx context.Context) {
+	if a == nil {
+		return
+	}
+	a.shutdown(ctx)
+}
+
+func BringToFront(a *App) {
+	if a == nil || a.ctx == nil {
+		return
+	}
+	wailsruntime.Show(a.ctx)
+	wailsruntime.WindowUnminimise(a.ctx)
 }
 
 // startup is called when the app starts. The context is saved

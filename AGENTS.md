@@ -11,7 +11,7 @@
 - Hooks: `frontend/src/hooks/`
 - i18n: `frontend/src/locales/`
 - Wails bindings (generated): `frontend/wailsjs/go/main/App.d.ts`
-- Backend modules: `library.go`, `metadata.go`, `playlists.go`, `state.go`, `stream.go`, `tray.go`, `hotkeys.go`, `theme.go`, `volume.go`
+- Backend modules: `internal/app/library.go`, `internal/app/metadata.go`, `internal/app/playlists.go`, `internal/app/state.go`, `internal/app/stream.go`, `internal/app/tray.go`, `internal/app/hotkeys.go`, `internal/app/theme.go`, `internal/app/volume.go`
 
 ## Local data
 - Persisted state lives under the user config directory at `LiteSound/state.json`.
