@@ -1,4 +1,4 @@
-package app
+package media
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	"github.com/dhowden/tag"
 )
 
-func readAudioMetadata(path string) (string, string) {
+func ReadAudioMetadata(path string) (string, string) {
 	file, err := os.Open(path)
 	if err != nil {
 		return "", ""

@@ -8,8 +8,8 @@ import (
 
 func (a *App) PickMusicDir(current string) (string, error) {
 	dir := strings.TrimSpace(current)
-	if dir == "" {
-		resolved, err := a.resolveMusicDirs()
+	if dir == "" && a.store != nil {
+		resolved, err := a.store.ResolveMusicDirs()
 		if err == nil && len(resolved) > 0 {
 			dir = resolved[0]
 		}

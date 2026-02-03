@@ -1,8 +1,9 @@
 //go:build windows
 
-package app
+package system
 
 import (
+	"context"
 	"runtime"
 	"sync"
 	"unsafe"
@@ -40,19 +41,19 @@ var (
 	hotkeyThreadID uint32
 )
 
-func startHotkeys(a *App) {
+func StartHotkeys(ctx context.Context) {
 	hotkeyOnce.Do(func() {
-		go runHotkeys(a)
+		go runHotkeys(ctx)
 	})
 }
 
-func stopHotkeys() {
+func StopHotkeys() {
 	if hotkeyThreadID != 0 {
 		_, _, _ = procPostThreadMessage.Call(uintptr(hotkeyThreadID), uintptr(wmQuit), 0, 0)
 	}
 }
 
-func runHotkeys(a *App) {
+func runHotkeys(ctx context.Context) {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	hotkeyThreadID = windows.GetCurrentThreadId()
@@ -83,11 +84,11 @@ func runHotkeys(a *App) {
 		}
 		switch msg.WParam {
 		case hotkeyPlayPause:
-			wailsruntime.EventsEmit(a.ctx, "hotkey:playpause")
+			wailsruntime.EventsEmit(ctx, "hotkey:playpause")
 		case hotkeyNext:
-			wailsruntime.EventsEmit(a.ctx, "hotkey:next")
+			wailsruntime.EventsEmit(ctx, "hotkey:next")
 		case hotkeyPrev:
-			wailsruntime.EventsEmit(a.ctx, "hotkey:prev")
+			wailsruntime.EventsEmit(ctx, "hotkey:prev")
 		}
 	}
 }

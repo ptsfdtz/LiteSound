@@ -1,4 +1,4 @@
-export namespace app {
+export namespace media {
 	
 	export class MusicFile {
 	    name: string;
@@ -20,6 +20,11 @@ export namespace app {
 	        this.album = source["album"];
 	    }
 	}
+
+}
+
+export namespace state {
+	
 	export class Playlist {
 	    name: string;
 	    tracks: string[];

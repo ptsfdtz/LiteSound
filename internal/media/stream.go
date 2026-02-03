@@ -1,4 +1,4 @@
-package app
+package media
 
 import (
 	"context"
@@ -66,7 +66,7 @@ func (s *StreamServer) handleMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ext := strings.ToLower(filepath.Ext(path))
-	mime, ok := allowedAudioExt[ext]
+	mime, ok := AllowedAudioExt[ext]
 	if !ok {
 		http.Error(w, "unsupported audio type", http.StatusBadRequest)
 		return
@@ -82,7 +82,7 @@ func (s *StreamServer) handleMedia(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid path", http.StatusBadRequest)
 		return
 	}
-	if !isPathWithinAnyDir(dirs, absFile) {
+	if !IsPathWithinAnyDir(dirs, absFile) {
 		http.Error(w, "file not in music directory", http.StatusForbidden)
 		return
 	}

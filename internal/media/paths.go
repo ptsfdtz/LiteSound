@@ -1,4 +1,4 @@
-package app
+package media
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func isPathWithinDir(dir string, file string) bool {
+func IsPathWithinDir(dir string, file string) bool {
 	dir = strings.ToLower(filepath.Clean(dir))
 	file = strings.ToLower(filepath.Clean(file))
 	if dir == file {
@@ -18,12 +18,12 @@ func isPathWithinDir(dir string, file string) bool {
 	return strings.HasPrefix(file, dir)
 }
 
-func isPathWithinAnyDir(dirs []string, file string) bool {
+func IsPathWithinAnyDir(dirs []string, file string) bool {
 	for _, dir := range dirs {
 		if dir == "" {
 			continue
 		}
-		if isPathWithinDir(dir, file) {
+		if IsPathWithinDir(dir, file) {
 			return true
 		}
 	}

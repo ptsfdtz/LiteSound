@@ -10,8 +10,13 @@
 - UI components: `frontend/src/components/`
 - Hooks: `frontend/src/hooks/`
 - i18n: `frontend/src/locales/`
-- Wails bindings (generated): `frontend/wailsjs/go/main/App.d.ts`
-- Backend modules: `internal/app/library.go`, `internal/app/metadata.go`, `internal/app/playlists.go`, `internal/app/state.go`, `internal/app/stream.go`, `internal/app/tray.go`, `internal/app/hotkeys.go`, `internal/app/theme.go`, `internal/app/volume.go`
+- Wails bindings (generated): `frontend/wailsjs/go/app/App.d.ts`
+- Backend modules:
+  - `internal/app/`: Wails bindings + thin handlers.
+  - `internal/state/`: persisted state, playlists, filters, theme.
+  - `internal/library/`: music directory scanning + file reads.
+  - `internal/media/`: audio metadata, path helpers, stream server.
+  - `internal/system/`: tray, hotkeys, volume, theme apply.
 
 ## Local data
 - Persisted state lives under the user config directory at `LiteSound/state.json`.
