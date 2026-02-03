@@ -1,10 +1,13 @@
-import { Button, Checkbox, Dialog, Input, Transition } from '@headlessui/react';
-import { FaPlus, FaPen, FaTrash } from 'react-icons/fa';
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { FaPen, FaPlus, FaTrash } from 'react-icons/fa';
+import { useEffect, useMemo, useState } from 'react';
 import type { MusicFile, Playlist } from '@/types/media';
-import styles from '@/components/PlaylistSidebar/PlaylistSidebar.module.css';
 import { Dropdown } from '@/components/common/Dropdown/Dropdown';
 import { useI18n } from '@/locales';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 type PlaylistSidebarProps = {
   playlists: Playlist[];
@@ -148,11 +151,13 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
   };
 
   return (
-    <aside className={styles.sidebar}>
-      <div className={styles.header}>
-        <div className={styles.title}>{t('playlist.title')}</div>
+    <aside className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="ml-2 text-base font-semibold">{t('playlist.title')}</div>
         <Button
-          className={`${styles.button} ${styles.addButton}`}
+          variant="secondary"
+          size="icon"
+          className="h-8 w-8 rounded-[10px]"
           onClick={() => {
             setMode('create');
             setComposerFilter(allFilter);
@@ -164,13 +169,24 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
           <FaPlus />
         </Button>
       </div>
-      <div className={styles.list}>
+      <div className="flex max-h-[360px] flex-col gap-2 overflow-auto px-1 py-2">
         <div
-          className={!activePlaylist ? `${styles.item} ${styles.itemActive}` : styles.item}
+          className={cn(
+            'flex cursor-pointer items-center justify-between gap-2 rounded-lg border border-transparent px-2.5 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            !activePlaylist && 'border-primary bg-secondary',
+          )}
           onClick={() => onSelectPlaylist(undefined)}
+          tabIndex={0}
+          role="button"
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              onSelectPlaylist(undefined);
+            }
+          }}
         >
           <span>{t('playlist.allTracks')}</span>
-          <span className={styles.itemCount}>{totalTracks}</span>
+          <span className="text-xs text-muted-foreground">{totalTracks}</span>
         </div>
         {playlists.map((playlist) => {
           const playlistLabel = getPlaylistLabel(playlist);
@@ -179,17 +195,26 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
           return (
             <div
               key={playlist.name}
-              className={
-                activePlaylist?.name === playlist.name
-                  ? `${styles.item} ${styles.itemActive}`
-                  : styles.item
-              }
+              className={cn(
+                'group flex cursor-pointer items-center justify-between gap-2 rounded-lg border border-transparent px-2.5 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                activePlaylist?.name === playlist.name && 'border-primary bg-secondary',
+              )}
               onClick={() => onSelectPlaylist(playlist)}
+              tabIndex={0}
+              role="button"
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  onSelectPlaylist(playlist);
+                }
+              }}
             >
-              <span>{playlistLabel}</span>
-              <span className={styles.itemActions}>
+              <span className="truncate">{playlistLabel}</span>
+              <span className="flex items-center gap-1.5">
                 <Button
-                  className={`${styles.button} ${styles.editButton}`}
+                  variant="secondary"
+                  size="icon"
+                  className="h-7 w-7 rounded-md opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100"
                   onClick={(event) => {
                     event.stopPropagation();
                     handleEdit(playlist);
@@ -197,11 +222,13 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
                   aria-label={t('playlist.editWithName', { name: playlistLabel })}
                   title={t('playlist.editWithName', { name: playlistLabel })}
                 >
-                  <FaPen />
+                  <FaPen className="h-3 w-3" />
                 </Button>
                 {!favorites && (
                   <Button
-                    className={`${styles.button} ${styles.deleteButton}`}
+                    variant="secondary"
+                    size="icon"
+                    className="h-7 w-7 rounded-md opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100"
                     onClick={(event) => {
                       event.stopPropagation();
                       handleDelete(playlist);
@@ -209,183 +236,141 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
                     aria-label={t('playlist.deleteWithName', { name: playlistLabel })}
                     title={t('playlist.deleteWithName', { name: playlistLabel })}
                   >
-                    <FaTrash />
+                    <FaTrash className="h-3 w-3" />
                   </Button>
                 )}
-                <span className={styles.itemCount}>{playlist.tracks.length}</span>
+                <span className="text-xs text-muted-foreground">{playlist.tracks.length}</span>
               </span>
             </div>
           );
         })}
-        {!playlists.length && <div>{t('playlist.noPlaylists')}</div>}
+        {!playlists.length && (
+          <div className="text-sm text-muted-foreground">{t('playlist.noPlaylists')}</div>
+        )}
       </div>
 
-      <Transition show={isOpen} as={Fragment}>
-        <Dialog onClose={() => setIsOpen(false)} className={styles.dialog}>
-          <Transition.Child
-            as={Fragment}
-            enter={styles.menuEnter}
-            enterFrom={styles.menuEnterFrom}
-            enterTo={styles.menuEnterTo}
-            leave={styles.menuLeave}
-            leaveFrom={styles.menuLeaveFrom}
-            leaveTo={styles.menuLeaveTo}
-          >
-            <div className={styles.overlay} />
-          </Transition.Child>
-          <div className={styles.dialogContainer}>
-            <Transition.Child
-              as={Fragment}
-              enter={styles.menuEnter}
-              enterFrom={styles.menuEnterFrom}
-              enterTo={styles.menuEnterTo}
-              leave={styles.menuLeave}
-              leaveFrom={styles.menuLeaveFrom}
-              leaveTo={styles.menuLeaveTo}
-            >
-              <Dialog.Panel className={styles.dialogPanel}>
-                <Dialog.Title className={styles.dialogTitle}>
-                  {mode === 'edit' ? t('playlist.edit') : t('playlist.addTo')}
-                </Dialog.Title>
-                <div className={styles.dialogBody}>
-                  {mode === 'create' && (
-                    <div className={styles.fieldRow}>
-                      <Input
-                        className={styles.input}
-                        placeholder={t('playlist.newNamePlaceholder')}
-                        value={newPlaylistName}
-                        onChange={(event) => setNewPlaylistName(event.target.value)}
-                      />
-                      <Button
-                        className={`${styles.button} ${styles.createButton}`}
-                        onClick={handleCreate}
-                      >
-                        {t('playlist.create')}
-                      </Button>
-                      <Dropdown
-                        value={selectedPlaylist}
-                        onChange={setSelectedPlaylist}
-                        options={playlists}
-                        getOptionLabel={getPlaylistLabel}
-                        getOptionKey={(playlist) => playlist.name}
-                        getOptionMeta={(playlist) => playlist.tracks.length}
-                        buttonLabel={
-                          selectedPlaylist
-                            ? t('playlist.label', { name: getPlaylistLabel(selectedPlaylist) })
-                            : t('playlist.selectPlaylist')
-                        }
-                        className={styles.listbox}
-                      />
-                    </div>
-                  )}
-                  {mode === 'edit' && (
-                    <div className={styles.filterRow}>
-                      <Dropdown
-                        value={composerFilter}
-                        onChange={setComposerFilter}
-                        options={composerOptions}
-                        getOptionLabel={renderFilterLabel}
-                        buttonLabel={`${t('filters.composer')}: ${renderFilterLabel(composerFilter)}`}
-                        className={styles.listbox}
-                      />
-                      <Dropdown
-                        value={albumFilter}
-                        onChange={setAlbumFilter}
-                        options={albumOptions}
-                        getOptionLabel={renderFilterLabel}
-                        buttonLabel={`${t('filters.album')}: ${renderFilterLabel(albumFilter)}`}
-                        className={styles.listbox}
-                      />
-                    </div>
-                  )}
-
-                  <div className={styles.trackList}>
-                    {filteredFiles.map((file) => {
-                      const alreadyInPlaylist = Boolean(
-                        selectedPlaylist?.tracks.includes(file.path),
-                      );
-                      const isChecked = selectedTracks[file.path] ?? alreadyInPlaylist;
-                      return (
-                        <div key={file.path} className={styles.trackRow}>
-                          <span>{file.name}</span>
-                          <Checkbox
-                            className={styles.checkbox}
-                            checked={isChecked}
-                            onChange={() => toggleTrack(file.path, alreadyInPlaylist)}
-                          >
-                            <span className={styles.checkboxMark} />
-                          </Checkbox>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {status && <div className={styles.status}>{status}</div>}
-                  <div className={styles.actions}>
-                    <Button className={styles.button} onClick={() => setIsOpen(false)}>
-                      {t('playlist.cancel')}
-                    </Button>
-                    <Button
-                      className={styles.button}
-                      onClick={handleAdd}
-                      disabled={!selectedPlaylist || selectedCount === 0}
-                    >
-                      {selectedCount
-                        ? t('playlist.addCount', { count: selectedCount })
-                        : t('playlist.add')}
-                    </Button>
-                  </div>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-[600px] rounded-2xl border border-border bg-card p-4 shadow-[0_20px_40px_var(--panel-glow)]">
+          <DialogHeader>
+            <DialogTitle>{mode === 'edit' ? t('playlist.edit') : t('playlist.addTo')}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-3">
+            {mode === 'create' && (
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Input
+                    className="min-w-[220px] flex-1"
+                    placeholder={t('playlist.newNamePlaceholder')}
+                    value={newPlaylistName}
+                    onChange={(event) => setNewPlaylistName(event.target.value)}
+                  />
+                  <Button
+                    variant="secondary"
+                    className="h-10 rounded-[10px]"
+                    onClick={handleCreate}
+                  >
+                    {t('playlist.create')}
+                  </Button>
                 </div>
-              </Dialog.Panel>
-            </Transition.Child>
-          </div>
-        </Dialog>
-      </Transition>
+                <Dropdown
+                  value={selectedPlaylist}
+                  onChange={setSelectedPlaylist}
+                  options={playlists}
+                  getOptionLabel={getPlaylistLabel}
+                  getOptionKey={(playlist) => playlist.name}
+                  getOptionMeta={(playlist) => playlist.tracks.length}
+                  buttonLabel={
+                    selectedPlaylist
+                      ? t('playlist.label', { name: getPlaylistLabel(selectedPlaylist) })
+                      : t('playlist.selectPlaylist')
+                  }
+                  className="min-w-[220px]"
+                />
+              </div>
+            )}
+            {mode === 'edit' && (
+              <div className="flex items-center gap-2">
+                <Dropdown
+                  value={composerFilter}
+                  onChange={setComposerFilter}
+                  options={composerOptions}
+                  getOptionLabel={renderFilterLabel}
+                  getOptionKey={(value) => value}
+                  buttonLabel={`${t('filters.composer')}: ${renderFilterLabel(composerFilter)}`}
+                  className="w-[240px]"
+                />
+                <Dropdown
+                  value={albumFilter}
+                  onChange={setAlbumFilter}
+                  options={albumOptions}
+                  getOptionLabel={renderFilterLabel}
+                  getOptionKey={(value) => value}
+                  buttonLabel={`${t('filters.album')}: ${renderFilterLabel(albumFilter)}`}
+                  className="w-[240px]"
+                />
+              </div>
+            )}
 
-      <Transition show={Boolean(deleteTarget)} as={Fragment}>
-        <Dialog onClose={() => setDeleteTarget(null)} className={styles.dialog}>
-          <Transition.Child
-            as={Fragment}
-            enter={styles.menuEnter}
-            enterFrom={styles.menuEnterFrom}
-            enterTo={styles.menuEnterTo}
-            leave={styles.menuLeave}
-            leaveFrom={styles.menuLeaveFrom}
-            leaveTo={styles.menuLeaveTo}
-          >
-            <div className={styles.overlay} />
-          </Transition.Child>
-          <div className={styles.dialogContainer}>
-            <Transition.Child
-              as={Fragment}
-              enter={styles.menuEnter}
-              enterFrom={styles.menuEnterFrom}
-              enterTo={styles.menuEnterTo}
-              leave={styles.menuLeave}
-              leaveFrom={styles.menuLeaveFrom}
-              leaveTo={styles.menuLeaveTo}
-            >
-              <Dialog.Panel className={styles.dialogPanel}>
-                <Dialog.Title className={styles.dialogTitle}>{t('playlist.delete')}</Dialog.Title>
-                <div className={styles.dialogBody}>
-                  <div className={styles.status}>
-                    {deleteTarget
-                      ? t('playlist.confirmDelete', { name: getPlaylistLabel(deleteTarget) })
-                      : ''}
+            <div className="flex h-[240px] flex-col gap-2 overflow-auto rounded-lg border border-border bg-card p-2">
+              {filteredFiles.map((file) => {
+                const alreadyInPlaylist = Boolean(selectedPlaylist?.tracks.includes(file.path));
+                const isChecked = selectedTracks[file.path] ?? alreadyInPlaylist;
+                return (
+                  <div key={file.path} className="flex items-center justify-between gap-2">
+                    <span className="truncate text-sm">{file.name}</span>
+                    <Checkbox
+                      className="h-5 w-5"
+                      checked={isChecked}
+                      onCheckedChange={() => toggleTrack(file.path, alreadyInPlaylist)}
+                    />
                   </div>
-                  <div className={styles.actions}>
-                    <Button className={styles.button} onClick={() => setDeleteTarget(null)}>
-                      {t('playlist.cancel')}
-                    </Button>
-                    <Button className={styles.button} onClick={confirmDelete}>
-                      {t('playlist.delete')}
-                    </Button>
-                  </div>
-                </div>
-              </Dialog.Panel>
-            </Transition.Child>
+                );
+              })}
+            </div>
+            {status && <div className="text-sm text-muted-foreground">{status}</div>}
+            <div className="flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => setIsOpen(false)}>
+                {t('playlist.cancel')}
+              </Button>
+              <Button
+                variant="default"
+                onClick={handleAdd}
+                disabled={!selectedPlaylist || selectedCount === 0}
+              >
+                {selectedCount
+                  ? t('playlist.addCount', { count: selectedCount })
+                  : t('playlist.add')}
+              </Button>
+            </div>
           </div>
-        </Dialog>
-      </Transition>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <DialogContent className="max-w-[480px] rounded-2xl border border-border bg-card p-4 shadow-[0_20px_40px_var(--panel-glow)]">
+          <DialogHeader>
+            <DialogTitle>{t('playlist.delete')}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <div className="text-sm text-muted-foreground">
+              {deleteTarget ? t('playlist.confirmDelete', { name: getPlaylistLabel(deleteTarget) }) : ''}
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => setDeleteTarget(null)}>
+                {t('playlist.cancel')}
+              </Button>
+              <Button variant="destructive" onClick={confirmDelete}>
+                {t('playlist.delete')}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </aside>
   );
 }

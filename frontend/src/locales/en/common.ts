@@ -4,6 +4,7 @@ const common = {
   'filters.selected': 'selected',
   'filters.all': 'All',
   'filters.unknown': 'Unknown',
+  'filters.trackInputPlaceholder': 'Search track',
   'playlist.title': 'Playlist',
   'playlist.allTracks': 'All tracks',
   'playlist.noPlaylists': 'No playlists.',

@@ -10,11 +10,19 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\""
   },
   "dependencies": {
-    "@headlessui/react": "^2.2.9",
+    "@radix-ui/react-checkbox": "^1.1.2",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-popover": "^1.1.2",
+    "@radix-ui/react-select": "^2.1.2",
+    "@radix-ui/react-slot": "^1.1.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "howler": "^2.2.4",
+    "lucide-react": "^0.469.0",
     "react-icons": "^4.12.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {
     "@types/howler": "^2.2.12",
@@ -22,7 +30,11 @@
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^2.0.1",
+    "autoprefixer": "^10.4.20",
     "prettier": "^3.2.5",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.10",
+    "tailwindcss-animate": "^1.0.7",
     "typescript": "^4.6.4",
     "vite": "^3.0.7"
   }

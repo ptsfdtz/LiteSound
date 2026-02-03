@@ -1,4 +1,3 @@
-import { Button, Dialog, Input, Transition } from '@headlessui/react';
 import {
   FaAdjust,
   FaCog,
@@ -15,20 +14,22 @@ import {
   FaWindowMinimize,
   FaWindowRestore,
 } from 'react-icons/fa';
-import { Fragment, useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import {
   Hide,
-  Quit,
-  WindowMinimise,
   WindowIsMaximised,
   WindowMaximise,
+  WindowMinimise,
   WindowUnmaximise,
 } from '../../../wailsjs/runtime/runtime';
 import { api } from '@/services/api';
 import appIcon from '@/assets/appicon.svg';
-import styles from '@/components/HeaderBar/HeaderBar.module.css';
 import type { ThemeMode } from '@/hooks/useTheme';
 import { useI18n } from '@/locales';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 type HeaderBarProps = {
   title: string;
@@ -153,46 +154,70 @@ export function HeaderBar(props: HeaderBarProps) {
     onSetMusicDirs([]);
     setIsSettingsOpen(false);
   };
+
   return (
-    <header className={styles.header}>
-      <div className={styles.brand}>
+    <header
+      className="flex min-h-[48px] items-center justify-between gap-4"
+      style={{ '--wails-draggable': 'drag' } as CSSProperties}
+    >
+      <div className="flex items-center gap-3">
         <span
-          className={styles.logo}
+          className="h-8 w-8 bg-[var(--app-text)]"
           role="img"
           aria-label={t('app.logo')}
           style={{
             maskImage: `url(${appIcon})`,
             WebkitMaskImage: `url(${appIcon})`,
+            maskRepeat: 'no-repeat',
+            WebkitMaskRepeat: 'no-repeat',
+            maskSize: 'contain',
+            WebkitMaskSize: 'contain',
+            maskPosition: 'center',
+            WebkitMaskPosition: 'center',
           }}
         />
-        <h1>{title}</h1>
+        <h1 className="mb-[3px] text-[28px] tracking-[0.5px]">{title}</h1>
       </div>
-      <div className={styles.actions}>
+      <div
+        className="flex items-center gap-3"
+        style={{ '--wails-draggable': 'no-drag' } as CSSProperties}
+      >
         <Button
-          className={styles.ghost}
+          variant="secondary"
+          size="icon"
+          className="h-9 w-9 rounded-[10px]"
           aria-label={t('settings.title')}
           title={t('settings.title')}
           onClick={openSettings}
         >
           <FaCog />
         </Button>
-        <div className={styles.windowControls}>
+        <div
+          className="inline-flex items-center gap-2"
+          style={{ '--wails-draggable': 'no-drag' } as CSSProperties}
+        >
           <Button
-            className={styles.windowButton}
+            variant="secondary"
+            size="icon"
+            className="h-9 w-9 rounded-[10px]"
             onClick={handleMinimise}
             aria-label={t('window.minimise')}
           >
             <FaWindowMinimize />
           </Button>
           <Button
-            className={styles.windowButton}
+            variant="secondary"
+            size="icon"
+            className="h-9 w-9 rounded-[10px]"
             onClick={toggleMaximise}
             aria-label={t('window.maximise')}
           >
             {isMaximised ? <FaWindowRestore /> : <FaWindowMaximize />}
           </Button>
           <Button
-            className={styles.windowButton}
+            variant="secondary"
+            size="icon"
+            className="h-9 w-9 rounded-[10px]"
             onClick={handleClose}
             aria-label={t('window.close')}
           >
@@ -200,173 +225,178 @@ export function HeaderBar(props: HeaderBarProps) {
           </Button>
         </div>
       </div>
-      <Transition show={isSettingsOpen} as={Fragment}>
-        <Dialog onClose={() => setIsSettingsOpen(false)} className={styles.dialog}>
-          <Transition.Child
-            as={Fragment}
-            enter={styles.menuEnter}
-            enterFrom={styles.menuEnterFrom}
-            enterTo={styles.menuEnterTo}
-            leave={styles.menuLeave}
-            leaveFrom={styles.menuLeaveFrom}
-            leaveTo={styles.menuLeaveTo}
-          >
-            <div className={styles.overlay} />
-          </Transition.Child>
-          <div className={styles.dialogContainer}>
-            <Transition.Child
-              as={Fragment}
-              enter={styles.menuEnter}
-              enterFrom={styles.menuEnterFrom}
-              enterTo={styles.menuEnterTo}
-              leave={styles.menuLeave}
-              leaveFrom={styles.menuLeaveFrom}
-              leaveTo={styles.menuLeaveTo}
-            >
-              <Dialog.Panel className={styles.dialogPanel}>
-                <Dialog.Title className={styles.dialogTitle}>{t('settings.title')}</Dialog.Title>
-                <div className={styles.dialogBody}>
-                  <div className={styles.themeRow}>
-                    <div className={styles.settingGroup}>
-                      <div className={styles.settingLabel}>
-                        <FaAdjust /> {t('settings.theme')}
-                      </div>
-                      <div className={styles.themeButtons}>
-                        <Button
-                          className={`${styles.button} ${
-                            theme === 'system' ? styles.themeButtonActive : ''
-                          }`}
-                          onClick={() => onSetTheme('system')}
-                          aria-label={t('settings.themeSystem')}
-                          title={t('settings.themeSystem')}
-                        >
-                          <FaAdjust />
-                        </Button>
-                        <Button
-                          className={`${styles.button} ${
-                            theme === 'light' ? styles.themeButtonActive : ''
-                          }`}
-                          onClick={() => onSetTheme('light')}
-                          aria-label={t('settings.themeLight')}
-                          title={t('settings.themeLight')}
-                        >
-                          <FaSun />
-                        </Button>
-                        <Button
-                          className={`${styles.button} ${
-                            theme === 'dark' ? styles.themeButtonActive : ''
-                          }`}
-                          onClick={() => onSetTheme('dark')}
-                          aria-label={t('settings.themeDark')}
-                          title={t('settings.themeDark')}
-                        >
-                          <FaMoon />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className={styles.settingGroup}>
-                      <div className={styles.settingLabel}>
-                        <FaGlobe /> {t('settings.language')}
-                      </div>
-                      <div className={styles.themeButtons}>
-                        <Button
-                          className={`${styles.button} ${
-                            locale === 'zh-CN' ? styles.themeButtonActive : ''
-                          }`}
-                          onClick={() => setLocale('zh-CN')}
-                          aria-label={t('settings.langZh')}
-                          title={t('settings.langZh')}
-                        >
-                          {t('settings.langZh')}
-                        </Button>
-                        <Button
-                          className={`${styles.button} ${
-                            locale === 'en' ? styles.themeButtonActive : ''
-                          }`}
-                          onClick={() => setLocale('en')}
-                          aria-label={t('settings.langEn')}
-                          title={t('settings.langEn')}
-                        >
-                          {t('settings.langEn')}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className={styles.fieldRow}>
-                    <Input
-                      className={styles.input}
-                      value={dirValue}
-                      onChange={(event) => setDirValue(event.target.value)}
-                      placeholder={t('settings.musicFolderPlaceholder')}
-                    />
-                    <Button
-                      className={styles.button}
-                      onClick={() => {
-                        addDir(dirValue);
-                        setDirValue('');
-                      }}
-                      aria-label={t('settings.addFolder')}
-                      title={t('settings.addFolder')}
-                    >
-                      <FaPlus />
-                    </Button>
-                    <Button
-                      className={styles.button}
-                      onClick={handlePickDir}
-                      aria-label={t('settings.browseFolder')}
-                      title={t('settings.browseFolder')}
-                    >
-                      <FaFolderOpen />
-                    </Button>
-                  </div>
-                  <div className={styles.directoryList}>
-                    {dirs.map((dir) => (
-                      <div key={dir} className={styles.directoryItem}>
-                        <span className={styles.directoryPath}>{dir}</span>
-                        <Button
-                          className={styles.button}
-                          onClick={() => setDirs((prev) => prev.filter((item) => item !== dir))}
-                          aria-label={t('settings.removeFolder')}
-                          title={t('settings.removeFolder')}
-                        >
-                          <FaTrash />
-                        </Button>
-                      </div>
-                    ))}
-                    {!dirs.length && (
-                      <div className={styles.hint}>{t('settings.usingDefault')}</div>
-                    )}
-                  </div>
-                  <div className={styles.hint}>{t('settings.defaultHint')}</div>
-                  <div className={styles.actionsRow}>
-                    <Button
-                      className={styles.button}
-                      onClick={handleRefresh}
-                      aria-label={t('settings.refresh')}
-                      title={t('settings.refresh')}
-                    >
-                      <FaSyncAlt className={isRefreshing ? styles.spin : undefined} />
-                    </Button>
-                    <div className={styles.actionsGroup}>
-                      <Button className={styles.button} onClick={handleReset}>
-                        {t('settings.useDefault')}
-                      </Button>
-                      <Button
-                        className={styles.button}
-                        onClick={handleSave}
-                        aria-label={t('settings.save')}
-                        title={t('settings.save')}
-                      >
-                        <FaSave />
-                      </Button>
-                    </div>
-                  </div>
+
+      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+        <DialogContent className="max-w-[560px] rounded-[18px] border border-border bg-card p-5 shadow-[0_20px_40px_var(--panel-glow)]">
+          <DialogHeader>
+            <DialogTitle>{t('settings.title')}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <FaAdjust /> {t('settings.theme')}
                 </div>
-              </Dialog.Panel>
-            </Transition.Child>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className={cn(
+                      'h-9 w-9 rounded-[10px]',
+                      theme === 'system' && 'border-primary text-primary',
+                    )}
+                    onClick={() => onSetTheme('system')}
+                    aria-label={t('settings.themeSystem')}
+                    title={t('settings.themeSystem')}
+                  >
+                    <FaAdjust />
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className={cn(
+                      'h-9 w-9 rounded-[10px]',
+                      theme === 'light' && 'border-primary text-primary',
+                    )}
+                    onClick={() => onSetTheme('light')}
+                    aria-label={t('settings.themeLight')}
+                    title={t('settings.themeLight')}
+                  >
+                    <FaSun />
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className={cn(
+                      'h-9 w-9 rounded-[10px]',
+                      theme === 'dark' && 'border-primary text-primary',
+                    )}
+                    onClick={() => onSetTheme('dark')}
+                    aria-label={t('settings.themeDark')}
+                    title={t('settings.themeDark')}
+                  >
+                    <FaMoon />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <FaGlobe /> {t('settings.language')}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className={cn(
+                      'rounded-[10px] px-3',
+                      locale === 'zh-CN' && 'border-primary text-primary',
+                    )}
+                    onClick={() => setLocale('zh-CN')}
+                    aria-label={t('settings.langZh')}
+                    title={t('settings.langZh')}
+                  >
+                    {t('settings.langZh')}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className={cn(
+                      'rounded-[10px] px-3',
+                      locale === 'en' && 'border-primary text-primary',
+                    )}
+                    onClick={() => setLocale('en')}
+                    aria-label={t('settings.langEn')}
+                    title={t('settings.langEn')}
+                  >
+                    {t('settings.langEn')}
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Input
+                className="min-w-[220px] flex-1"
+                value={dirValue}
+                onChange={(event) => setDirValue(event.target.value)}
+                placeholder={t('settings.musicFolderPlaceholder')}
+              />
+              <Button
+                variant="secondary"
+                size="icon"
+                className="h-9 w-9 rounded-[10px]"
+                onClick={() => {
+                  addDir(dirValue);
+                  setDirValue('');
+                }}
+                aria-label={t('settings.addFolder')}
+                title={t('settings.addFolder')}
+              >
+                <FaPlus />
+              </Button>
+              <Button
+                variant="secondary"
+                size="icon"
+                className="h-9 w-9 rounded-[10px]"
+                onClick={handlePickDir}
+                aria-label={t('settings.browseFolder')}
+                title={t('settings.browseFolder')}
+              >
+                <FaFolderOpen />
+              </Button>
+            </div>
+            <div className="flex max-h-40 flex-col gap-2 overflow-auto">
+              {dirs.map((dir) => (
+                <div key={dir} className="flex items-center justify-between gap-2">
+                  <span className="flex-1 break-all rounded-xl border border-border px-3 py-2 text-xs text-muted-foreground">
+                    {dir}
+                  </span>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-8 w-8 rounded-[10px]"
+                    onClick={() => setDirs((prev) => prev.filter((item) => item !== dir))}
+                    aria-label={t('settings.removeFolder')}
+                    title={t('settings.removeFolder')}
+                  >
+                    <FaTrash />
+                  </Button>
+                </div>
+              ))}
+              {!dirs.length && (
+                <div className="text-xs text-muted-foreground">{t('settings.usingDefault')}</div>
+              )}
+            </div>
+            <div className="text-xs text-muted-foreground">{t('settings.defaultHint')}</div>
+            <div className="flex items-center justify-between gap-2">
+              <Button
+                variant="secondary"
+                size="icon"
+                className="h-9 w-9 rounded-[10px]"
+                onClick={handleRefresh}
+                aria-label={t('settings.refresh')}
+                title={t('settings.refresh')}
+              >
+                <FaSyncAlt className={cn(isRefreshing && 'animate-spin')} />
+              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="secondary" onClick={handleReset}>
+                  {t('settings.useDefault')}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-9 w-9 rounded-[10px]"
+                  onClick={handleSave}
+                  aria-label={t('settings.save')}
+                  title={t('settings.save')}
+                >
+                  <FaSave />
+                </Button>
+              </div>
+            </div>
           </div>
-        </Dialog>
-      </Transition>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }

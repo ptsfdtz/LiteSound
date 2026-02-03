@@ -1,4 +1,3 @@
-import { Button, Transition } from '@headlessui/react';
 import {
   FaListUl,
   FaPause,
@@ -11,12 +10,14 @@ import {
   FaVolumeMute,
   FaVolumeUp,
 } from 'react-icons/fa';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { formatTime } from '@/utils/media';
 import type { MusicFile, PlayMode } from '@/types/media';
-import styles from '@/components/PlayerBar/PlayerBar.module.css';
 import { useI18n } from '@/locales';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 type PlayerBarProps = {
   active?: MusicFile;
@@ -66,7 +67,6 @@ export function PlayerBar(props: PlayerBarProps) {
 
   const [isSeeking, setIsSeeking] = useState(false);
   const [seekValue, setSeekValue] = useState(0);
-  const [isVolumeOpen, setIsVolumeOpen] = useState(false);
   const seekValueRef = useRef(0);
   const displayPosition = isSeeking ? seekValue : position;
   const clampedPosition = Math.min(displayPosition, duration || 0);
@@ -100,11 +100,13 @@ export function PlayerBar(props: PlayerBarProps) {
   }, [isSeeking, onSeek]);
 
   return (
-    <section className={styles.player}>
-      <div className={styles.card}>
-        <div className={styles.controls}>
+    <section className="mt-auto flex justify-center">
+      <div className="flex w-[min(960px,100%)] flex-col gap-4 rounded-[18px] border border-border bg-card px-4 py-3 shadow-[0_16px_32px_var(--panel-glow)]">
+        <div className="flex flex-wrap items-center gap-3">
           <Button
-            className={`${styles.button} ${styles.ghost}`}
+            variant="secondary"
+            size="icon"
+            className="h-10 w-10 rounded-[10px]"
             onClick={onPrev}
             disabled={!hasTracks}
             aria-label={t('player.previous')}
@@ -112,7 +114,9 @@ export function PlayerBar(props: PlayerBarProps) {
             <FaStepBackward />
           </Button>
           <Button
-            className={styles.button}
+            variant="default"
+            size="icon"
+            className="h-10 w-10 rounded-[10px]"
             onClick={onTogglePlay}
             disabled={!active}
             aria-label={isPlaying ? t('player.pause') : t('player.play')}
@@ -120,7 +124,9 @@ export function PlayerBar(props: PlayerBarProps) {
             {isPlaying ? <FaPause /> : <FaPlay />}
           </Button>
           <Button
-            className={`${styles.button} ${styles.ghost}`}
+            variant="secondary"
+            size="icon"
+            className="h-10 w-10 rounded-[10px]"
             onClick={onNext}
             disabled={!hasTracks}
             aria-label={t('player.next')}
@@ -128,7 +134,7 @@ export function PlayerBar(props: PlayerBarProps) {
             <FaStepForward />
           </Button>
           <input
-            className={styles.progress}
+            className={cn('player-progress h-1.5 min-w-[180px] flex-1 cursor-pointer')}
             type="range"
             min={0}
             max={duration || 0}
@@ -149,11 +155,13 @@ export function PlayerBar(props: PlayerBarProps) {
             disabled={!active}
             style={{ '--progress': progressPercent } as CSSProperties}
           />
-          <div className={styles.time}>
+          <div className="ml-auto text-xs text-muted-foreground">
             {formatTime(clampedPosition)} / {formatTime(duration)}
           </div>
           <Button
-            className={styles.button}
+            variant="secondary"
+            size="icon"
+            className="h-10 w-10 rounded-[10px]"
             onClick={onStop}
             disabled={!active}
             aria-label={t('player.stop')}
@@ -161,7 +169,9 @@ export function PlayerBar(props: PlayerBarProps) {
             <FaStop />
           </Button>
           <Button
-            className={`${styles.button} ${styles.ghost}`}
+            variant="secondary"
+            size="icon"
+            className="h-10 w-10 rounded-[10px]"
             onClick={onCyclePlayMode}
             disabled={!hasTracks}
             aria-label={playModeLabel}
@@ -169,42 +179,39 @@ export function PlayerBar(props: PlayerBarProps) {
           >
             {getPlayModeIcon(playMode)}
           </Button>
-          <div
-            className={styles.volume}
-            onMouseEnter={() => setIsVolumeOpen(true)}
-            onMouseLeave={() => setIsVolumeOpen(false)}
-          >
-            <Button
-              className={`${styles.button} ${styles.ghost}`}
-              onClick={onToggleMute}
-              aria-label={volume === 0 ? t('player.unmute') : t('player.mute')}
-            >
-              {volume === 0 ? <FaVolumeMute /> : <FaVolumeUp />}
-            </Button>
-            <Transition
-              as={Fragment}
-              show={isVolumeOpen}
-              enter={styles.volumeEnter}
-              enterFrom={styles.volumeEnterFrom}
-              enterTo={styles.volumeEnterTo}
-              leave={styles.volumeLeave}
-              leaveFrom={styles.volumeLeaveFrom}
-              leaveTo={styles.volumeLeaveTo}
-            >
-              <div className={styles.volumePopover}>
-                <div className={styles.volumeValue}>{volume}%</div>
-                <input
-                  className={styles.volumeSlider}
-                  type="range"
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={volume}
-                  onChange={(event) => onVolumeChange(Number(event.target.value))}
-                  style={{ '--volume': volumePercent } as CSSProperties}
-                />
-              </div>
-            </Transition>
+          <div className="relative inline-flex items-center">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-10 w-10 rounded-[10px]"
+                  onClick={onToggleMute}
+                  aria-label={volume === 0 ? t('player.unmute') : t('player.mute')}
+                >
+                  {volume === 0 ? <FaVolumeMute /> : <FaVolumeUp />}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                side="top"
+                align="end"
+                className="w-16 rounded-[14px] border border-border bg-secondary p-3 shadow-[0_18px_28px_var(--panel-glow)]"
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <div className="text-xs text-muted-foreground">{volume}%</div>
+                  <input
+                    className="volume-slider h-40 w-6 cursor-pointer"
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={volume}
+                    onChange={(event) => onVolumeChange(Number(event.target.value))}
+                    style={{ '--volume': volumePercent } as CSSProperties}
+                  />
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </div>

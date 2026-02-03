@@ -1,6 +1,6 @@
-import { Listbox, Transition } from '@headlessui/react';
-import { Fragment, type ReactElement, type ReactNode } from 'react';
-import styles from '@/components/common/Dropdown/Dropdown.module.css';
+import { useMemo, type ReactNode } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 type DropdownProps<T> = {
   value?: T;
@@ -12,7 +12,6 @@ type DropdownProps<T> = {
   getOptionMeta?: (option: T) => ReactNode;
   getOptionKey?: (option: T) => string;
   className?: string;
-  renderOption?: (option: T, state: { active: boolean; selected: boolean }) => ReactElement;
 };
 
 export function Dropdown<T>(props: DropdownProps<T>) {
@@ -26,58 +25,46 @@ export function Dropdown<T>(props: DropdownProps<T>) {
     getOptionMeta,
     getOptionKey,
     className,
-    renderOption,
   } = props;
 
-  const compare = getOptionKey
-    ? (a: T | null | undefined, b: T | null | undefined) => {
-        if (!a || !b) return false;
-        return getOptionKey(a) === getOptionKey(b);
-      }
-    : undefined;
+  const resolveKey = (option: T) => (getOptionKey ? getOptionKey(option) : getOptionLabel(option));
+  const selectedKey = value ? resolveKey(value) : undefined;
+  const optionMap = useMemo(
+    () => new Map(options.map((option) => [resolveKey(option), option])),
+    [options, getOptionKey, getOptionLabel],
+  );
 
-  const safeValue = value ?? undefined;
+  const handleChange = (next: string) => {
+    const selected = optionMap.get(next);
+    if (selected) {
+      onChange(selected);
+    }
+  };
 
   return (
-    <div className={className ? `${styles.container} ${className}` : styles.container}>
-      <Listbox value={safeValue} onChange={onChange} by={compare}>
-        <Listbox.Button className={styles.trigger}>{buttonLabel}</Listbox.Button>
-        <Transition
-          as={Fragment}
-          enter={styles.menuEnter}
-          enterFrom={styles.menuEnterFrom}
-          enterTo={styles.menuEnterTo}
-          leave={styles.menuLeave}
-          leaveFrom={styles.menuLeaveFrom}
-          leaveTo={styles.menuLeaveTo}
-        >
-          <Listbox.Options className={styles.options}>
-            {options.map((option) => (
-              <Listbox.Option
-                key={getOptionKey ? getOptionKey(option) : getOptionLabel(option)}
-                value={option}
-              >
-                {({ active, selected }) => {
-                  if (renderOption) {
-                    return renderOption(option, { active, selected });
-                  }
-                  const meta = getOptionMeta ? getOptionMeta(option) : undefined;
-                  return (
-                    <div className={active ? `${styles.row} ${styles.rowActive}` : styles.row}>
-                      <span>{getOptionLabel(option)}</span>
-                      {selected && selectedLabel ? (
-                        <span className={styles.selected}>{selectedLabel}</span>
-                      ) : meta != undefined ? (
-                        <span className={styles.meta}>{meta}</span>
-                      ) : null}
-                    </div>
-                  );
-                }}
-              </Listbox.Option>
-            ))}
-          </Listbox.Options>
-        </Transition>
-      </Listbox>
-    </div>
+    <Select value={selectedKey} onValueChange={handleChange}>
+      <SelectTrigger className={cn('min-w-[220px] justify-between', className)}>
+        <span className="truncate text-left">{buttonLabel}</span>
+      </SelectTrigger>
+      <SelectContent align="start">
+        {options.map((option) => {
+          const key = resolveKey(option);
+          const meta = getOptionMeta ? getOptionMeta(option) : undefined;
+          const isSelected = selectedKey === key;
+          return (
+            <SelectItem key={key} value={key}>
+              <span className="flex w-full items-center justify-between gap-2">
+                <span className="truncate">{getOptionLabel(option)}</span>
+                {isSelected && selectedLabel ? (
+                  <span className="text-xs text-muted-foreground">{selectedLabel}</span>
+                ) : meta != undefined ? (
+                  <span className="text-xs text-muted-foreground">{meta}</span>
+                ) : null}
+              </span>
+            </SelectItem>
+          );
+        })}
+      </SelectContent>
+    </Select>
   );
 }

@@ -11,6 +11,7 @@ export function useMusicLibrary() {
   const [status, setStatus] = useState(t('status.loading'));
   const [composerFilter, setComposerFilter] = useState('All');
   const [albumFilter, setAlbumFilter] = useState('All');
+  const [trackQuery, setTrackQuery] = useState('');
   const [lastPlayedPath, setLastPlayedPath] = useState('');
 
   useEffect(() => {
@@ -86,6 +87,7 @@ export function useMusicLibrary() {
   }, [files]);
 
   const filteredFiles = useMemo(() => {
+    const query = trackQuery.trim().toLowerCase();
     return files.filter((file) => {
       const composer = file.composer?.trim() || 'Unknown';
       const album = file.album?.trim() || 'Unknown';
@@ -95,9 +97,12 @@ export function useMusicLibrary() {
       if (albumFilter !== 'All' && album !== albumFilter) {
         return false;
       }
+      if (query && !file.name.toLowerCase().includes(query)) {
+        return false;
+      }
       return true;
     });
-  }, [files, composerFilter, albumFilter]);
+  }, [files, composerFilter, albumFilter, trackQuery]);
 
   return {
     musicDir,
@@ -109,6 +114,8 @@ export function useMusicLibrary() {
     setComposerFilter,
     albumFilter,
     setAlbumFilter,
+    trackQuery,
+    setTrackQuery,
     lastPlayedPath,
     updateMusicDirs,
     refresh,

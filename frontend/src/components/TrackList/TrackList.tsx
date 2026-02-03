@@ -1,9 +1,9 @@
-import { Button, Listbox } from '@headlessui/react';
 import { FaHeart, FaRegHeart, FaTimes } from 'react-icons/fa';
 import { useMemo } from 'react';
 import type { MusicFile } from '@/types/media';
-import styles from '@/components/TrackList/TrackList.module.css';
 import { useI18n } from '@/locales';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 type TrackListProps = {
   files: MusicFile[];
@@ -31,55 +31,79 @@ export function TrackList(props: TrackListProps) {
   const showRemove = Boolean(playlistName && playlistName !== favoritesKey);
 
   return (
-    <aside className={styles.list}>
-      <Listbox value={active} by="path" onChange={onSelect}>
-        <Listbox.Options className={styles.options} static>
-          {files.map((file) => {
-            const isFavorite = favoriteSet.has(file.path);
-            return (
-              <Listbox.Option key={file.path} value={file}>
-                {({ selected }) => (
-                  <div className={selected ? `${styles.track} ${styles.active}` : styles.track}>
-                    <span className={styles.name}>{file.name}</span>
-                    <span className={styles.meta}>
-                      {showRemove && (
-                        <Button
-                          className={styles.removeButton}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            onRemoveFromPlaylist(playlistName || '', file.path);
-                          }}
-                          aria-label={t('track.removeFromPlaylist')}
-                        >
-                          <FaTimes />
-                        </Button>
-                      )}
-                      <Button
-                        className={
-                          isFavorite
-                            ? `${styles.favoriteButton} ${styles.favoriteActive}`
-                            : styles.favoriteButton
-                        }
-                        onClick={(event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          onToggleFavorite(file.path);
-                        }}
-                        aria-label={isFavorite ? t('track.unfavorite') : t('track.favorite')}
-                      >
-                        {isFavorite ? <FaHeart /> : <FaRegHeart />}
-                      </Button>
-                      <span className={styles.ext}>{selected ? t('track.playing') : file.ext}</span>
-                    </span>
-                  </div>
+    <aside className="flex max-h-[calc(100vh-180px)] flex-col gap-2 overflow-auto rounded-2xl border border-border bg-card p-4 shadow-[0_16px_32px_var(--panel-glow)] max-[900px]:max-h-none">
+      <div role="listbox" className="flex flex-col gap-2">
+        {files.map((file) => {
+          const isFavorite = favoriteSet.has(file.path);
+          const isActive = active?.path === file.path;
+          return (
+            <div
+              key={file.path}
+              role="option"
+              aria-selected={isActive}
+              tabIndex={0}
+              className={cn(
+                'group flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-transparent px-3 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                isActive ? 'border-primary bg-secondary' : 'hover:border-border hover:bg-secondary',
+              )}
+              onClick={() => onSelect(file)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  onSelect(file);
+                }
+              }}
+            >
+              <span className="text-sm leading-snug">{file.name}</span>
+              <span className="flex items-center gap-2">
+                {showRemove && (
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-7 w-7 rounded-md opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      onRemoveFromPlaylist(playlistName || '', file.path);
+                    }}
+                    aria-label={t('track.removeFromPlaylist')}
+                  >
+                    <FaTimes className="h-3 w-3" />
+                  </Button>
                 )}
-              </Listbox.Option>
-            );
-          })}
-          {!files.length && <div className={styles.empty}>No tracks match the filters.</div>}
-        </Listbox.Options>
-      </Listbox>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className={cn(
+                    'h-7 w-7 rounded-md opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100',
+                    isFavorite && 'text-primary',
+                  )}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onToggleFavorite(file.path);
+                  }}
+                  aria-label={isFavorite ? t('track.unfavorite') : t('track.favorite')}
+                >
+                  {isFavorite ? (
+                    <FaHeart className="h-3 w-3" />
+                  ) : (
+                    <FaRegHeart className="h-3 w-3" />
+                  )}
+                </Button>
+                <span className="text-xs text-muted-foreground">
+                  {isActive ? t('track.playing') : file.ext}
+                </span>
+              </span>
+            </div>
+          );
+        })}
+        {!files.length && (
+          <div className="px-3 py-2 text-sm text-muted-foreground">
+            No tracks match the filters.
+          </div>
+        )}
+      </div>
     </aside>
   );
 }

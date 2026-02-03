@@ -4,6 +4,7 @@ const common = {
   'filters.selected': '已选',
   'filters.all': '全部',
   'filters.unknown': '未知',
+  'filters.trackInputPlaceholder': '搜索歌曲名',
   'playlist.title': '歌单',
   'playlist.allTracks': '全部音乐',
   'playlist.noPlaylists': '暂无歌单。',

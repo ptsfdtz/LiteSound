@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef } from 'react';
-import styles from '@/App.module.css';
 import { FiltersBar, HeaderBar, PlayerBar, PlaylistSidebar, TrackList } from '@/components';
 import { useMusicLibrary } from '@/hooks/useMusicLibrary';
 import { usePlaylists } from '@/hooks/usePlaylists';
@@ -19,6 +18,8 @@ function App() {
     setComposerFilter,
     albumFilter,
     setAlbumFilter,
+    trackQuery,
+    setTrackQuery,
     composers,
     albums,
     lastPlayedPath,
@@ -75,7 +76,7 @@ function App() {
   }, [visibleFiles, lastPlayedPath]);
 
   return (
-    <div className={styles.app}>
+    <div className="fixed inset-0 flex h-full w-full flex-col gap-6 bg-[var(--app-bg)] px-8 pb-[30px] pt-5 max-[900px]:p-6">
       <HeaderBar
         title="LiteSound"
         onRefresh={refresh}
@@ -92,8 +93,10 @@ function App() {
         albums={albums}
         albumFilter={albumFilter}
         onAlbumChange={setAlbumFilter}
+        trackQuery={trackQuery}
+        onTrackQueryChange={setTrackQuery}
       />
-      <div className={styles.body}>
+      <div className="grid max-h-[calc(100%-88px)] flex-1 grid-cols-[minmax(240px,320px)_1fr] gap-6 overflow-hidden max-[900px]:grid-cols-1">
         <PlaylistSidebar
           playlists={playlists}
           activePlaylist={activePlaylist}
