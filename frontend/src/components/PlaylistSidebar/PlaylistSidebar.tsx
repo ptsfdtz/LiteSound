@@ -155,7 +155,7 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
       <div className="flex items-center justify-between gap-2">
         <div className="ml-2 text-base font-semibold">{t('playlist.title')}</div>
         <Button
-          variant="secondary"
+          variant="ghost"
           size="icon"
           className="h-8 w-8 rounded-[10px]"
           onClick={() => {
@@ -212,7 +212,7 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
               <span className="truncate">{playlistLabel}</span>
               <span className="flex items-center gap-1.5">
                 <Button
-                  variant="secondary"
+                  variant="ghost"
                   size="icon"
                   className="h-7 w-7 rounded-md opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100"
                   onClick={(event) => {
@@ -226,7 +226,7 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
                 </Button>
                 {!favorites && (
                   <Button
-                    variant="secondary"
+                    variant="ghost"
                     size="icon"
                     className="h-7 w-7 rounded-md opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100"
                     onClick={(event) => {

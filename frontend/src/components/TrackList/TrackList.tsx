@@ -58,7 +58,7 @@ export function TrackList(props: TrackListProps) {
               <span className="flex items-center gap-2">
                 {showRemove && (
                   <Button
-                    variant="secondary"
+                    variant="ghost"
                     size="icon"
                     className="h-7 w-7 rounded-md opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100"
                     onClick={(event) => {
@@ -72,7 +72,7 @@ export function TrackList(props: TrackListProps) {
                   </Button>
                 )}
                 <Button
-                  variant="secondary"
+                  variant="ghost"
                   size="icon"
                   className={cn(
                     'h-7 w-7 rounded-md opacity-0 transition-opacity pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100',
