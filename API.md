@@ -1,6 +1,6 @@
 # API Reference
 
-This is a developer-facing overview of the Wails APIs exposed by the backend. The TypeScript bindings are generated under `frontend/wailsjs/go/main/App.d.ts`.
+This is a developer-facing overview of the Wails APIs exposed by the backend. The TypeScript bindings are generated under `frontend/wailsjs/go/app/App.d.ts`.
 
 ## Library
 - `ListMusicFiles(): Promise<MusicFile[]>` - Scan music folders and return metadata.
@@ -16,6 +16,7 @@ This is a developer-facing overview of the Wails APIs exposed by the backend. Th
 
 ## Playback state
 - `GetLastPlayed(): Promise<string>` - Get last played track path.
+- `GetLastPlayedRecord(): Promise<{ path: string; playedAt: number }>` - Get last played track and timestamp.
 - `SetLastPlayed(path: string): Promise<void>` - Persist last played track path.
 - `GetActivePlaylist(): Promise<string>` - Get active playlist name.
 - `SetActivePlaylist(name: string): Promise<void>` - Persist active playlist name.

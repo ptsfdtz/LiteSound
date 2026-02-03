@@ -13,17 +13,19 @@ export function useMusicLibrary() {
   const [albumFilter, setAlbumFilter] = useState('All');
   const [trackQuery, setTrackQuery] = useState('');
   const [lastPlayedPath, setLastPlayedPath] = useState('');
+  const [lastPlayedAt, setLastPlayedAt] = useState(0);
 
   useEffect(() => {
     let mounted = true;
-    Promise.all([api.getMusicDirs(), api.listMusicFiles(), api.getLastPlayed(), api.getFilters()])
+    Promise.all([api.getMusicDirs(), api.listMusicFiles(), api.getLastPlayedRecord(), api.getFilters()])
       .then(([dirs, list, lastPlayed, filters]) => {
         if (!mounted) return;
         setMusicDirs(dirs);
         setMusicDir(dirs[0] ?? '');
         setFiles(list);
         setStatus(list.length ? t('status.ready') : t('status.noFiles'));
-        setLastPlayedPath(lastPlayed || '');
+        setLastPlayedPath(lastPlayed?.path || '');
+        setLastPlayedAt(lastPlayed?.playedAt || 0);
         const [savedComposer, savedAlbum] = filters ?? [];
         if (savedComposer) {
           setComposerFilter(savedComposer);
@@ -122,5 +124,6 @@ export function useMusicLibrary() {
     composers,
     albums,
     filteredFiles,
+    lastPlayedAt,
   };
 }

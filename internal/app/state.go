@@ -1,5 +1,7 @@
 package app
 
+import "LiteSound/internal/state"
+
 func (a *App) GetActivePlaylist() (string, error) {
 	if a.store == nil {
 		return "", nil
@@ -19,6 +21,13 @@ func (a *App) GetLastPlayed() (string, error) {
 		return "", nil
 	}
 	return a.store.GetLastPlayed()
+}
+
+func (a *App) GetLastPlayedRecord() (state.LastPlayedRecord, error) {
+	if a.store == nil {
+		return state.LastPlayedRecord{}, nil
+	}
+	return a.store.GetLastPlayedRecord()
 }
 
 func (a *App) SetLastPlayed(path string) error {

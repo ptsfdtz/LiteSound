@@ -26,6 +26,10 @@ export function GetLastPlayed() {
   return window['go']['app']['App']['GetLastPlayed']();
 }
 
+export function GetLastPlayedRecord() {
+  return window['go']['app']['App']['GetLastPlayedRecord']();
+}
+
 export function GetMusicDir() {
   return window['go']['app']['App']['GetMusicDir']();
 }

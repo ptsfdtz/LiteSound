@@ -25,6 +25,20 @@ export namespace media {
 
 export namespace state {
 	
+	export class LastPlayedRecord {
+	    path: string;
+	    playedAt: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new LastPlayedRecord(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.path = source["path"];
+	        this.playedAt = source["playedAt"];
+	    }
+	}
 	export class Playlist {
 	    name: string;
 	    tracks: string[];

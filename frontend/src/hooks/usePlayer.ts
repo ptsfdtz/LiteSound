@@ -288,6 +288,29 @@ export function usePlayer(options: UsePlayerOptions) {
   }, [active, filteredFiles, goNext, goPrev, togglePlay, selectTrack]);
 
   useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.code !== 'Space' && event.key !== ' ') return;
+      const target = event.target as HTMLElement | null;
+      const isEditable =
+        target?.isContentEditable ||
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.tagName === 'SELECT';
+      if (isEditable) return;
+      event.preventDefault();
+      if (!active && filteredFiles.length) {
+        void selectTrack(filteredFiles[0]);
+        return;
+      }
+      togglePlay();
+    };
+    window.addEventListener('keydown', handleKeydown);
+    return () => {
+      window.removeEventListener('keydown', handleKeydown);
+    };
+  }, [active, filteredFiles, selectTrack, togglePlay]);
+
+  useEffect(() => {
     const track = active?.name ?? '';
     void api.updateTrayPlayback(track, isPlaying, playMode);
   }, [active, isPlaying, playMode]);

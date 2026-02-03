@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"LiteSound/internal/media"
 )
@@ -19,6 +20,7 @@ type Playlist struct {
 
 type State struct {
 	LastPlayedPath string     `json:"lastPlayedPath"`
+	LastPlayedAt   int64      `json:"lastPlayedAt"`
 	ComposerFilter string     `json:"composerFilter"`
 	AlbumFilter    string     `json:"albumFilter"`
 	Theme          string     `json:"theme"`
@@ -26,6 +28,11 @@ type State struct {
 	MusicDirs      []string   `json:"musicDirs"`
 	Playlists      []Playlist `json:"playlists"`
 	ActivePlaylist string     `json:"activePlaylist"`
+}
+
+type LastPlayedRecord struct {
+	Path     string `json:"path"`
+	PlayedAt int64  `json:"playedAt"`
 }
 
 type Store struct {
@@ -212,6 +219,20 @@ func (s *Store) GetLastPlayed() (string, error) {
 	return state.LastPlayedPath, nil
 }
 
+func (s *Store) GetLastPlayedRecord() (LastPlayedRecord, error) {
+	state, err := s.Load()
+	if err != nil {
+		return LastPlayedRecord{}, err
+	}
+	if state.LastPlayedPath == "" {
+		return LastPlayedRecord{}, nil
+	}
+	return LastPlayedRecord{
+		Path:     state.LastPlayedPath,
+		PlayedAt: state.LastPlayedAt,
+	}, nil
+}
+
 func (s *Store) SetLastPlayed(path string) error {
 	if path == "" {
 		return errors.New("path is required")
@@ -235,6 +256,7 @@ func (s *Store) SetLastPlayed(path string) error {
 		return err
 	}
 	state.LastPlayedPath = absFile
+	state.LastPlayedAt = time.Now().UnixMilli()
 	return s.Save(state)
 }
 

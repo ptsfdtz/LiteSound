@@ -15,6 +15,8 @@ export function GetFilters():Promise<string>;
 
 export function GetLastPlayed():Promise<string>;
 
+export function GetLastPlayedRecord():Promise<state.LastPlayedRecord>;
+
 export function GetMusicDir():Promise<string>;
 
 export function GetMusicDirs():Promise<Array<string>>;
