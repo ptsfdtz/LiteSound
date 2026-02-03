@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '@/services/api';
 import type { Playlist } from '@/types/media';
 import { useI18n } from '@/locales';
+import { toast } from 'sonner';
 
 export function usePlaylists() {
   const { t } = useI18n();
@@ -20,7 +21,9 @@ export function usePlaylists() {
       const match = saved ? list.find((playlist) => playlist.name === saved) : undefined;
       setActivePlaylist(match);
     } catch (err: any) {
-      setPlaylistStatus(err?.message ?? t('playlistStatus.failedRefresh'));
+      const message = err?.message ?? t('playlistStatus.failedRefresh');
+      setPlaylistStatus(message);
+      toast.error(message);
     }
   };
 
@@ -33,7 +36,9 @@ export function usePlaylists() {
         setActivePlaylist(match);
       }
     } catch (err: any) {
-      setPlaylistStatus(err?.message ?? t('playlistStatus.failedRefresh'));
+      const message = err?.message ?? t('playlistStatus.failedRefresh');
+      setPlaylistStatus(message);
+      toast.error(message);
     }
   };
 
@@ -57,10 +62,14 @@ export function usePlaylists() {
     }
     try {
       await api.createPlaylist(trimmed);
-      setPlaylistStatus(t('playlistStatus.created'));
+      const message = t('playlistStatus.created');
+      setPlaylistStatus(message);
+      toast.success(message);
       await refreshPlaylists();
     } catch (err: any) {
-      setPlaylistStatus(err?.message ?? t('playlistStatus.failedCreate'));
+      const message = err?.message ?? t('playlistStatus.failedCreate');
+      setPlaylistStatus(message);
+      toast.error(message);
     }
   };
 
@@ -72,9 +81,14 @@ export function usePlaylists() {
         setActivePlaylist(undefined);
         await api.setActivePlaylist('');
       }
+      const message = t('playlistStatus.deleted');
+      setPlaylistStatus(message);
+      toast.success(message);
       await refreshPlaylists();
     } catch (err: any) {
-      setPlaylistStatus(err?.message ?? t('playlistStatus.failedDelete'));
+      const message = err?.message ?? t('playlistStatus.failedDelete');
+      setPlaylistStatus(message);
+      toast.error(message);
     }
   };
 
@@ -84,14 +98,20 @@ export function usePlaylists() {
     try {
       if (isFavorite) {
         await api.removeFromPlaylist(favoritesKey, path);
-        setPlaylistStatus(t('playlistStatus.unfavorited'));
+        const message = t('playlistStatus.unfavorited');
+        setPlaylistStatus(message);
+        toast.success(message);
       } else {
         await api.addToPlaylist(favoritesKey, path);
-        setPlaylistStatus(t('playlistStatus.favorited'));
+        const message = t('playlistStatus.favorited');
+        setPlaylistStatus(message);
+        toast.success(message);
       }
       await refreshPlaylists();
     } catch (err: any) {
-      setPlaylistStatus(err?.message ?? t('playlistStatus.failedFavorite'));
+      const message = err?.message ?? t('playlistStatus.failedFavorite');
+      setPlaylistStatus(message);
+      toast.error(message);
     }
   };
 
@@ -99,15 +119,22 @@ export function usePlaylists() {
     if (!playlistName || !path) return;
     try {
       await api.removeFromPlaylist(playlistName, path);
+      const message = t('playlistStatus.removed');
+      setPlaylistStatus(message);
+      toast.success(message);
       await refreshPlaylists();
     } catch (err: any) {
-      setPlaylistStatus(err?.message ?? t('playlistStatus.failedRemove'));
+      const message = err?.message ?? t('playlistStatus.failedRemove');
+      setPlaylistStatus(message);
+      toast.error(message);
     }
   };
 
   const addTracksToPlaylist = async (playlistName: string, trackPaths: string[]) => {
     if (!playlistName || !trackPaths.length) {
-      setPlaylistStatus(t('playlistStatus.selectPrompt'));
+      const message = t('playlistStatus.selectPrompt');
+      setPlaylistStatus(message);
+      toast.info(message);
       return;
     }
     try {
@@ -116,7 +143,9 @@ export function usePlaylists() {
       }
       await refreshPlaylists();
     } catch (err: any) {
-      setPlaylistStatus(err?.message ?? t('playlistStatus.failedAdd'));
+      const message = err?.message ?? t('playlistStatus.failedAdd');
+      setPlaylistStatus(message);
+      toast.error(message);
     }
   };
 

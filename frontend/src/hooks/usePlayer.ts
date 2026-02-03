@@ -5,6 +5,7 @@ import type { MusicFile, PlayMode } from '@/types/media';
 import { pickRandomIndex } from '@/utils/media';
 import { EventsOn } from '../../wailsjs/runtime/runtime';
 import { useI18n } from '@/locales';
+import { toast } from 'sonner';
 
 type UsePlayerOptions = {
   filteredFiles: MusicFile[];
@@ -142,7 +143,9 @@ export function usePlayer(options: UsePlayerOptions) {
     try {
       const baseURL = streamBaseURL || (await api.getStreamBaseURL());
       if (!baseURL) {
-        onStatusChange?.(t('playerStatus.streamUnavailable'));
+        const message = t('playerStatus.streamUnavailable');
+        onStatusChange?.(message);
+        toast.error(message);
         return;
       }
       const url = new URL('/media', baseURL);
@@ -183,7 +186,9 @@ export function usePlayer(options: UsePlayerOptions) {
       onStatusChange?.(t('status.ready'));
       void api.setLastPlayed(file.path);
     } catch (err: any) {
-      onStatusChange?.(err?.message ?? t('playerStatus.loadFailed'));
+      const message = err?.message ?? t('playerStatus.loadFailed');
+      onStatusChange?.(message);
+      toast.error(message);
     }
   };
 

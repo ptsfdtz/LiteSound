@@ -169,7 +169,7 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
           <FaPlus />
         </Button>
       </div>
-      <div className="flex max-h-[360px] flex-col gap-2 overflow-auto px-1 py-2">
+      <div className="flex max-h-[400px] flex-col gap-2 overflow-auto px-1 py-2">
         <div
           className={cn(
             'flex cursor-pointer items-center justify-between gap-2 rounded-lg border border-transparent px-2.5 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
@@ -358,7 +358,9 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
           </DialogHeader>
           <div className="flex flex-col gap-4">
             <div className="text-sm text-muted-foreground">
-              {deleteTarget ? t('playlist.confirmDelete', { name: getPlaylistLabel(deleteTarget) }) : ''}
+              {deleteTarget
+                ? t('playlist.confirmDelete', { name: getPlaylistLabel(deleteTarget) })
+                : ''}
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onClick={() => setDeleteTarget(null)}>

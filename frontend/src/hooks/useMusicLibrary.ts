@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/services/api';
 import type { MusicFile } from '@/types/media';
 import { useI18n } from '@/locales';
+import { toast } from 'sonner';
 
 export function useMusicLibrary() {
   const { t } = useI18n();
@@ -36,7 +37,9 @@ export function useMusicLibrary() {
       })
       .catch((err) => {
         if (!mounted) return;
-        setStatus(err?.message ?? t('status.failedLoad'));
+        const message = err?.message ?? t('status.failedLoad');
+        setStatus(message);
+        toast.error(message);
       });
     return () => {
       mounted = false;
@@ -54,7 +57,9 @@ export function useMusicLibrary() {
       setFiles(list);
       setStatus(list.length ? t('status.ready') : t('status.noFiles'));
     } catch (err: any) {
-      setStatus(err?.message ?? t('status.failedRefresh'));
+      const message = err?.message ?? t('status.failedRefresh');
+      setStatus(message);
+      toast.error(message);
     }
   };
 
@@ -66,7 +71,9 @@ export function useMusicLibrary() {
       setMusicDir(nextDirs[0] ?? '');
       await refresh();
     } catch (err: any) {
-      setStatus(err?.message ?? t('status.failedUpdateDir'));
+      const message = err?.message ?? t('status.failedUpdateDir');
+      setStatus(message);
+      toast.error(message);
     }
   };
 

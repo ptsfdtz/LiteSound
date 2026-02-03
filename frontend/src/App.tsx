@@ -5,6 +5,7 @@ import { usePlaylists } from '@/hooks/usePlaylists';
 import { usePlayer } from '@/hooks/usePlayer';
 import { useTheme } from '@/hooks/useTheme';
 import { findTrackByPath } from '@/utils/media';
+import { Toaster } from '@/components/ui/sonner';
 
 function App() {
   const {
@@ -136,6 +137,7 @@ function App() {
         onToggleMute={player.toggleMute}
         onCyclePlayMode={player.cyclePlayMode}
       />
+      <Toaster position="top-center" />
     </div>
   );
 }
