@@ -5,7 +5,9 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"LiteSound/internal/media"
@@ -37,6 +39,7 @@ type LastPlayedRecord struct {
 
 type Store struct {
 	appName string
+	mu      sync.RWMutex
 }
 
 func NewStore(appName string) *Store {
@@ -56,6 +59,36 @@ func (s *Store) stateFilePath() (string, error) {
 }
 
 func (s *Store) Load() (State, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.loadFromDisk()
+}
+
+func (s *Store) Save(state State) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.saveToDisk(state)
+}
+
+func (s *Store) Update(updateFn func(*State) error) (State, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	state, err := s.loadFromDisk()
+	if err != nil {
+		return State{}, err
+	}
+	if updateFn != nil {
+		if err := updateFn(&state); err != nil {
+			return State{}, err
+		}
+	}
+	if err := s.saveToDisk(state); err != nil {
+		return State{}, err
+	}
+	return state, nil
+}
+
+func (s *Store) loadFromDisk() (State, error) {
 	state := State{}
 	statePath, err := s.stateFilePath()
 	if err != nil {
@@ -90,7 +123,7 @@ func (s *Store) Load() (State, error) {
 	return state, nil
 }
 
-func (s *Store) Save(state State) error {
+func (s *Store) saveToDisk(state State) error {
 	statePath, err := s.stateFilePath()
 	if err != nil {
 		return err
@@ -102,7 +135,37 @@ func (s *Store) Save(state State) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(statePath, data, 0o644)
+	tempFile, err := os.CreateTemp(filepath.Dir(statePath), "state-*.tmp")
+	if err != nil {
+		return err
+	}
+	tempPath := tempFile.Name()
+	if _, err := tempFile.Write(data); err != nil {
+		_ = tempFile.Close()
+		_ = os.Remove(tempPath)
+		return err
+	}
+	if err := tempFile.Sync(); err != nil {
+		_ = tempFile.Close()
+		_ = os.Remove(tempPath)
+		return err
+	}
+	if err := tempFile.Close(); err != nil {
+		_ = os.Remove(tempPath)
+		return err
+	}
+	if err := os.Chmod(tempPath, 0o644); err != nil {
+		_ = os.Remove(tempPath)
+		return err
+	}
+	if runtime.GOOS == "windows" {
+		_ = os.Remove(statePath)
+	}
+	if err := os.Rename(tempPath, statePath); err != nil {
+		_ = os.Remove(tempPath)
+		return err
+	}
+	return nil
 }
 
 func (s *Store) ResolveMusicDirs() ([]string, error) {
@@ -153,7 +216,7 @@ func (s *Store) SetMusicDirs(paths []string) ([]string, error) {
 		if trimmed == "" {
 			continue
 		}
-		abs, err := filepath.Abs(trimmed)
+		abs, err := media.ResolveExistingPath(trimmed)
 		if err != nil {
 			return nil, err
 		}
@@ -170,22 +233,22 @@ func (s *Store) SetMusicDirs(paths []string) ([]string, error) {
 		seen[abs] = struct{}{}
 		cleaned = append(cleaned, abs)
 	}
-	state, err := s.Load()
+	updateFn := func(state *State) error {
+		if len(cleaned) == 0 {
+			state.MusicDir = ""
+			state.MusicDirs = []string{}
+			return nil
+		}
+		state.MusicDir = ""
+		state.MusicDirs = cleaned
+		return nil
+	}
+	_, err := s.Update(updateFn)
 	if err != nil {
 		return nil, err
 	}
 	if len(cleaned) == 0 {
-		state.MusicDir = ""
-		state.MusicDirs = []string{}
-		if err := s.Save(state); err != nil {
-			return nil, err
-		}
 		return s.ResolveMusicDirs()
-	}
-	state.MusicDir = ""
-	state.MusicDirs = cleaned
-	if err := s.Save(state); err != nil {
-		return nil, err
 	}
 	return cleaned, nil
 }
@@ -199,13 +262,12 @@ func (s *Store) GetFilters() (string, string, error) {
 }
 
 func (s *Store) SetFilters(composer string, album string) error {
-	state, err := s.Load()
-	if err != nil {
-		return err
-	}
-	state.ComposerFilter = composer
-	state.AlbumFilter = album
-	return s.Save(state)
+	_, err := s.Update(func(state *State) error {
+		state.ComposerFilter = composer
+		state.AlbumFilter = album
+		return nil
+	})
+	return err
 }
 
 func (s *Store) GetLastPlayed() (string, error) {
@@ -244,20 +306,19 @@ func (s *Store) SetLastPlayed(path string) error {
 	if err != nil {
 		return err
 	}
-	absFile, err := filepath.Abs(path)
+	absFile, err := media.ResolveExistingPath(path)
 	if err != nil {
 		return err
 	}
 	if !media.IsPathWithinAnyDir(dirs, absFile) {
 		return errors.New("file not in music directory")
 	}
-	state, err := s.Load()
-	if err != nil {
-		return err
-	}
-	state.LastPlayedPath = absFile
-	state.LastPlayedAt = time.Now().UnixMilli()
-	return s.Save(state)
+	_, err = s.Update(func(state *State) error {
+		state.LastPlayedPath = absFile
+		state.LastPlayedAt = time.Now().UnixMilli()
+		return nil
+	})
+	return err
 }
 
 func (s *Store) GetActivePlaylist() (string, error) {
@@ -270,21 +331,20 @@ func (s *Store) GetActivePlaylist() (string, error) {
 
 func (s *Store) SetActivePlaylist(name string) error {
 	name = strings.TrimSpace(name)
-	state, err := s.Load()
-	if err != nil {
-		return err
-	}
-	if name == "" {
-		state.ActivePlaylist = ""
-		return s.Save(state)
-	}
-	for _, playlist := range state.Playlists {
-		if strings.EqualFold(playlist.Name, name) {
-			state.ActivePlaylist = playlist.Name
-			return s.Save(state)
+	_, err := s.Update(func(state *State) error {
+		if name == "" {
+			state.ActivePlaylist = ""
+			return nil
 		}
-	}
-	return errors.New("playlist not found")
+		for _, playlist := range state.Playlists {
+			if strings.EqualFold(playlist.Name, name) {
+				state.ActivePlaylist = playlist.Name
+				return nil
+			}
+		}
+		return errors.New("playlist not found")
+	})
+	return err
 }
 
 func (s *Store) GetPlaylists() ([]Playlist, error) {
@@ -306,17 +366,16 @@ func (s *Store) CreatePlaylist(name string) error {
 	if strings.EqualFold(name, FavoritesKey) {
 		return errors.New("playlist name is reserved")
 	}
-	state, err := s.Load()
-	if err != nil {
-		return err
-	}
-	for _, playlist := range state.Playlists {
-		if strings.EqualFold(playlist.Name, name) {
-			return errors.New("playlist already exists")
+	_, err := s.Update(func(state *State) error {
+		for _, playlist := range state.Playlists {
+			if strings.EqualFold(playlist.Name, name) {
+				return errors.New("playlist already exists")
+			}
 		}
-	}
-	state.Playlists = append(state.Playlists, Playlist{Name: name, Tracks: []string{}})
-	return s.Save(state)
+		state.Playlists = append(state.Playlists, Playlist{Name: name, Tracks: []string{}})
+		return nil
+	})
+	return err
 }
 
 func (s *Store) DeletePlaylist(name string) error {
@@ -327,27 +386,26 @@ func (s *Store) DeletePlaylist(name string) error {
 	if strings.EqualFold(name, FavoritesKey) {
 		return errors.New("playlist name is reserved")
 	}
-	state, err := s.Load()
-	if err != nil {
-		return err
-	}
-	updated := make([]Playlist, 0, len(state.Playlists))
-	found := false
-	for _, playlist := range state.Playlists {
-		if strings.EqualFold(playlist.Name, name) {
-			found = true
-			continue
+	_, err := s.Update(func(state *State) error {
+		updated := make([]Playlist, 0, len(state.Playlists))
+		found := false
+		for _, playlist := range state.Playlists {
+			if strings.EqualFold(playlist.Name, name) {
+				found = true
+				continue
+			}
+			updated = append(updated, playlist)
 		}
-		updated = append(updated, playlist)
-	}
-	if !found {
-		return errors.New("playlist not found")
-	}
-	if strings.EqualFold(state.ActivePlaylist, name) {
-		state.ActivePlaylist = ""
-	}
-	state.Playlists = updated
-	return s.Save(state)
+		if !found {
+			return errors.New("playlist not found")
+		}
+		if strings.EqualFold(state.ActivePlaylist, name) {
+			state.ActivePlaylist = ""
+		}
+		state.Playlists = updated
+		return nil
+	})
+	return err
 }
 
 func (s *Store) AddToPlaylist(name string, path string) error {
@@ -365,7 +423,7 @@ func (s *Store) AddToPlaylist(name string, path string) error {
 	if err != nil {
 		return err
 	}
-	absFile, err := filepath.Abs(path)
+	absFile, err := media.ResolveExistingPath(path)
 	if err != nil {
 		return err
 	}
@@ -373,22 +431,21 @@ func (s *Store) AddToPlaylist(name string, path string) error {
 		return errors.New("file not in music directory")
 	}
 
-	state, err := s.Load()
-	if err != nil {
-		return err
-	}
-	for i, playlist := range state.Playlists {
-		if strings.EqualFold(playlist.Name, name) {
-			for _, existing := range playlist.Tracks {
-				if strings.EqualFold(existing, absFile) {
-					return nil
+	_, err = s.Update(func(state *State) error {
+		for i, playlist := range state.Playlists {
+			if strings.EqualFold(playlist.Name, name) {
+				for _, existing := range playlist.Tracks {
+					if strings.EqualFold(existing, absFile) {
+						return nil
+					}
 				}
+				state.Playlists[i].Tracks = append(state.Playlists[i].Tracks, absFile)
+				return nil
 			}
-			state.Playlists[i].Tracks = append(state.Playlists[i].Tracks, absFile)
-			return s.Save(state)
 		}
-	}
-	return errors.New("playlist not found")
+		return errors.New("playlist not found")
+	})
+	return err
 }
 
 func (s *Store) RemoveFromPlaylist(name string, path string) error {
@@ -406,7 +463,7 @@ func (s *Store) RemoveFromPlaylist(name string, path string) error {
 	if err != nil {
 		return err
 	}
-	absFile, err := filepath.Abs(path)
+	absFile, err := media.ResolveExistingPath(path)
 	if err != nil {
 		return err
 	}
@@ -414,29 +471,28 @@ func (s *Store) RemoveFromPlaylist(name string, path string) error {
 		return errors.New("file not in music directory")
 	}
 
-	state, err := s.Load()
-	if err != nil {
-		return err
-	}
-	for i, playlist := range state.Playlists {
-		if strings.EqualFold(playlist.Name, name) {
-			updated := make([]string, 0, len(playlist.Tracks))
-			removed := false
-			for _, existing := range playlist.Tracks {
-				if strings.EqualFold(existing, absFile) {
-					removed = true
-					continue
+	_, err = s.Update(func(state *State) error {
+		for i, playlist := range state.Playlists {
+			if strings.EqualFold(playlist.Name, name) {
+				updated := make([]string, 0, len(playlist.Tracks))
+				removed := false
+				for _, existing := range playlist.Tracks {
+					if strings.EqualFold(existing, absFile) {
+						removed = true
+						continue
+					}
+					updated = append(updated, existing)
 				}
-				updated = append(updated, existing)
-			}
-			if !removed {
+				if !removed {
+					return nil
+				}
+				state.Playlists[i].Tracks = updated
 				return nil
 			}
-			state.Playlists[i].Tracks = updated
-			return s.Save(state)
 		}
-	}
-	return errors.New("playlist not found")
+		return errors.New("playlist not found")
+	})
+	return err
 }
 
 func NormalizeTheme(theme string) (string, error) {
@@ -467,12 +523,11 @@ func (s *Store) SetTheme(theme string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	state, err := s.Load()
+	_, err = s.Update(func(state *State) error {
+		state.Theme = normalized
+		return nil
+	})
 	if err != nil {
-		return "", err
-	}
-	state.Theme = normalized
-	if err := s.Save(state); err != nil {
 		return "", err
 	}
 	return normalized, nil

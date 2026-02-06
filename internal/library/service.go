@@ -48,7 +48,7 @@ func (s *Service) ListMusicFiles() ([]media.MusicFile, error) {
 			if _, ok := media.AllowedAudioExt[ext]; !ok {
 				return nil
 			}
-			abs, err := filepath.Abs(path)
+			abs, err := media.ResolveExistingPath(path)
 			if err != nil {
 				return err
 			}
@@ -90,7 +90,7 @@ func (s *Service) ReadMusicFile(path string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	absFile, err := filepath.Abs(path)
+	absFile, err := media.ResolveExistingPath(path)
 	if err != nil {
 		return nil, err
 	}

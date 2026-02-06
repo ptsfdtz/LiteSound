@@ -7,15 +7,28 @@ import (
 )
 
 func IsPathWithinDir(dir string, file string) bool {
-	dir = strings.ToLower(filepath.Clean(dir))
-	file = strings.ToLower(filepath.Clean(file))
-	if dir == file {
+	resolvedDir, err := ResolveExistingPath(dir)
+	if err != nil {
+		return false
+	}
+	resolvedFile, err := ResolveExistingPath(file)
+	if err != nil {
+		return false
+	}
+	relative, err := filepath.Rel(resolvedDir, resolvedFile)
+	if err != nil {
+		return false
+	}
+	if relative == "." {
 		return true
 	}
-	if !strings.HasSuffix(dir, string(os.PathSeparator)) {
-		dir += string(os.PathSeparator)
+	if relative == ".." {
+		return false
 	}
-	return strings.HasPrefix(file, dir)
+	if strings.HasPrefix(relative, ".."+string(os.PathSeparator)) {
+		return false
+	}
+	return true
 }
 
 func IsPathWithinAnyDir(dirs []string, file string) bool {
@@ -28,4 +41,16 @@ func IsPathWithinAnyDir(dirs []string, file string) bool {
 		}
 	}
 	return false
+}
+
+func ResolveExistingPath(path string) (string, error) {
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return "", err
+	}
+	resolvedPath, err := filepath.EvalSymlinks(absPath)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Clean(resolvedPath), nil
 }
