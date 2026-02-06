@@ -47,23 +47,40 @@ jobs:
         run: pnpm install
         working-directory: frontend
 
-      - name: Build
-        run: wails build -platform ${{ matrix.platform }}
+      - name: Install NSIS
+        if: matrix.os == 'windows-latest'
+        run: choco install nsis --no-progress -y
+
+      - name: Build (Windows installer)
+        if: matrix.os == 'windows-latest'
+        run: wails build -platform ${{ matrix.platform }} -nsis -clean
+
+      - name: Build (macOS app)
+        if: matrix.os == 'macos-latest'
+        run: wails build -platform ${{ matrix.platform }} -clean
 
       - name: Package (Windows)
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
           $tag = "${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}"
-          $artifact = "LiteSound-windows-amd64-$tag.zip"
-          Compress-Archive -Path build/bin/LiteSound.exe -DestinationPath $artifact
+          $installer = Get-ChildItem -Path "build/bin" -Filter "*-installer.exe" | Select-Object -First 1
+          if (-not $installer) {
+            throw "NSIS installer not found in build/bin"
+          }
+          $artifact = "LiteSound-windows-amd64-$tag-installer.exe"
+          Copy-Item $installer.FullName $artifact
 
       - name: Package (macOS)
         if: matrix.os == 'macos-latest'
         run: |
           tag="${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}"
-          artifact="LiteSound-macos-arm64-$tag.zip"
-          ditto -c -k --sequesterRsrc --keepParent build/bin/LiteSound.app "$artifact"
+          artifact="LiteSound-macos-arm64-$tag.dmg"
+          staging="build/dmg"
+          rm -rf "$staging"
+          mkdir -p "$staging"
+          cp -R "build/bin/LiteSound.app" "$staging/"
+          hdiutil create -volname "LiteSound" -srcfolder "$staging" -ov -format UDZO "$artifact"
 
       - name: Release
         uses: softprops/action-gh-release@v2
