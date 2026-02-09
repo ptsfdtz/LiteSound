@@ -51,13 +51,53 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: choco install nsis --no-progress -y
 
+      - name: Configure NSIS PATH
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $candidates = @(
+            "C:\Program Files (x86)\NSIS",
+            "C:\Program Files\NSIS"
+          )
+          $found = $false
+          foreach ($path in $candidates) {
+            if (Test-Path (Join-Path $path "makensis.exe")) {
+              Write-Host "Found makensis at $path"
+              $path | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+              $found = $true
+              break
+            }
+          }
+          if (-not $found) {
+            throw "makensis.exe not found after NSIS install"
+          }
+
       - name: Build (Windows installer)
         if: matrix.os == 'windows-latest'
-        run: wails build -platform ${{ matrix.platform }} -nsis -clean
+        shell: pwsh
+        run: |
+          wails build -platform ${{ matrix.platform }} -nsis -clean
+          $installer = Get-ChildItem -Path "build/bin" -Filter "*-installer.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $installer) {
+            Write-Host "Wails did not emit installer; trying manual NSIS build"
+            $makensis = Get-Command makensis -ErrorAction SilentlyContinue
+            if (-not $makensis) {
+              throw "makensis not found in PATH"
+            }
+            & $makensis.Path "/DARG_WAILS_AMD64_BINARY=$PWD\build\bin\LiteSound.exe" "$PWD\build\windows\installer\project.nsi"
+            if ($LASTEXITCODE -ne 0) {
+              throw "manual NSIS build failed"
+            }
+          }
+          Write-Host "Windows build/bin contents:"
+          Get-ChildItem -Path "build/bin" | Format-Table Name, Length
 
       - name: Build (macOS app)
         if: matrix.os == 'macos-latest'
-        run: wails build -platform ${{ matrix.platform }} -clean
+        run: |
+          wails build -platform ${{ matrix.platform }} -clean
+          echo "macOS build/bin contents:"
+          ls -la build/bin
 
       - name: Package (Windows)
         if: matrix.os == 'windows-latest'
@@ -70,6 +110,7 @@ jobs:
           }
           $artifact = "LiteSound-windows-amd64-$tag-installer.exe"
           Copy-Item $installer.FullName $artifact
+          Write-Host "Packaged artifact: $artifact"
 
       - name: Package (macOS)
         if: matrix.os == 'macos-latest'
@@ -81,6 +122,23 @@ jobs:
           mkdir -p "$staging"
           cp -R "build/bin/LiteSound.app" "$staging/"
           hdiutil create -volname "LiteSound" -srcfolder "$staging" -ov -format UDZO "$artifact"
+          echo "Packaged artifact: $artifact"
+
+      - name: Upload artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer-${{ github.run_number }}
+          path: LiteSound-windows-amd64-${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}-installer.exe
+          if-no-files-found: error
+
+      - name: Upload artifact (macOS)
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-installer-${{ github.run_number }}
+          path: LiteSound-macos-arm64-${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}.dmg
+          if-no-files-found: error
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -88,4 +146,6 @@ jobs:
           tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}
           name: ${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}
           prerelease: ${{ github.ref_type != 'tag' }}
-          files: LiteSound-*-${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}.*
+          files: |
+            LiteSound-windows-amd64-${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}-installer.exe
+            LiteSound-macos-arm64-${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}.dmg
