@@ -107,6 +107,20 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
     });
   };
 
+  const handleSelectAll = () => {
+    if (!selectedPlaylist) return;
+    const existing = new Set(selectedPlaylist.tracks);
+    setSelectedTracks((prev) => {
+      const next = { ...prev };
+      filteredFiles.forEach((file) => {
+        if (!existing.has(file.path)) {
+          next[file.path] = true;
+        }
+      });
+      return next;
+    });
+  };
+
   const handleCreate = () => {
     if (!newPlaylistName.trim()) return;
     const created = newPlaylistName.trim();
@@ -289,7 +303,7 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
               </div>
             )}
             {mode === 'edit' && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Dropdown
                   value={composerFilter}
                   onChange={setComposerFilter}
@@ -308,6 +322,14 @@ export function PlaylistSidebar(props: PlaylistSidebarProps) {
                   buttonLabel={`${t('filters.album')}: ${renderFilterLabel(albumFilter)}`}
                   className="w-[240px]"
                 />
+                <Button
+                  variant="secondary"
+                  className="h-9 rounded-[10px]"
+                  onClick={handleSelectAll}
+                  disabled={!selectedPlaylist || filteredFiles.length === 0}
+                >
+                  {t('playlist.selectAll')}
+                </Button>
               </div>
             )}
 
