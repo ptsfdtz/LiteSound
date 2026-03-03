@@ -12,6 +12,8 @@ permissions:
 
 jobs:
   build:
+    env:
+      APP_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || format('nightly-{0}', github.run_number) }}
     strategy:
       fail-fast: false
       matrix:
@@ -76,7 +78,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          wails build -platform ${{ matrix.platform }} -nsis -clean
+          wails build -platform ${{ matrix.platform }} -nsis -clean -ldflags "-X main.appVersion=$env:APP_VERSION"
           $installer = Get-ChildItem -Path "build/bin" -Filter "*-installer.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
           if (-not $installer) {
             Write-Host "Wails did not emit installer; trying manual NSIS build"
@@ -95,7 +97,7 @@ jobs:
       - name: Build (macOS app)
         if: matrix.os == 'macos-latest'
         run: |
-          wails build -platform ${{ matrix.platform }} -clean
+          wails build -platform ${{ matrix.platform }} -clean -ldflags "-X main.appVersion=${APP_VERSION}"
           echo "macOS build/bin contents:"
           ls -la build/bin
 

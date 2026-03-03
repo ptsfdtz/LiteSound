@@ -13,9 +13,16 @@ import (
 //go:embed all:frontend/dist
 var assets embed.FS
 
+// Set via ldflags in release builds, e.g. -X main.appVersion=v0.2.1
+var appVersion = "dev"
+
+// Set via ldflags if publishing from a fork.
+var updateRepoOwner = "ptsfdtz"
+var updateRepoName = "LiteSound"
+
 func main() {
 	// Create an instance of the app structure
-	appInstance := app.NewApp()
+	appInstance := app.NewApp(appVersion, updateRepoOwner, updateRepoName)
 
 	// Create application with options
 	err := wails.Run(&options.App{
