@@ -39,6 +39,24 @@ export namespace state {
 	        this.playedAt = source["playedAt"];
 	    }
 	}
+	export class NeteaseConfig {
+	    enabled: boolean;
+	    apiBaseURL: string;
+	    cookie: string;
+	    quality: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new NeteaseConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.enabled = source["enabled"];
+	        this.apiBaseURL = source["apiBaseURL"];
+	        this.cookie = source["cookie"];
+	        this.quality = source["quality"];
+	    }
+	}
 	export class Playlist {
 	    name: string;
 	    tracks: string[];

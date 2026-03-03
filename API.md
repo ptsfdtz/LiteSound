@@ -6,6 +6,7 @@ This is a developer-facing overview of the Wails APIs exposed by the backend. Th
 - `ListMusicFiles(): Promise<MusicFile[]>` - Scan music folders and return metadata.
 - `ReadMusicFile(path: string): Promise<number[]>` - Read file data (used by the stream server).
 - `GetStreamBaseURL(): Promise<string>` - Base URL for local streaming server.
+- `GetPlaybackURL(path: string): Promise<string>` - Resolve playable URL for local or cloud tracks.
 
 ## Music folders
 - `GetMusicDir(): Promise<string>` - Get primary music folder.
@@ -22,6 +23,8 @@ This is a developer-facing overview of the Wails APIs exposed by the backend. Th
 - `SetActivePlaylist(name: string): Promise<void>` - Persist active playlist name.
 - `GetFilters(): Promise<string>` - Get saved composer/album filters.
 - `SetFilters(composer: string, album: string): Promise<void>` - Persist filters.
+- `GetNeteaseConfig(): Promise<{ enabled: boolean; apiBaseURL: string; cookie: string; quality: string }>` - Get Netease cloud sync config.
+- `SetNeteaseConfig(config): Promise<{ enabled: boolean; apiBaseURL: string; cookie: string; quality: string }>` - Save Netease cloud sync config.
 
 ## Playlists
 - `GetPlaylists(): Promise<Playlist[]>` - Get all playlists.

@@ -16,7 +16,6 @@ export function usePlayer(options: UsePlayerOptions) {
   const { t } = useI18n();
   const { filteredFiles, onStatusChange } = options;
   const [active, setActive] = useState<MusicFile | undefined>(undefined);
-  const [streamBaseURL, setStreamBaseURL] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
@@ -45,23 +44,6 @@ export function usePlayer(options: UsePlayerOptions) {
   useEffect(() => {
     filteredFilesRef.current = filteredFiles;
   }, [filteredFiles]);
-
-  useEffect(() => {
-    let mounted = true;
-    api
-      .getStreamBaseURL()
-      .then((url) => {
-        if (!mounted) return;
-        setStreamBaseURL(url);
-      })
-      .catch(() => {
-        if (!mounted) return;
-        setStreamBaseURL('');
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -141,20 +123,18 @@ export function usePlayer(options: UsePlayerOptions) {
     onStatusChange?.(t('playerStatus.loadingFile', { name: file.name }));
     setPosition(0);
     try {
-      const baseURL = streamBaseURL || (await api.getStreamBaseURL());
-      if (!baseURL) {
+      const playbackURL = await api.getPlaybackURL(file.path);
+      if (!playbackURL) {
         const message = t('playerStatus.streamUnavailable');
         onStatusChange?.(message);
         toast.error(message);
         return;
       }
-      const url = new URL('/media', baseURL);
-      url.searchParams.set('path', file.path);
       if (howlRef.current) {
         howlRef.current.unload();
       }
       const howl = new Howl({
-        src: [url.toString()],
+        src: [playbackURL],
         html5: true,
         onload: () => {
           setDuration(howl.duration() || 0);

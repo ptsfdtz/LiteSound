@@ -12,14 +12,53 @@ import (
 )
 
 type Service struct {
-	store *state.Store
+	store   *state.Store
+	netease *NeteaseClient
 }
 
 func New(store *state.Store) *Service {
-	return &Service{store: store}
+	return &Service{
+		store:   store,
+		netease: NewNeteaseClient(store),
+	}
 }
 
 func (s *Service) ListMusicFiles() ([]media.MusicFile, error) {
+	entries, err := s.listLocalMusicFiles()
+	if err != nil {
+		return nil, err
+	}
+
+	cloudEntries, cloudErr := s.netease.ListCloudMusicFiles()
+	if cloudErr != nil {
+		if len(entries) == 0 {
+			return nil, cloudErr
+		}
+		// Keep local playback available even if cloud sync fails.
+		cloudEntries = nil
+	}
+	if len(cloudEntries) > 0 {
+		seen := make(map[string]struct{}, len(entries))
+		for _, file := range entries {
+			seen[file.Path] = struct{}{}
+		}
+		for _, file := range cloudEntries {
+			if _, ok := seen[file.Path]; ok {
+				continue
+			}
+			seen[file.Path] = struct{}{}
+			entries = append(entries, file)
+		}
+	}
+
+	sort.Slice(entries, func(i, j int) bool {
+		return strings.ToLower(entries[i].Name) < strings.ToLower(entries[j].Name)
+	})
+
+	return entries, nil
+}
+
+func (s *Service) listLocalMusicFiles() ([]media.MusicFile, error) {
 	dirs, err := s.store.ResolveMusicDirs()
 	if err != nil {
 		return nil, err
@@ -70,17 +109,15 @@ func (s *Service) ListMusicFiles() ([]media.MusicFile, error) {
 			return nil, err
 		}
 	}
-
-	sort.Slice(entries, func(i, j int) bool {
-		return strings.ToLower(entries[i].Name) < strings.ToLower(entries[j].Name)
-	})
-
 	return entries, nil
 }
 
 func (s *Service) ReadMusicFile(path string) ([]byte, error) {
 	if path == "" {
 		return nil, errors.New("path is required")
+	}
+	if _, _, ok := media.ParseNeteaseCloudPath(path); ok {
+		return nil, errors.New("cloud track does not support direct file read")
 	}
 	if !media.IsAllowedAudio(path) {
 		return nil, errors.New("unsupported audio type")
@@ -100,4 +137,8 @@ func (s *Service) ReadMusicFile(path string) ([]byte, error) {
 	}
 
 	return os.ReadFile(absFile)
+}
+
+func (s *Service) ResolveNeteaseSongURL(songID int64) (string, error) {
+	return s.netease.ResolveSongURL(songID)
 }

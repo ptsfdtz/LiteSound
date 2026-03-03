@@ -21,6 +21,10 @@ export function GetMusicDir():Promise<string>;
 
 export function GetMusicDirs():Promise<Array<string>>;
 
+export function GetNeteaseConfig():Promise<state.NeteaseConfig>;
+
+export function GetPlaybackURL(arg1:string):Promise<string>;
+
 export function GetPlaylists():Promise<Array<state.Playlist>>;
 
 export function GetStreamBaseURL():Promise<string>;
@@ -46,6 +50,8 @@ export function SetLastPlayed(arg1:string):Promise<void>;
 export function SetMusicDir(arg1:string):Promise<string>;
 
 export function SetMusicDirs(arg1:Array<string>):Promise<Array<string>>;
+
+export function SetNeteaseConfig(arg1:state.NeteaseConfig):Promise<state.NeteaseConfig>;
 
 export function SetSystemVolume(arg1:number):Promise<number>;
 

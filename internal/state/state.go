@@ -3,6 +3,7 @@ package state
 import (
 	"encoding/json"
 	"errors"
+	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -20,16 +21,24 @@ type Playlist struct {
 	Tracks []string `json:"tracks"`
 }
 
+type NeteaseConfig struct {
+	Enabled    bool   `json:"enabled"`
+	APIBaseURL string `json:"apiBaseURL"`
+	Cookie     string `json:"cookie"`
+	Quality    string `json:"quality"`
+}
+
 type State struct {
-	LastPlayedPath string     `json:"lastPlayedPath"`
-	LastPlayedAt   int64      `json:"lastPlayedAt"`
-	ComposerFilter string     `json:"composerFilter"`
-	AlbumFilter    string     `json:"albumFilter"`
-	Theme          string     `json:"theme"`
-	MusicDir       string     `json:"musicDir"`
-	MusicDirs      []string   `json:"musicDirs"`
-	Playlists      []Playlist `json:"playlists"`
-	ActivePlaylist string     `json:"activePlaylist"`
+	LastPlayedPath string        `json:"lastPlayedPath"`
+	LastPlayedAt   int64         `json:"lastPlayedAt"`
+	ComposerFilter string        `json:"composerFilter"`
+	AlbumFilter    string        `json:"albumFilter"`
+	Theme          string        `json:"theme"`
+	MusicDir       string        `json:"musicDir"`
+	MusicDirs      []string      `json:"musicDirs"`
+	Playlists      []Playlist    `json:"playlists"`
+	ActivePlaylist string        `json:"activePlaylist"`
+	Netease        NeteaseConfig `json:"netease"`
 }
 
 type LastPlayedRecord struct {
@@ -120,6 +129,7 @@ func (s *Store) loadFromDisk() (State, error) {
 	if strings.TrimSpace(state.Theme) == "" {
 		state.Theme = "system"
 	}
+	state.Netease = normalizeNeteaseConfigOnLoad(state.Netease)
 	return state, nil
 }
 
@@ -270,6 +280,29 @@ func (s *Store) SetFilters(composer string, album string) error {
 	return err
 }
 
+func (s *Store) GetNeteaseConfig() (NeteaseConfig, error) {
+	state, err := s.Load()
+	if err != nil {
+		return NeteaseConfig{}, err
+	}
+	return state.Netease, nil
+}
+
+func (s *Store) SetNeteaseConfig(config NeteaseConfig) (NeteaseConfig, error) {
+	normalized, err := NormalizeNeteaseConfig(config)
+	if err != nil {
+		return NeteaseConfig{}, err
+	}
+	_, err = s.Update(func(state *State) error {
+		state.Netease = normalized
+		return nil
+	})
+	if err != nil {
+		return NeteaseConfig{}, err
+	}
+	return normalized, nil
+}
+
 func (s *Store) GetLastPlayed() (string, error) {
 	state, err := s.Load()
 	if err != nil {
@@ -296,25 +329,16 @@ func (s *Store) GetLastPlayedRecord() (LastPlayedRecord, error) {
 }
 
 func (s *Store) SetLastPlayed(path string) error {
-	if path == "" {
-		return errors.New("path is required")
-	}
-	if !media.IsAllowedAudio(path) {
-		return errors.New("unsupported audio type")
-	}
 	dirs, err := s.ResolveMusicDirs()
 	if err != nil {
 		return err
 	}
-	absFile, err := media.ResolveExistingPath(path)
+	normalizedPath, err := normalizeTrackPath(path, dirs)
 	if err != nil {
 		return err
 	}
-	if !media.IsPathWithinAnyDir(dirs, absFile) {
-		return errors.New("file not in music directory")
-	}
 	_, err = s.Update(func(state *State) error {
-		state.LastPlayedPath = absFile
+		state.LastPlayedPath = normalizedPath
 		state.LastPlayedAt = time.Now().UnixMilli()
 		return nil
 	})
@@ -413,33 +437,24 @@ func (s *Store) AddToPlaylist(name string, path string) error {
 	if name == "" {
 		return errors.New("playlist name is required")
 	}
-	if path == "" {
-		return errors.New("path is required")
-	}
-	if !media.IsAllowedAudio(path) {
-		return errors.New("unsupported audio type")
-	}
 	dirs, err := s.ResolveMusicDirs()
 	if err != nil {
 		return err
 	}
-	absFile, err := media.ResolveExistingPath(path)
+	normalizedPath, err := normalizeTrackPath(path, dirs)
 	if err != nil {
 		return err
-	}
-	if !media.IsPathWithinAnyDir(dirs, absFile) {
-		return errors.New("file not in music directory")
 	}
 
 	_, err = s.Update(func(state *State) error {
 		for i, playlist := range state.Playlists {
 			if strings.EqualFold(playlist.Name, name) {
 				for _, existing := range playlist.Tracks {
-					if strings.EqualFold(existing, absFile) {
+					if strings.EqualFold(existing, normalizedPath) {
 						return nil
 					}
 				}
-				state.Playlists[i].Tracks = append(state.Playlists[i].Tracks, absFile)
+				state.Playlists[i].Tracks = append(state.Playlists[i].Tracks, normalizedPath)
 				return nil
 			}
 		}
@@ -453,22 +468,13 @@ func (s *Store) RemoveFromPlaylist(name string, path string) error {
 	if name == "" {
 		return errors.New("playlist name is required")
 	}
-	if path == "" {
-		return errors.New("path is required")
-	}
-	if !media.IsAllowedAudio(path) {
-		return errors.New("unsupported audio type")
-	}
 	dirs, err := s.ResolveMusicDirs()
 	if err != nil {
 		return err
 	}
-	absFile, err := media.ResolveExistingPath(path)
+	normalizedPath, err := normalizeTrackPath(path, dirs)
 	if err != nil {
 		return err
-	}
-	if !media.IsPathWithinAnyDir(dirs, absFile) {
-		return errors.New("file not in music directory")
 	}
 
 	_, err = s.Update(func(state *State) error {
@@ -477,7 +483,7 @@ func (s *Store) RemoveFromPlaylist(name string, path string) error {
 				updated := make([]string, 0, len(playlist.Tracks))
 				removed := false
 				for _, existing := range playlist.Tracks {
-					if strings.EqualFold(existing, absFile) {
+					if strings.EqualFold(existing, normalizedPath) {
 						removed = true
 						continue
 					}
@@ -540,4 +546,90 @@ func ensureFavoritesPlaylist(state *State) {
 		}
 	}
 	state.Playlists = append([]Playlist{{Name: FavoritesKey, Tracks: []string{}}}, state.Playlists...)
+}
+
+func normalizeTrackPath(trackPath string, dirs []string) (string, error) {
+	trimmedPath := strings.TrimSpace(trackPath)
+	if trimmedPath == "" {
+		return "", errors.New("path is required")
+	}
+
+	if songID, ext, ok := media.ParseNeteaseCloudPath(trimmedPath); ok {
+		if _, allowed := media.AllowedAudioExt[ext]; !allowed {
+			return "", errors.New("unsupported audio type")
+		}
+		return media.BuildNeteaseCloudPath(songID, ext), nil
+	}
+
+	if !media.IsAllowedAudio(trimmedPath) {
+		return "", errors.New("unsupported audio type")
+	}
+	absFile, err := media.ResolveExistingPath(trimmedPath)
+	if err != nil {
+		return "", err
+	}
+	if !media.IsPathWithinAnyDir(dirs, absFile) {
+		return "", errors.New("file not in music directory")
+	}
+	return absFile, nil
+}
+
+func normalizeNeteaseConfigOnLoad(config NeteaseConfig) NeteaseConfig {
+	normalized, err := NormalizeNeteaseConfig(config)
+	if err == nil {
+		return normalized
+	}
+	// Keep user-provided enable/cookie values but recover to safe defaults.
+	fallback := defaultNeteaseConfig()
+	fallback.Enabled = config.Enabled
+	fallback.Cookie = strings.TrimSpace(config.Cookie)
+	return fallback
+}
+
+func defaultNeteaseConfig() NeteaseConfig {
+	return NeteaseConfig{
+		Enabled:    false,
+		APIBaseURL: media.DefaultNeteaseAPIBaseURL,
+		Cookie:     "",
+		Quality:    "exhigh",
+	}
+}
+
+func NormalizeNeteaseConfig(config NeteaseConfig) (NeteaseConfig, error) {
+	normalized := config
+	apiBaseURL := strings.TrimSpace(config.APIBaseURL)
+	if apiBaseURL == "" {
+		apiBaseURL = media.DefaultNeteaseAPIBaseURL
+	}
+	parsedURL, err := url.Parse(apiBaseURL)
+	if err != nil {
+		return NeteaseConfig{}, errors.New("invalid netease api url")
+	}
+	if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
+		return NeteaseConfig{}, errors.New("netease api url must start with http or https")
+	}
+	if strings.TrimSpace(parsedURL.Host) == "" {
+		return NeteaseConfig{}, errors.New("invalid netease api url")
+	}
+	parsedURL.RawQuery = ""
+	parsedURL.Fragment = ""
+	apiBaseURL = strings.TrimRight(parsedURL.String(), "/")
+	if apiBaseURL == "" {
+		return NeteaseConfig{}, errors.New("invalid netease api url")
+	}
+
+	quality := strings.ToLower(strings.TrimSpace(config.Quality))
+	if quality == "" {
+		quality = "exhigh"
+	}
+	switch quality {
+	case "standard", "higher", "exhigh", "lossless", "hires", "jyeffect", "sky", "jymaster":
+	default:
+		return NeteaseConfig{}, errors.New("invalid netease quality level")
+	}
+
+	normalized.APIBaseURL = apiBaseURL
+	normalized.Cookie = strings.TrimSpace(config.Cookie)
+	normalized.Quality = quality
+	return normalized, nil
 }

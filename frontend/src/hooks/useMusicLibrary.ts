@@ -1,8 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/services/api';
-import type { MusicFile } from '@/types/media';
+import type { MusicFile, NeteaseConfig } from '@/types/media';
 import { useI18n } from '@/locales';
 import { toast } from 'sonner';
+
+const defaultNeteaseConfig: NeteaseConfig = {
+  enabled: false,
+  apiBaseURL: 'http://127.0.0.1:3000',
+  cookie: '',
+  quality: 'exhigh',
+};
 
 export function useMusicLibrary() {
   const { t } = useI18n();
@@ -15,11 +22,18 @@ export function useMusicLibrary() {
   const [trackQuery, setTrackQuery] = useState('');
   const [lastPlayedPath, setLastPlayedPath] = useState('');
   const [lastPlayedAt, setLastPlayedAt] = useState(0);
+  const [neteaseConfig, setNeteaseConfig] = useState<NeteaseConfig>(defaultNeteaseConfig);
 
   useEffect(() => {
     let mounted = true;
-    Promise.all([api.getMusicDirs(), api.listMusicFiles(), api.getLastPlayedRecord(), api.getFilters()])
-      .then(([dirs, list, lastPlayed, filters]) => {
+    Promise.all([
+      api.getMusicDirs(),
+      api.listMusicFiles(),
+      api.getLastPlayedRecord(),
+      api.getFilters(),
+      api.getNeteaseConfig(),
+    ])
+      .then(([dirs, list, lastPlayed, filters, netease]) => {
         if (!mounted) return;
         setMusicDirs(dirs);
         setMusicDir(dirs[0] ?? '');
@@ -33,6 +47,14 @@ export function useMusicLibrary() {
         }
         if (savedAlbum) {
           setAlbumFilter(savedAlbum);
+        }
+        if (netease) {
+          setNeteaseConfig({
+            enabled: Boolean(netease.enabled),
+            apiBaseURL: netease.apiBaseURL || defaultNeteaseConfig.apiBaseURL,
+            cookie: netease.cookie || '',
+            quality: netease.quality || defaultNeteaseConfig.quality,
+          });
         }
       })
       .catch((err) => {
@@ -72,6 +94,24 @@ export function useMusicLibrary() {
       await refresh();
     } catch (err: any) {
       const message = err?.message ?? t('status.failedUpdateDir');
+      setStatus(message);
+      toast.error(message);
+    }
+  };
+
+  const updateNeteaseConfig = async (config: NeteaseConfig) => {
+    setStatus(t('status.updatingNetease'));
+    try {
+      const next = await api.setNeteaseConfig(config);
+      setNeteaseConfig({
+        enabled: Boolean(next.enabled),
+        apiBaseURL: next.apiBaseURL || defaultNeteaseConfig.apiBaseURL,
+        cookie: next.cookie || '',
+        quality: next.quality || defaultNeteaseConfig.quality,
+      });
+      await refresh();
+    } catch (err: any) {
+      const message = err?.message ?? t('status.failedUpdateNetease');
       setStatus(message);
       toast.error(message);
     }
@@ -126,7 +166,9 @@ export function useMusicLibrary() {
     trackQuery,
     setTrackQuery,
     lastPlayedPath,
+    neteaseConfig,
     updateMusicDirs,
+    updateNeteaseConfig,
     refresh,
     composers,
     albums,

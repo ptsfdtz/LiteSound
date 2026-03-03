@@ -24,7 +24,9 @@ function App() {
     composers,
     albums,
     lastPlayedPath,
+    neteaseConfig,
     updateMusicDirs,
+    updateNeteaseConfig,
     refresh,
   } = useMusicLibrary();
 
@@ -84,6 +86,8 @@ function App() {
         musicDir={musicDir}
         musicDirs={musicDirs}
         onSetMusicDirs={updateMusicDirs}
+        neteaseConfig={neteaseConfig}
+        onSetNeteaseConfig={updateNeteaseConfig}
         theme={theme}
         onSetTheme={setTheme}
       />
