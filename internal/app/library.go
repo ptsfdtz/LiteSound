@@ -1,6 +1,10 @@
 package app
 
 import (
+	"errors"
+	"net/url"
+	"strings"
+
 	"LiteSound/internal/media"
 )
 
@@ -48,4 +52,25 @@ func (a *App) ReadMusicFile(path string) ([]byte, error) {
 		return nil, nil
 	}
 	return a.library.ReadMusicFile(path)
+}
+
+func (a *App) GetPlaybackURL(path string) (string, error) {
+	if a.library == nil {
+		return "", errors.New("library unavailable")
+	}
+	if songID, _, ok := media.ParseNeteaseCloudPath(path); ok {
+		return a.library.ResolveNeteaseSongURL(songID)
+	}
+	if strings.TrimSpace(a.streamBaseURL) == "" {
+		return "", errors.New("stream server unavailable")
+	}
+	baseURL, err := url.Parse(a.streamBaseURL)
+	if err != nil {
+		return "", err
+	}
+	baseURL.Path = "/media"
+	query := baseURL.Query()
+	query.Set("path", path)
+	baseURL.RawQuery = query.Encode()
+	return baseURL.String(), nil
 }

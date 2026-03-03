@@ -1,5 +1,6 @@
 import {
   FaAdjust,
+  FaCloud,
   FaCog,
   FaFolderOpen,
   FaGlobe,
@@ -27,27 +28,45 @@ import appIcon from '@/assets/appicon.svg';
 import type { ThemeMode } from '@/hooks/useTheme';
 import { useI18n } from '@/locales';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import type { NeteaseConfig } from '@/types/media';
 
 type HeaderBarProps = {
   title: string;
   onRefresh: () => void;
   musicDir: string;
   musicDirs: string[];
-  onSetMusicDirs: (paths: string[]) => void;
+  onSetMusicDirs: (paths: string[]) => void | Promise<void>;
+  neteaseConfig: NeteaseConfig;
+  onSetNeteaseConfig: (config: NeteaseConfig) => void | Promise<void>;
   theme: ThemeMode;
   onSetTheme: (theme: ThemeMode) => void;
 };
 
 export function HeaderBar(props: HeaderBarProps) {
-  const { title, onRefresh, musicDir, musicDirs, onSetMusicDirs, theme, onSetTheme } = props;
+  const {
+    title,
+    onRefresh,
+    musicDir,
+    musicDirs,
+    onSetMusicDirs,
+    neteaseConfig,
+    onSetNeteaseConfig,
+    theme,
+    onSetTheme,
+  } = props;
   const { locale, setLocale, t } = useI18n();
   const [isMaximised, setIsMaximised] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isNeteaseOpen, setIsNeteaseOpen] = useState(false);
   const [dirValue, setDirValue] = useState(musicDir);
   const [dirs, setDirs] = useState<string[]>(musicDirs);
+  const [neteaseEnabled, setNeteaseEnabled] = useState(neteaseConfig.enabled);
+  const [neteaseAPIBaseURL, setNeteaseAPIBaseURL] = useState(neteaseConfig.apiBaseURL);
+  const [neteaseCookie, setNeteaseCookie] = useState(neteaseConfig.cookie);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
@@ -107,6 +126,13 @@ export function HeaderBar(props: HeaderBarProps) {
     setIsSettingsOpen(true);
   };
 
+  const openNeteaseSettings = () => {
+    setNeteaseEnabled(neteaseConfig.enabled);
+    setNeteaseAPIBaseURL(neteaseConfig.apiBaseURL);
+    setNeteaseCookie(neteaseConfig.cookie);
+    setIsNeteaseOpen(true);
+  };
+
   const addDir = (path: string) => {
     const trimmed = path.trim();
     if (!trimmed) {
@@ -133,12 +159,32 @@ export function HeaderBar(props: HeaderBarProps) {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const pending = dirValue.trim();
     const combined = pending ? [...dirs, pending] : dirs;
     const cleaned = combined.map((dir) => dir.trim()).filter(Boolean);
-    onSetMusicDirs(cleaned);
-    setIsSettingsOpen(false);
+    try {
+      await Promise.resolve(onSetMusicDirs(cleaned));
+      setIsSettingsOpen(false);
+    } catch {
+      // Errors are surfaced by hooks using status/toast.
+    }
+  };
+
+  const handleSaveNetease = async () => {
+    try {
+      await Promise.resolve(
+        onSetNeteaseConfig({
+          enabled: neteaseEnabled,
+          apiBaseURL: neteaseAPIBaseURL,
+          cookie: neteaseCookie,
+          quality: neteaseConfig.quality || 'exhigh',
+        }),
+      );
+      setIsNeteaseOpen(false);
+    } catch {
+      // Errors are surfaced by hooks using status/toast.
+    }
   };
 
   const handleRefresh = async () => {
@@ -182,6 +228,16 @@ export function HeaderBar(props: HeaderBarProps) {
         className="flex items-center gap-3"
         style={{ '--wails-draggable': 'no-drag' } as CSSProperties}
       >
+        <Button
+          variant="secondary"
+          size="icon"
+          className="h-9 w-9 rounded-[10px]"
+          aria-label={t('settings.neteaseSection')}
+          title={t('settings.neteaseSection')}
+          onClick={openNeteaseSettings}
+        >
+          <FaCloud />
+        </Button>
         <Button
           variant="secondary"
           size="icon"
@@ -386,13 +442,54 @@ export function HeaderBar(props: HeaderBarProps) {
                   variant="secondary"
                   size="icon"
                   className="h-9 w-9 rounded-[10px]"
-                  onClick={handleSave}
+                  onClick={() => {
+                    void handleSave();
+                  }}
                   aria-label={t('settings.save')}
                   title={t('settings.save')}
                 >
                   <FaSave />
                 </Button>
               </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isNeteaseOpen} onOpenChange={setIsNeteaseOpen}>
+        <DialogContent className="max-w-[560px] rounded-[18px] border border-border bg-card p-5 shadow-[0_20px_40px_var(--panel-glow)]">
+          <DialogHeader>
+            <DialogTitle>{t('settings.neteaseSection')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <FaCloud /> {t('settings.neteaseSection')}
+              </div>
+              <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+                <Checkbox
+                  checked={neteaseEnabled}
+                  onCheckedChange={(checked) => setNeteaseEnabled(checked === true)}
+                />
+                <span>{t('settings.neteaseEnabled')}</span>
+              </label>
+            </div>
+            <Input
+              value={neteaseAPIBaseURL}
+              onChange={(event) => setNeteaseAPIBaseURL(event.target.value)}
+              placeholder={t('settings.neteaseApiPlaceholder')}
+            />
+            <Input
+              value={neteaseCookie}
+              onChange={(event) => setNeteaseCookie(event.target.value)}
+              placeholder={t('settings.neteaseCookiePlaceholder')}
+            />
+            <div className="text-xs text-muted-foreground">{t('settings.neteaseHint')}</div>
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <Button variant="secondary" onClick={() => setIsNeteaseOpen(false)}>
+                {t('playlist.cancel')}
+              </Button>
+              <Button onClick={() => void handleSaveNetease()}>{t('settings.save')}</Button>
             </div>
           </div>
         </DialogContent>

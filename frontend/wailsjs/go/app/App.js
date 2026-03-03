@@ -38,6 +38,14 @@ export function GetMusicDirs() {
   return window['go']['app']['App']['GetMusicDirs']();
 }
 
+export function GetNeteaseConfig() {
+  return window['go']['app']['App']['GetNeteaseConfig']();
+}
+
+export function GetPlaybackURL(arg1) {
+  return window['go']['app']['App']['GetPlaybackURL'](arg1);
+}
+
 export function GetPlaylists() {
   return window['go']['app']['App']['GetPlaylists']();
 }
@@ -88,6 +96,10 @@ export function SetMusicDir(arg1) {
 
 export function SetMusicDirs(arg1) {
   return window['go']['app']['App']['SetMusicDirs'](arg1);
+}
+
+export function SetNeteaseConfig(arg1) {
+  return window['go']['app']['App']['SetNeteaseConfig'](arg1);
 }
 
 export function SetSystemVolume(arg1) {

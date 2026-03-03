@@ -12,3 +12,10 @@ export type Playlist = {
 };
 
 export type PlayMode = 'order' | 'repeat' | 'shuffle';
+
+export type NeteaseConfig = {
+  enabled: boolean;
+  apiBaseURL: string;
+  cookie: string;
+  quality: string;
+};
